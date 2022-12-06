@@ -12,7 +12,8 @@ and library files into C:\mlpack\.
 
  * Armadillo: https://mlpack.org/files/armadillo-11.4.1.tar.gz
    Download the .tar.gz, and extract it into C:\mlpack\armadillo-11.4.1\; note
-   that you may need to use a program such as 7Zip ( ) to unpack this archive.
+   that you may need to use a program such as 7Zip (https://www.7-zip.org/) to
+   unpack this archive.
 
  * Cereal: https://github.com/USCiLab/cereal/archive/refs/tags/v1.3.2.zip
    Download the .zip, and extract it into C:\mlpack\cereal-1.3.2\
@@ -20,15 +21,15 @@ and library files into C:\mlpack\.
  * ensmallen: https://ensmallen.org/files/ensmallen-2.19.0.tar.gz
    Download the .tar.gz, and extract it into C:\mlpack\ensmallen-2.19.0\
 
-Now, install mlpack into C:\mlpack\mlpack-3.4.2\.  If you downloaded the mlpack
+Now, install mlpack into C:\mlpack\mlpack-4.0.0\.  If you downloaded the mlpack
 source, you can either use the Windows build guide (see
 doc/user/build_windows.md) to build and install, or, since mlpack is
-header-only, copy the src/ directory to C:\mlpack\mlpack-3.4.2\ and rename it
-"include" (so there will now be a directory C:\mlpack\mlpack-3.4.2\include\,
+header-only, copy the src/ directory to C:\mlpack\mlpack-4.0.0\ and rename it
+"include" (so there will now be a directory C:\mlpack\mlpack-4.0.0\include\,
 which contains only base.hpp and the mlpack/ subdirectory).
 
 Alternately, if you downloaded the Windows MSI installer, you can install to
-C:\mlpack\mlpack-3.4.2\.
+C:\mlpack\mlpack-4.0.0\.
 
 Once all of that setup is done, the example should compile as-is.
 
