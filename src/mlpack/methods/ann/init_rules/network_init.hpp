@@ -46,7 +46,7 @@ class NetworkInitialization
    *
    * @param network Network that should be initialized.
    * @param parameter The network parameter.
-   * @param parameterOffset Offset for network paramater, default 0.
+   * @param parameterOffset Offset for network parameter, default 0.
    */
   template <typename eT>
   void Initialize(const std::vector<Layer<arma::Mat<eT>>*>& network,

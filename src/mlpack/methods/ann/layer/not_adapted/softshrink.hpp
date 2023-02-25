@@ -94,7 +94,7 @@ class SoftShrinkType : public Layer<InputType, OutputType>
   void serialize(Archive& ar, const uint32_t /* version */);
 
  private:
-  //! Locally-stored hyperparamater lambda.
+  //! Locally-stored hyperparameter lambda.
   double lambda;
 }; // class SoftShrinkType
 
