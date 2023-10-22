@@ -20,7 +20,7 @@ namespace mlpack {
  * QUIC-SVD is a matrix factorization technique, which operates in a subspace
  * such that A's approximation in that subspace has minimum error(A being the
  * data matrix). The subspace is constructed using a cosine tree, which ensures
- * minimum representative rank(and thus a fast running time). It follows a
+ * minimum representative rank (and thus a fast running time). It follows a
  * splitting policy based on Length-squared(LS) sampling and constructs the
  * child nodes based on the absolute cosines of the remaining points relative to
  * the pivot. The centroids of the points in the child nodes are added to the
