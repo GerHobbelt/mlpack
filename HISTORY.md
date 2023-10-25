@@ -1,5 +1,8 @@
 ### mlpack ?.?.?
 ###### ????-??-??
+
+### mlpack 4.0.1
+###### 2022-12-23
   * Fix mapping of categorical data for Julia bindings (#3305).
 
   * Bugfix: catch all exceptions when running bindings from Julia, instead of
@@ -20,6 +23,11 @@
 
   * Fix handling of transposed matrix parameters in Python, Julia, R, and Go
     bindings (#3327).
+
+  * Comment out definition of ARMA_NO DEBUG. This allows various Armadillo
+    run-time checks such as non-conforming matrices and out-of-bounds
+    element access. In turn this helps tracking down bugs and incorrect
+    usage (#3322).
 
 ### mlpack 4.0.0
 ###### 2022-10-23
