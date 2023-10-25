@@ -293,7 +293,7 @@ f.Search(5, indices, products);
 In this setting we have both a query and reference dataset.  We search for 10
 maximum kernels.
 
-```
+```c++
 #include <mlpack.hpp>
 
 using namespace mlpack::fastmks;
