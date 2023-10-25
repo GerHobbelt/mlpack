@@ -105,10 +105,9 @@ Citations are beneficial for the growth and improvement of mlpack.
 
 **mlpack** requires the following additional dependencies:
  - C++14 compiler
- - [Armadillo](https://arma.sourceforge.net/docs.html)      &nbsp;&emsp;>= 9.800
+ - [Armadillo](https://arma.sourceforge.net)      &nbsp;&emsp;>= 9.800
  - [ensmallen](https://ensmallen.org)      &emsp;>= 2.10.0
- - [cereal](http://uscilab.github.io/cereal/)         &ensp;&nbsp;
-&emsp;&emsp;>= 1.1.2
+ - [cereal](http://uscilab.github.io/cereal/)         &ensp;&nbsp;&emsp;&emsp;>= 1.1.2
 
 If the STB library headers are available, image loading support will be
 available.
@@ -120,7 +119,7 @@ If you are compiling Armadillo by hand, ensure that LAPACK and BLAS are enabled.
 *See also the [C++ quickstart](doc/quickstart/cpp.md).*
 
 Since mlpack is a header-only library, installing just the headers for use in a
-C++ application is trivial. However, should an error occurs due to uninstalled dependencies, take a look at [Section 3.1](#31-additional-build-options) for this particular error and more.
+C++ application is trivial. 
 
 From the root of the sources, configure and install
 in the standard CMake way:
@@ -131,8 +130,14 @@ cmake ..
 sudo make install
 ```
 
-Note: Since CMake v3.14.0 the `cmake` command can create the build folder itself.
-The above commands can be rewritten as follows:
+If the `cmake ..` command fails due to unavailable dependencies, consider either using the
+`-DDOWNLOAD_DEPENDENCIES=ON` option as detailed in
+[the following subsection](#31-additional-build-options), or ensure that mlpack's dependencies
+are installed, e.g. using the system package manager.  For example, on Debian and Ubuntu,
+all relevant dependencies can be installed with `sudo apt-get install libarmadillo-dev libensmallen-dev libcereal-dev g++ cmake`.
+
+Alternatively, since CMake v3.14.0 the `cmake` command can create the build folder itself,
+the above commands can be rewritten as follows:
 
 ```sh
 cmake -S . -B build
@@ -176,7 +181,7 @@ See the [C++ quickstart](doc/quickstart/cpp.md) and the
 [examples](https://github.com/mlpack/examples) repository for some examples of
 mlpack applications in C++, with corresponding `Makefile`s.
 
-### 3.2. Improving compile time
+### 3.2. Reducing compile time
 
 mlpack is a template-heavy library, and if care is not used, compilation time of
 a project can be increased greatly.  Fortunately, there are a number of ways to
