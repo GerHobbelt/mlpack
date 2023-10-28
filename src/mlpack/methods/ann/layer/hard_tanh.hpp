@@ -1,6 +1,7 @@
 /**
  * @file methods/ann/layer/hard_tanh.hpp
  * @author Dhawal Arora
+ * @author Vaibhav Pathak
  *
  * Definition and implementation of the HardTanH layer.
  *
@@ -44,8 +45,8 @@ namespace mlpack {
  *    to also be in this type. The type also allows the computation and weight
  *    type to differ from the input type (Default: arma::mat).
  */
-template <typename InputType = arma::mat, typename OutputType = arma::mat>
-class HardTanHType : public Layer<InputType, OutputType>
+template <typename MatType = arma::mat>
+class HardTanHType : public Layer<MatType>
 {
  public:
   /**
@@ -68,7 +69,7 @@ class HardTanHType : public Layer<InputType, OutputType>
    * @param input Input data used for evaluating the specified function.
    * @param output Resulting output activation.
    */
-  void Forward(const InputType& input, OutputType& output);
+  void Forward(const MatType& input, MatType& output);
 
   /**
    * Ordinary feed backward pass of a neural network, calculating the function
@@ -79,7 +80,7 @@ class HardTanHType : public Layer<InputType, OutputType>
    * @param gy The backpropagated error.
    * @param g The calculated gradient.
    */
-  void Backward(const InputType& input, const OutputType& gy, OutputType& g);
+  void Backward(const MatType& input, const MatType& gy, MatType& g);
 
   //! Get the maximum value.
   double const& MaxValue() const { return maxValue; }
@@ -108,7 +109,7 @@ class HardTanHType : public Layer<InputType, OutputType>
 // Convenience typedefs.
 
 // Standard HardTanH layer.
-typedef HardTanHType<arma::mat, arma::mat> HardTanH;
+typedef HardTanHType<arma::mat> HardTanH;
 
 } // namespace mlpack
 
