@@ -1,6 +1,9 @@
 ### mlpack ?.?.?
 ###### ????-??-??
-
+  * Reinforcement Learning: Ornstein-Uhlenbeck noise (#3499).
+  
+  * Reinforcement Learning: Deep Deterministic Policy Gradient (#3494).
+  
 ### mlpack 4.2.0
 ###### 2023-06-14
   * Adapt C_ReLU, ReLU6, FlexibleReLU layer for new neural network API (#3445).

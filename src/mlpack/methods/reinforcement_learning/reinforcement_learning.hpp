@@ -17,10 +17,12 @@
 #include "q_networks/q_networks.hpp"
 #include "replay/replay.hpp"
 #include "worker/worker.hpp"
+#include "noise/noise.hpp"
 
 #include "training_config.hpp"
 #include "async_learning.hpp"
 #include "q_learning.hpp"
 #include "sac.hpp"
+#include "ddpg.hpp"
 
 #endif
