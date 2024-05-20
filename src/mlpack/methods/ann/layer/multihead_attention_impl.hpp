@@ -20,79 +20,75 @@
 
 namespace mlpack {
 
-template <typename InputType, typename OutputType, typename RegularizerType>
-MultiheadAttentionType<InputType, OutputType, RegularizerType>::
+template <typename MatType, typename RegularizerType>
+MultiheadAttentionType<MatType, RegularizerType>::
 MultiheadAttentionType() :
     tgtSeqLen(0),
     srcSeqLen(0),
     embedDim(0),
     numHeads(0),
     headDim(0),
-    attnMask(InputType()),
-    keyPaddingMask(InputType())
+    selfAttention(false)
 {
   // Nothing to do here.
 }
 
-template <typename InputType, typename OutputType, typename RegularizerType>
-MultiheadAttentionType<InputType, OutputType, RegularizerType>::
+template <typename MatType, typename RegularizerType>
+MultiheadAttentionType<MatType, RegularizerType>::
 MultiheadAttentionType(
     const size_t tgtSeqLen,
-    const size_t srcSeqLen,
-    const size_t embedDim,
     const size_t numHeads,
-    const InputType& attnMask,
-    const InputType& keyPaddingMask) :
+    const bool selfAttention) :
     tgtSeqLen(tgtSeqLen),
-    srcSeqLen(srcSeqLen),
-    embedDim(embedDim),
+    srcSeqLen(0),
+    embedDim(0),
     numHeads(numHeads),
-    attnMask(attnMask),
-    keyPaddingMask(keyPaddingMask)
+    selfAttention(selfAttention)
 {
-  if (embedDim % numHeads != 0)
-  {
-    Log::Fatal << "Embedding dimension must be divisible by number of \
-        attention heads." << std::endl;
-  }
-
-  headDim = embedDim / numHeads;
 }
 
-template <typename InputType, typename OutputType, typename RegularizerType>
-void MultiheadAttentionType<InputType, OutputType, RegularizerType>::SetWeights(
-    typename OutputType::elem_type* weightsPtr)
+template <typename MatType, typename RegularizerType>
+void MultiheadAttentionType<MatType, RegularizerType>::SetWeights(
+    typename MatType::elem_type* weightsPtr)
 {
-  weights = OutputType(weightsPtr, 1, (4 * embedDim + 4) * embedDim, false,
+  weights = MatType(weightsPtr, (4 * embedDim + 4) * embedDim, 1, false,
       true);
 
-  queryWt = OutputType(weightsPtr, embedDim, embedDim, false, true);
-  keyWt = OutputType(weightsPtr + embedDim * embedDim, embedDim, embedDim,
+  queryWt = MatType(weightsPtr, embedDim, embedDim, false, true);
+  keyWt = MatType(weightsPtr + embedDim * embedDim, embedDim, embedDim,
       false, true);
-  valueWt = OutputType(weightsPtr + 2 * embedDim * embedDim, embedDim, embedDim,
+  valueWt = MatType(weightsPtr + 2 * embedDim * embedDim, embedDim, embedDim,
       false, true);
-  outWt = OutputType(weightsPtr + 3 * embedDim * embedDim, embedDim, embedDim,
+  outWt = MatType(weightsPtr + 3 * embedDim * embedDim, embedDim, embedDim,
       false, true);
 
-  qBias = OutputType(weightsPtr + 4 * embedDim * embedDim, embedDim, 1, false,
+  qBias = MatType(weightsPtr + 4 * embedDim * embedDim, embedDim, 1, false,
       true);
-  kBias = OutputType(weightsPtr + (4 * embedDim + 1) * embedDim, embedDim, 1,
+  kBias = MatType(weightsPtr + (4 * embedDim + 1) * embedDim, embedDim, 1,
       false, true);
-  vBias = OutputType(weightsPtr + (4 * embedDim + 2) * embedDim, embedDim, 1,
+  vBias = MatType(weightsPtr + (4 * embedDim + 2) * embedDim, embedDim, 1,
       false, true);
-  outBias = OutputType(weightsPtr + (4 * embedDim + 3) * embedDim, 1, embedDim,
+  outBias = MatType(weightsPtr + (4 * embedDim + 3) * embedDim, 1, embedDim,
       false, true);
 }
 
-template <typename InputType, typename OutputType, typename RegularizerType>
-void MultiheadAttentionType<InputType, OutputType, RegularizerType>::
-Forward(const InputType& input, OutputType& output)
+template <typename MatType, typename RegularizerType>
+void MultiheadAttentionType<MatType, RegularizerType>::
+Forward(const MatType& input, MatType& output)
 {
-  typedef typename arma::Cube<typename InputType::elem_type> CubeType;
+  typedef typename arma::Cube<typename MatType::elem_type> CubeType;
 
-  if (input.n_rows != embedDim * (tgtSeqLen + 2 * srcSeqLen))
+  if (input.n_rows != embedDim *
+      (selfAttention ? srcSeqLen : (tgtSeqLen + 2 * srcSeqLen)))
   {
     Log::Fatal << "Incorrect input dimensions!" << std::endl;
+  }
+
+  if (selfAttention && tgtSeqLen != srcSeqLen)
+  {
+    Log::Fatal << "Target sequence length (" << tgtSeqLen << ") and source "
+        << "sequence length (" << srcSeqLen << ") must match when using "
+        << "self-attention!" << std::endl;
   }
 
   const size_t batchSize = input.n_cols;
@@ -104,13 +100,13 @@ Forward(const InputType& input, OutputType& output)
   // The shape of q : (embedDim, tgtSeqLen, batchSize).
   // The shape of k : (embedDim, srcSeqLen, batchSize).
   // The shape of v : (embedDim, srcSeqLen, batchSize).
-  const CubeType q(const_cast<InputType&>(input).memptr(),
+  const CubeType q(const_cast<MatType&>(input).memptr(),
       embedDim, tgtSeqLen, batchSize, false, false);
-  const CubeType k(const_cast<InputType&>(input).memptr() +
-      embedDim * tgtSeqLen * batchSize,
+  const CubeType k(const_cast<MatType&>(input).memptr() +
+      (selfAttention ? 0 : embedDim * tgtSeqLen * batchSize),
       embedDim, srcSeqLen, batchSize, false, false);
-  const CubeType v(const_cast<InputType&>(input).memptr() +
-      embedDim * (tgtSeqLen + srcSeqLen) * batchSize,
+  const CubeType v(const_cast<MatType&>(input).memptr() +
+      (selfAttention ? 0 : embedDim * (tgtSeqLen + srcSeqLen) * batchSize),
       embedDim, srcSeqLen, batchSize, false, false);
 
   // qProj, kProj, and vProj are the linearly projected query, key and value
@@ -145,30 +141,45 @@ Forward(const InputType& input, OutputType& output)
 
   // Apply the attention mask if provided. The attention mask is used to black-
   // out future sequences and generally used in Encoder-Decoder attention.
-  // The attention mask has elements 0 or -infinity.
+  // The attention mask has elements 0 or 1.
   // The shape of the attention mask : (tgtSeqLen, srcSeqLen).
   if (!attnMask.is_empty())
   {
     if (attnMask.n_rows != tgtSeqLen || attnMask.n_cols != srcSeqLen)
       Log::Fatal << "The size of the 'attn_mask' is not correct.\n";
-    scores.each_slice() += attnMask;
+    // not sure if there is a better way to do this.  now that the mask
+    // is 0 or 1, we can't simply add, but converting first seems slow
+    const arma::uword rows = tgtSeqLen;
+    const arma::uword cols = srcSeqLen;
+    for (arma::uword i=0; i<rows; i++) {
+      for (arma::uword j=0; j<cols; j++) {
+        if (attnMask.at(i, j) == 0) {
+          scores.tube(i, j).fill(-INFINITY);
+        }
+      }
+    }
   }
 
   // Apply the key padding mask when provided. It blacks-out any particular
   // word in the sequence.
-  // The key padding mask has elements 0 or -infinity.
+  // The key padding mask has elements 0 or 1.
   // The shape of keyPaddingMask : (1, srcSeqLen).
   if (!keyPaddingMask.is_empty())
   {
     if (keyPaddingMask.n_rows != 1 || keyPaddingMask.n_cols != srcSeqLen)
         Log::Fatal << "The size of the 'keyPaddingMask' is not correct.\n";
-    scores.each_slice() += arma::repmat(keyPaddingMask, tgtSeqLen, 1);
+    // not sure if there is a better way to do this.  now that the mask
+    // is 0 or 1, we can't simply add, but converting first seems slow
+    for (arma::uword pos=0; pos<keyPaddingMask.n_elem; pos++) {
+      if (keyPaddingMask.at(pos) == 0) {
+        scores.tube(0, pos, tgtSeqLen, pos).fill(-INFINITY);
+      }
+    }
   }
 
   for (size_t i = 0; i < numHeads * batchSize; ++i)
   {
-    softmax.Forward(scores.slice(i), softmax.OutputParameter());
-    scores.slice(i) = softmax.OutputParameter();
+    softmax.Forward(scores.slice(i), scores.slice(i));
   }
 
   // Calculate the attention output i.e. matrix multiplication of softmax
@@ -188,13 +199,14 @@ Forward(const InputType& input, OutputType& output)
   }
 }
 
-template <typename InputType, typename OutputType, typename RegularizerType>
-void MultiheadAttentionType<InputType, OutputType, RegularizerType>::
-Backward(const InputType& /* input */,
-         const OutputType& gy,
-         OutputType& g)
+template <typename MatType, typename RegularizerType>
+void MultiheadAttentionType<MatType, RegularizerType>::
+Backward(const MatType& /* input */,
+         const MatType& /* output */,
+         const MatType& gy,
+         MatType& g)
 {
-  typedef typename arma::Cube<typename OutputType::elem_type> CubeType;
+  typedef typename arma::Cube<typename MatType::elem_type> CubeType;
 
   if (gy.n_rows != tgtSeqLen * embedDim)
   {
@@ -202,13 +214,14 @@ Backward(const InputType& /* input */,
   }
 
   const size_t batchSize = gy.n_cols;
-  g.set_size(embedDim * (tgtSeqLen + 2 * srcSeqLen), batchSize);
+  g.set_size(selfAttention ? (embedDim * srcSeqLen) :
+      embedDim * (tgtSeqLen + 2 * srcSeqLen), batchSize);
 
   // Reshape the propagated gradient into a cube.
   // The shape of gyTemp : (tgtSeqLen, embedDim, batchSize).
   // We need not split it into n heads now because this is the part when
   // output were concatenated from n heads.
-  CubeType gyTemp(const_cast<OutputType&>(gy).memptr(), embedDim,
+  CubeType gyTemp(const_cast<MatType&>(gy).memptr(), embedDim,
       tgtSeqLen, batchSize, true, false);
 
   // The shape of gyTemp : (embedDim, tgtSeqLen, batchSize).
@@ -232,8 +245,16 @@ Backward(const InputType& /* input */,
 
   for (size_t i = 0; i < batchSize; ++i)
   {
-    g.submat((tgtSeqLen + srcSeqLen) * embedDim, i, g.n_rows - 1, i)
-        = arma::vectorise(arma::trans(tmp.slice(i) * valueWt));
+    if (selfAttention)
+    {
+      g.submat(0, i, g.n_rows - 1, i) =
+          arma::vectorise(arma::trans(tmp.slice(i) * valueWt));
+    }
+    else
+    {
+      g.submat((tgtSeqLen + srcSeqLen) * embedDim, i, g.n_rows - 1, i) =
+          arma::vectorise(arma::trans(tmp.slice(i) * valueWt));
+    }
   }
 
   // The shape of gyTemp : (tgtSeqLen, headDim, numHeads * batchSize).
@@ -244,7 +265,7 @@ Backward(const InputType& /* input */,
   for (size_t i = 0; i < numHeads * batchSize; ++i)
   {
     // We will perform backpropagation of softmax over each slice of gyTemp.
-    softmax.Backward(scores.slice(i), gyTemp.slice(i), gyTemp.slice(i));
+    softmax.Backward({} /* unused */, scores.slice(i), gyTemp.slice(i), gyTemp.slice(i));
   }
 
   // Obtain backpropagated error of key.
@@ -258,8 +279,18 @@ Backward(const InputType& /* input */,
 
   for (size_t i = 0; i < batchSize; ++i)
   {
-    g.submat(tgtSeqLen * embedDim, i, (tgtSeqLen + srcSeqLen) * embedDim - 1, i)
-        = arma::vectorise(arma::trans(tmp.slice(i) * keyWt));
+    if (selfAttention)
+    {
+      // Sum the query, key, and value deltas.
+      g.submat(0, i, g.n_rows - 1, i) +=
+          arma::vectorise(arma::trans(tmp.slice(i) * keyWt));
+    }
+    else
+    {
+      g.submat(tgtSeqLen * embedDim, i,
+               (tgtSeqLen + srcSeqLen) * embedDim - 1, i) =
+          arma::vectorise(arma::trans(tmp.slice(i) * keyWt));
+    }
   }
 
   // Obtain backpropagated error of the query.
@@ -273,22 +304,39 @@ Backward(const InputType& /* input */,
 
   for (size_t i = 0; i < batchSize; ++i)
   {
-    g.submat(0, i, tgtSeqLen * embedDim - 1, i)
-        = arma::vectorise(arma::trans(tmp.slice(i) * queryWt));
+    if (selfAttention)
+    {
+      // Sum the query, key, and value deltas.
+      g.submat(0, i, g.n_rows - 1, i) +=
+          arma::vectorise(arma::trans(tmp.slice(i) * queryWt));
+    }
+    else
+    {
+      g.submat(0, i, tgtSeqLen * embedDim - 1, i) =
+          arma::vectorise(arma::trans(tmp.slice(i) * queryWt));
+    }
   }
 }
 
-template <typename InputType, typename OutputType, typename RegularizerType>
-void MultiheadAttentionType<InputType, OutputType, RegularizerType>::
-Gradient(const InputType& input,
-         const OutputType& error,
-         OutputType& gradient)
+template <typename MatType, typename RegularizerType>
+void MultiheadAttentionType<MatType, RegularizerType>::
+Gradient(const MatType& input,
+         const MatType& error,
+         MatType& gradient)
 {
-  typedef typename arma::Cube<typename InputType::elem_type> CubeType;
+  typedef typename arma::Cube<typename MatType::elem_type> CubeType;
 
-  if (input.n_rows != embedDim * (tgtSeqLen + 2 * srcSeqLen))
+  if (input.n_rows != embedDim * (selfAttention ? srcSeqLen :
+      (tgtSeqLen + 2 * srcSeqLen)))
   {
     Log::Fatal << "Incorrect input dimensions!" << std::endl;
+  }
+
+  if (selfAttention && tgtSeqLen != srcSeqLen)
+  {
+    Log::Fatal << "Target sequence length (" << tgtSeqLen << ") and source "
+        << "sequence length (" << srcSeqLen << ") must match when using "
+        << "self-attention!" << std::endl;
   }
 
   if (error.n_rows != tgtSeqLen * embedDim)
@@ -302,16 +350,18 @@ Gradient(const InputType& input,
   // The shape of gradient : (4 * embedDim * embedDim + 4 * embedDim, 1).
   gradient.set_size(arma::size(weights));
 
-  const CubeType q(const_cast<InputType&>(input).memptr(),
+  const CubeType q(const_cast<MatType&>(input).memptr(),
       embedDim, tgtSeqLen, batchSize, false, false);
-  const CubeType k(const_cast<InputType&>(input).memptr() + q.n_elem,
-      embedDim, srcSeqLen, batchSize, false, false);
-  const CubeType v(const_cast<InputType&>(input).memptr() + q.n_elem + k.n_elem,
-      embedDim, srcSeqLen, batchSize, false, false);
+  const CubeType k(const_cast<MatType&>(input).memptr() +
+      (selfAttention ? 0 : q.n_elem), embedDim, srcSeqLen, batchSize, false,
+      false);
+  const CubeType v(const_cast<MatType&>(input).memptr() +
+      (selfAttention ? 0 : (q.n_elem + k.n_elem)), embedDim, srcSeqLen,
+      batchSize, false, false);
 
   // Reshape the propagated error into a cube.
   // The shape of errorTemp : (embedDim, tgtSeqLen, batchSize).
-  CubeType errorTemp(const_cast<OutputType&>(error).memptr(), embedDim,
+  CubeType errorTemp(const_cast<MatType&>(error).memptr(), embedDim,
       tgtSeqLen, batchSize, true, false);
 
   // Gradient wrt. outBias, i.e. dL/d(outBias).
@@ -372,7 +422,8 @@ Gradient(const InputType& input,
     // The shape of scores : (tgtSeqLen, srcSeqLen, numHeads * batchSize).
     // The shape of errorTemp : (tgtSeqLen, srcSeqLen, numHeads * batchSize).
     // The new shape of errorTemp remain same.
-    softmax.Backward(scores.slice(i), errorTemp.slice(i), errorTemp.slice(i));
+    softmax.Backward({} /* unused */, scores.slice(i), errorTemp.slice(i),
+        errorTemp.slice(i));
   }
 
   // The shape of qProj : (tgtSeqLen, headDim, numHeads * batchSize).
@@ -425,18 +476,19 @@ Gradient(const InputType& input,
   regularizer.Evaluate(weights, gradient);
 }
 
-template <typename InputType, typename OutputType, typename RegularizerType>
+template <typename MatType, typename RegularizerType>
 template <typename Archive>
-void MultiheadAttentionType<InputType, OutputType, RegularizerType>::
+void MultiheadAttentionType<MatType, RegularizerType>::
 serialize(Archive& ar, const uint32_t /* version */)
 {
-  ar(cereal::base_class<Layer<InputType, OutputType>>(this));
+  ar(cereal::base_class<Layer<MatType>>(this));
 
   ar(CEREAL_NVP(tgtSeqLen));
   ar(CEREAL_NVP(srcSeqLen));
   ar(CEREAL_NVP(embedDim));
   ar(CEREAL_NVP(numHeads));
   ar(CEREAL_NVP(headDim));
+  ar(CEREAL_NVP(selfAttention));
   ar(CEREAL_NVP(softmax));
   ar(CEREAL_NVP(regularizer));
 
