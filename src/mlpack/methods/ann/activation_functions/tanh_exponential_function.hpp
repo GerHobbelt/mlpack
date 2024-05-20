@@ -74,9 +74,8 @@ class TanhExpFunction
   static double Deriv(const double x, const double y)
   {
     // leverage both y and x
-    // return std::tanh(std::exp(y)) - y * std::exp(y) *
-    //     (std::pow(std::tanh(std::exp(y)), 2) - 1);
-    return x == 0 ? std::tanh(1) : y / x + x * std::exp(x) * (1 - std::pow(y / x, 2));
+    return x == 0 ? std::tanh(1) :
+        y / x + x * std::exp(x) * (1 - std::pow(y / x, 2));
   }
 
   /**
@@ -87,11 +86,11 @@ class TanhExpFunction
    * @param dy The resulting derivatives.
    */
   template<typename InputVecType, typename OutputVecType, typename DerivVecType>
-  static void Deriv(const InputVecType& x, const OutputVecType& y, DerivVecType& dy)
+  static void Deriv(const InputVecType& x,
+                    const OutputVecType& y,
+                    DerivVecType& dy)
   {
     // leverage both y and x
-    // x = arma::tanh(arma::exp(y)) - y % arma::exp(y) %
-    //     (arma::pow(arma::tanh(arma::exp(y)), 2) - 1);
     dy = y / x + x % arma::exp(x) % (1 - arma::pow(y / x, 2));
     dy(arma::find(x == 0)).fill(std::tanh(1));
   }

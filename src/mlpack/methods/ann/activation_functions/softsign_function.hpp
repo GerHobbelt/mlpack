@@ -83,8 +83,6 @@ class SoftsignFunction
    */
   static double Deriv(const double x, const double /* y */)
   {
-    // TODO: this was the old implementation of deriv, but I don't believe it is correct
-    // return std::pow(1.0 - std::abs(y), 2);
     return 1.0 / std::pow(1.0 + std::abs(x), 2);
   }
 
@@ -96,10 +94,10 @@ class SoftsignFunction
    * @param dy The resulting derivatives.
    */
   template<typename InputVecType, typename OutputVecType, typename DerivVecType>
-  static void Deriv(const InputVecType& x, const OutputVecType& /* y */, DerivVecType& dy)
+  static void Deriv(const InputVecType& x,
+                    const OutputVecType& /* y */,
+                    DerivVecType& dy)
   {
-    // TODO: same as above
-    // x = arma::pow(1.0 - arma::abs(y), 2);
     dy = 1.0 / arma::pow(1.0 + arma::abs(x), 2);
   }
 

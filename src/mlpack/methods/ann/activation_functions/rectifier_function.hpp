@@ -101,9 +101,11 @@ class RectifierFunction
    * @param dy The resulting derivatives.
    */
   template<typename InputType, typename OutputType, typename DerivType>
-  static void Deriv(const InputType& x, const OutputType& /* y */, DerivType& dy)
+  static void Deriv(const InputType& x,
+                    const OutputType& /* y */,
+                    DerivType& dy)
   {
-    dy = arma::ones<DerivType>(size(x)) % (x > 0);
+    dy = arma::conv_to<DerivType>::from(x > 0);
   }
 }; // class RectifierFunction
 

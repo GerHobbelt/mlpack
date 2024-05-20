@@ -89,15 +89,17 @@ class SILUFunction
    * @param dy The resulting derivatives.
    */
   template<typename InputVecType, typename OutputVecType, typename DerivVecType>
-  static void Deriv(const InputVecType &x, const OutputVecType &y, DerivVecType &dy)
+  static void Deriv(const InputVecType& x,
+                    const OutputVecType& y,
+                    DerivVecType& dy)
   {
     // since y = x * sigmoid(x)
     // DerivVecType sigmoid = y / x;
     // dy = sigmoid % (1.0 + x % (1.0 - sigmoid));
     dy = (y / x) % (1.0 + x - y);
+    dy(arma::find(x == 0)).fill(0.5);
     // the expression above is indeterminate at 0, even though
     // the expression solely in terms of x is defined (= 0.5)
-    dy(arma::find(x == 0)).fill(0.5);
   }
 }; // class SILUFunction
 
