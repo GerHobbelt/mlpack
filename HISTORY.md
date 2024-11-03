@@ -4,6 +4,14 @@
 
 _????-??-??_
 
+  * Distribute STB headers as part of R package (#3724, #3726).
+  * Added OpenMP support for fast approximation (#3685). 
+
+
+## mlpack 4.4.0
+
+_2024-05-26_
+
   * Add `print_training_accuracy` option to LogisticRegression bindings (#3552).
 
   * Fix `preprocess_split()` call in documentation for `LinearRegression` and
