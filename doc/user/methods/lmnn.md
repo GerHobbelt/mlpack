@@ -48,7 +48,7 @@ std::cout << " - After LMNN:  "
 
 <!-- TODO: link to kNN -->
 
- * [mlpack distance metrics](../core.md#distances)
+ * [mlpack distance metrics](../core/distances.md)
  * [`NCA`](nca.md)
  * [Metric learning on Wikipedia](https://en.wikipedia.org/wiki/Similarity_learning#Metric_learning)
  * [Large margin nearest neighbor on Wikipedia](https://en.wikipedia.org/wiki/Large_margin_nearest_neighbor)
@@ -67,7 +67,7 @@ std::cout << " - After LMNN:  "
  * `lmnn = LMNN<DistanceType>(k, regularization=0.5, updateInterval=1)`
  * `lmnn = LMNN<DistanceType>(k, regularization,     updateInterval,   distance)`
    - Create an `LMNN` object using a custom
-     [`DistanceType`](../core.md#distances).
+     [`DistanceType`](../core/distances.md).
    - `k` specifies the number of neighbors to consider.
    - `regularization` specifies the regularization penalty to be applied to the
      LMNN cost function (a `double`).
@@ -80,13 +80,13 @@ std::cout << " - After LMNN:  "
      `DistanceType`*.
      * This means any learned distance may not necessarily improve
        classification performance with the
-       [Euclidean distance](../core.md#lmetric).
+       [Euclidean distance](../core/distances.md#lmetric).
      * Instead, classification performance will be improved when the learned
        distance is used with the given `DistanceType` only.
    - Any mlpack `DistanceType` can be used as a drop-in replacement, or a
      [custom `DistanceType`](../../developer/distances.md).
      * A list of mlpack's provided distance metrics can be found
-       [here](../core.md#distances).
+       [here](../core/distances.md).
    - ***Note: be sure that you understand the implications of a custom
      `DistanceType` before using this version.***
 
@@ -148,7 +148,8 @@ to learn a distance.
 To use `distance`, either:
 
  * Compute a new transformed dataset as `distance * data`, or
- * Use an instantiated [`MahalanobisDistance`](../core.md#mahalanobisdistance)
+ * Use an instantiated
+   [`MahalanobisDistance`](../core/distances.md#mahalanobisdistance)
    with `distance.t() * distance` as the `Q` matrix.
 
 See the [examples section](#simple-examples) for more details.
@@ -158,7 +159,7 @@ See the [examples section](#simple-examples) for more details.
 | **name** | **type** | **description** |
 |----------|----------|-----------------|
 | `data` | [`arma::mat`](../matrices.md) | [Column-major](../matrices.md#representing-data-in-mlpack) training matrix. |
-| `labels` | [`arma::Row<size_t>`](../matrices.md) | Training labels, [between `0` and `numClasses - 1`](../load_save.md#normalizing-labels) (inclusive).  Should have length `data.n_cols`.  |
+| `labels` | [`arma::Row<size_t>`](../matrices.md) | Training labels, [between `0` and `numClasses - 1`](../core/normalizing_labels.md) (inclusive).  Should have length `data.n_cols`.  |
 | `distance` | [`arma::mat`](../matrices.md) | Output matrix to store transformation matrix representing learned distance. |
 | `optimizer` | [any ensmallen optimizer](https://www.ensmallen.org) | Instantiated ensmallen optimizer for [differentiable functions](https://www.ensmallen.org/docs.html#differentiable-functions) or [differentiable separable functions](https://www.ensmallen.org/docs.html#differentiable-separable-functions). | `ens::AMSGrad()` |
 | `callbacks...` | [any set of ensmallen callbacks](https://www.ensmallen.org/docs.html#callback-documentation) | Optional callbacks for the ensmallen optimizer, such as e.g. `ens::ProgressBar()`, `ens::Report()`, or others. | _(N/A)_ |
@@ -186,8 +187,8 @@ that type implements the Armadillo API.  So, e.g., `arma::fmat` can be used.
 
  * `lmnn.Distance()` will return the `DistanceType` being used for learning.
    Unless a custom `DistanceType` was specified in the constructor,
-   this simply returns a [`SquaredEuclideanDistance`](../core.md#lmetric)
-   object.
+   this simply returns a
+   [`SquaredEuclideanDistance`](../core/distances.md#lmetric) object.
 
 ### Simple Examples
 
