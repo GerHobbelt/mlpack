@@ -708,7 +708,7 @@ double DecisionTreeRegressor<FitnessFunction,
     }
 
     // Figure out counts of children.
-    arma::Row<size_t> childCounts(numChildren, arma::fill::zeros);
+    arma::Row<size_t> childCounts(numChildren);
     for (size_t i = begin; i < begin + count; ++i)
       childCounts[childAssignments[i - begin]]++;
 
@@ -1024,7 +1024,7 @@ void DecisionTreeRegressor<FitnessFunction,
   // Serialize the children first.
   ar(CEREAL_VECTOR_POINTER(children));
 
-  // Now serialize the rest of the object. Since splitDimension and 
+  // Now serialize the rest of the object. Since splitDimension and
   // prediction are a union, we only need to serialize one of them.
   ar(CEREAL_NVP(prediction));
   ar(CEREAL_NVP(dimensionType));

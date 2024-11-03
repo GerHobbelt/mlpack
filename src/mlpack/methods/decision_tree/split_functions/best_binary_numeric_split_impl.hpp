@@ -1,5 +1,5 @@
 /**
- * @file methods/decision_tree/best_binary_numeric_split_impl.hpp
+ * @file methods/decision_tree/split_functions/best_binary_numeric_split_impl.hpp
  * @author Ryan Curtin
  *
  * Implementation of strategy that finds the best binary numeric split.
@@ -121,7 +121,7 @@ double BestBinaryNumericSplit<FitnessFunction>::SplitIfBetter(
     // Make sure that the value has changed.
     if (data[sortedIndices[index - 1]] == data[sortedIndices[index]])
       continue;
- 
+
     // Calculate the gain for the left and right child.  Only use weights if
     // needed.
     const double leftGain = UseWeights ?

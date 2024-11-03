@@ -1,5 +1,5 @@
 /**
- * @file methods/decision_tree/best_binary_numeric_split.hpp
+ * @file methods/decision_tree/split_functions/best_binary_numeric_split.hpp
  * @author Ryan Curtin
  *
  * A tree splitter that finds the best binary numeric split.
@@ -13,7 +13,7 @@
 #define MLPACK_METHODS_DECISION_TREE_BEST_BINARY_NUMERIC_SPLIT_HPP
 
 #include <mlpack/prereqs.hpp>
-#include "mse_gain.hpp"
+#include <mlpack/methods/decision_tree/fitness_functions/mse_gain.hpp>
 
 #include <mlpack/core/util/sfinae_utility.hpp>
 
@@ -34,7 +34,7 @@ HAS_MEM_FUNC(BinaryGains, HasBinaryGains);
 template<typename T, bool /* UseWeights */>
 struct HasOptimizedBinarySplitForms
 {
-  const static bool value = HasBinaryGains<T,
+  static const bool value = HasBinaryGains<T,
       std::tuple<double, double>(T::*)()>::value;
 };
 

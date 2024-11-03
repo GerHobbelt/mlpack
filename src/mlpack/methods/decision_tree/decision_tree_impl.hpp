@@ -727,7 +727,7 @@ double DecisionTree<FitnessFunction,
     }
 
     // Figure out counts of children.
-    arma::Row<size_t> childCounts(numChildren, arma::fill::zeros);
+    arma::Row<size_t> childCounts(numChildren);
     for (size_t i = begin; i < begin + count; ++i)
       childCounts[childAssignments[i - begin]]++;
 
@@ -1086,7 +1086,8 @@ void DecisionTree<FitnessFunction,
 
   // Now serialize the rest of the object.
   ar(CEREAL_NVP(splitDimension));
-  // Since dimensionType and majorityClass are a union, we only need to serialize one.
+  // Since dimensionType and majorityClass are a union, we only need to
+  // serialize one.
   ar(CEREAL_NVP(dimensionType));
   ar(CEREAL_NVP(classProbabilities));
 }
