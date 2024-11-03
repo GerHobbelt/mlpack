@@ -98,7 +98,7 @@ TEST_CASE("PReLUGRADIENTTest", "[ANNLayerTest]")
 
 double ComputeMSRE(arma::mat input, arma::mat target)
 {
-  return std::pow(arma::accu(arma::pow(input - target, 2)) / target.n_cols, 0.5);
+  return std::pow(arma::accu(pow(input - target, 2)) / target.n_cols, 0.5);
 }
 
 TEST_CASE("PReLUIntegrationTest", "[ANNLayerTest]")
@@ -132,8 +132,6 @@ TEST_CASE("PReLUIntegrationTest", "[ANNLayerTest]")
     double msreTrain = ComputeMSRE(predictions, trainLabels);
     model.Predict(testData, predictions);
     double msreTest = ComputeMSRE(predictions, testLabels);
-    std::cout << "train: " << msreTrain << "\n";
-    std::cout << "test: " << msreTest << "\n";
 
     double relativeMSRE = std::abs((msreTest - msreTrain) / msreTrain);
     if (relativeMSRE <= 0.35)

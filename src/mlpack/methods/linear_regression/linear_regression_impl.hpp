@@ -24,7 +24,8 @@ inline LinearRegression<ModelMatType>::LinearRegression(
     const ResponsesType& responses,
     const double lambda,
     const bool intercept) :
-    LinearRegression(predictors, responses, ResponsesType(), lambda, intercept)
+    LinearRegression(predictors, responses,
+        arma::Row<typename ResponsesType::elem_type>(), lambda, intercept)
 { /* Nothing to do. */ }
 
 template<typename ModelMatType>
@@ -83,7 +84,8 @@ typename LinearRegression<ModelMatType>::ElemType
 LinearRegression<ModelMatType>::Train(const MatType& predictors,
                                       const ResponsesType& responses)
 {
-  return Train(predictors, responses, ResponsesType(), this->lambda,
+  return Train(predictors, responses,
+      arma::Row<typename ResponsesType::elem_type>(), this->lambda,
       this->intercept);
 }
 
@@ -95,7 +97,8 @@ LinearRegression<ModelMatType>::Train(const MatType& predictors,
                                       const ResponsesType& responses,
                                       const double lambda)
 {
-  return Train(predictors, responses, ResponsesType(), lambda, this->intercept);
+  return Train(predictors, responses,
+      arma::Row<typename ResponsesType::elem_type>(), lambda, this->intercept);
 }
 
 template<typename ModelMatType>
@@ -107,7 +110,8 @@ LinearRegression<ModelMatType>::Train(const MatType& predictors,
                                       const double lambda,
                                       const bool intercept)
 {
-  return Train(predictors, responses, ResponsesType(), lambda, intercept);
+  return Train(predictors, responses,
+      arma::Row<typename ResponsesType::elem_type>(), lambda, intercept);
 }
 
 template<typename ModelMatType>
@@ -222,10 +226,10 @@ LinearRegression<ModelMatType>::Predict(const VecType& point) const
     // We want to be sure we have the correct number of dimensions in the
     // dataset.
     // Prevent underflow.
-    const size_t labels = (parameters.n_rows == 0) ? size_t(0) :
+    const size_t dimensionality = (parameters.n_rows == 0) ? size_t(0) :
         size_t(parameters.n_rows - 1);
-    util::CheckSameDimensionality(point, labels, "LinearRegression::Predict()",
-        "point");
+    util::CheckSameDimensionality(point, dimensionality,
+        "LinearRegression::Predict()", "point");
 
     return dot(parameters.subvec(1, parameters.n_elem - 1).t(), point) +
         parameters(0);
@@ -252,10 +256,11 @@ inline void LinearRegression<ModelMatType>::Predict(
     // We want to be sure we have the correct number of dimensions in the
     // dataset.
     // Prevent underflow.
-    const size_t labels = (parameters.n_rows == 0) ? size_t(0) :
+    const size_t dimensionality = (parameters.n_rows == 0) ? size_t(0) :
         size_t(parameters.n_rows - 1);
-    util::CheckSameDimensionality(points, labels, "LinearRegression::Predict()",
-        "points");
+    util::CheckSameDimensionality(points, dimensionality,
+        "LinearRegression::Predict()", "points");
+
     // Get the predictions, but this ignores the intercept value
     // (parameters[0]).
     predictions = parameters.subvec(1, parameters.n_elem - 1).t() * points;
@@ -268,7 +273,7 @@ inline void LinearRegression<ModelMatType>::Predict(
     // the dataset.
     util::CheckSameDimensionality(points, parameters,
         "LinearRegression::Predict()", "points");
-    predictions = arma::trans(parameters) * points;
+    predictions = trans(parameters) * points;
   }
 }
 
@@ -288,7 +293,7 @@ LinearRegression<ModelMatType>::ComputeError(
 
   // Calculate the differences between actual responses and predicted responses.
   // We must also add the intercept (parameters(0)) to the predictions.
-  ResponsesType temp;
+  arma::Row<typename ResponsesType::elem_type> temp;
   if (intercept)
   {
     // Ensure that we have the correct number of dimensions in the dataset.
