@@ -19,23 +19,24 @@
 namespace mlpack {
 
 template<typename MetricType>
-LMNNFunction<MetricType>::LMNNFunction(const arma::mat& dataset,
-                                       const arma::Row<size_t>& labels,
+LMNNFunction<MetricType>::LMNNFunction(const arma::mat& datasetIn,
+                                       const arma::Row<size_t>& labelsIn,
                                        size_t k,
                                        double regularization,
                                        size_t range,
                                        MetricType metric) :
-    dataset(MakeAlias(const_cast<arma::mat&>(dataset), false)),
-    labels(MakeAlias(const_cast<arma::Row<size_t>&>(labels), false)),
     k(k),
     metric(metric),
     regularization(regularization),
     iteration(0),
     range(range),
-    constraint(dataset, labels, k),
-    points(dataset.n_cols),
+    constraint(datasetIn, labelsIn, k),
+    points(datasetIn.n_cols),
     impBounds(false)
 {
+  MakeAlias(dataset, datasetIn, datasetIn.n_rows, datasetIn.n_cols, false);
+  MakeAlias(labels, labelsIn, labelsIn.n_rows, labelsIn.n_cols, false);
+
   // Initialize the initial learning point.
   initialPoint.eye(dataset.n_rows, dataset.n_rows);
   // Initialize transformed dataset to base dataset.
@@ -64,7 +65,7 @@ LMNNFunction<MetricType>::LMNNFunction(const arma::mat& dataset,
   oldTransformationCounts.push_back(dataset.n_cols);
 
   // Check if we can impose bounds over impostors.
-  size_t minCount = arma::min(arma::histc(labels, arma::unique(labels)));
+  size_t minCount = min(arma::histc(labels, arma::unique(labels)));
   if (minCount <= k + 1)
   {
     // Initialize target neighbors & impostors.
