@@ -205,12 +205,12 @@ void BINDING_FUNCTION(util::Params& params, util::Timers& /* timers */)
       // Extract the labels as the last
       Log::Info << "Using the last dimension of training set as labels."
           << endl;
-      labels = arma::conv_to<arma::Row<size_t>>::from(
+      labels = ConvTo<arma::Row<size_t>>::From(
           trainingSet.row(trainingSet.n_rows - 1));
       trainingSet.shed_row(trainingSet.n_rows - 1);
     }
 
-    const size_t numClasses = arma::max(arma::max(labels)) + 1;
+    const size_t numClasses = max(labels) + 1;
 
     // Now build the tree.
     const size_t minLeafSize = (size_t) params.Get<int>("minimum_leaf_size");

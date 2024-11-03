@@ -195,12 +195,12 @@ void BINDING_FUNCTION(util::Params& params, util::Timers& timers)
   {
     arma::rowvec feature;
     if (rowMajor)
-      feature = arma::conv_to<arma::rowvec>::from(data.col(dim));
+      feature = ConvTo<arma::rowvec>::From(data.col(dim));
     else
       feature = data.row(dim);
 
     // f at the front of the variable names means "feature".
-    const double fMax = arma::max(feature);
+    const double fMax = max(feature);
     const double fMin = arma::min(feature);
     const double fMean = arma::mean(feature);
     const double fStd = arma::stddev(feature, population);

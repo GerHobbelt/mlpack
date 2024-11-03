@@ -420,10 +420,10 @@ TEST_CASE_METHOD(SparseCodingTestFixture, "SparseCodingDiffMaxItrTest",
 
   // Check that initial outputs and final outputs
   // using two models model are different.
-  REQUIRE(arma::accu(dictionary ==
+  REQUIRE(accu(dictionary ==
       params.Get<arma::mat>("dictionary")) < dictionary.n_elem);
 
-  REQUIRE(arma::accu(codes ==
+  REQUIRE(accu(codes ==
       params.Get<arma::mat>("codes")) < codes.n_elem);
 }
 
@@ -469,9 +469,9 @@ TEST_CASE_METHOD(SparseCodingTestFixture, "SparseCodingDiffObjToleranceTest",
 
   // Check that initial outputs and final outputs
   // using two models model are different.
-  REQUIRE(arma::accu(dictionary ==
+  REQUIRE(accu(dictionary ==
       params.Get<arma::mat>("dictionary")) < dictionary.n_elem);
-  REQUIRE(arma::accu(codes ==
+  REQUIRE(accu(codes ==
       params.Get<arma::mat>("codes")) < codes.n_elem);
 }
 
@@ -518,11 +518,10 @@ TEST_CASE_METHOD(SparseCodingTestFixture,
 
   // Check that initial outputs and final outputs
   // using two models model are different.
-  REQUIRE(arma::accu(dictionary ==
+  REQUIRE(accu(dictionary ==
       params.Get<arma::mat>("dictionary")) < dictionary.n_elem);
 
-  REQUIRE(arma::accu(codes ==
-      params.Get<arma::mat>("codes")) < codes.n_elem);
+  REQUIRE(accu(codes == params.Get<arma::mat>("codes")) < codes.n_elem);
 }
 
 /**
@@ -567,11 +566,10 @@ TEST_CASE_METHOD(SparseCodingTestFixture, "SparseCodingDiffL1Test",
 
   // Check that initial outputs and final outputs
   // using two models model are different.
-  REQUIRE(arma::accu(dictionary ==
+  REQUIRE(accu(dictionary ==
       params.Get<arma::mat>("dictionary")) < dictionary.n_elem);
 
-  REQUIRE(arma::accu(codes ==
-      params.Get<arma::mat>("codes")) < codes.n_elem);
+  REQUIRE(accu(codes == params.Get<arma::mat>("codes")) < codes.n_elem);
 }
 
 /**
@@ -616,11 +614,10 @@ TEST_CASE_METHOD(SparseCodingTestFixture, "SparseCodingDiffL2Test",
 
   // Check that initial outputs and final outputs
   // using two models model are different.
-  REQUIRE(arma::accu(dictionary ==
+  REQUIRE(accu(dictionary ==
       params.Get<arma::mat>("dictionary")) < dictionary.n_elem);
 
-  REQUIRE(arma::accu(codes ==
-      params.Get<arma::mat>("codes")) < codes.n_elem);
+  REQUIRE(accu(codes == params.Get<arma::mat>("codes")) < codes.n_elem);
 }
 
 /**
@@ -667,9 +664,8 @@ TEST_CASE_METHOD(SparseCodingTestFixture, "SparseCodingDiffL1L2Test",
 
   // Check that initial outputs and final outputs
   // using two models model are different.
-  REQUIRE(arma::accu(dictionary ==
+  REQUIRE(accu(dictionary ==
       params.Get<arma::mat>("dictionary")) < dictionary.n_elem);
 
-  REQUIRE(arma::accu(codes ==
-      params.Get<arma::mat>("codes")) < codes.n_elem);
+  REQUIRE(accu(codes == params.Get<arma::mat>("codes")) < codes.n_elem);
 }

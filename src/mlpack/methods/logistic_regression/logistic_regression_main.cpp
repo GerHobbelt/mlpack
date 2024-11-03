@@ -288,7 +288,7 @@ void BINDING_FUNCTION(util::Params& params, util::Timers& timers)
     }
 
     // The initial predictors for y, Nx1.
-    responses = arma::conv_to<arma::Row<size_t>>::from(
+    responses = ConvTo<arma::Row<size_t>>::From(
         regressors.row(regressors.n_rows - 1));
     regressors.shed_row(regressors.n_rows - 1);
   }
@@ -343,7 +343,7 @@ void BINDING_FUNCTION(util::Params& params, util::Timers& timers)
       arma::Row<size_t> predictions;
       model->Classify(regressors, predictions);
 
-      const size_t correct = arma::accu(predictions == responses);
+      const size_t correct = accu(predictions == responses);
 
       Log::Info << correct << " of " << responses.n_elem << " correct on training"
           << " set (" << (double(correct) / double(responses.n_elem) * 100) << ")."

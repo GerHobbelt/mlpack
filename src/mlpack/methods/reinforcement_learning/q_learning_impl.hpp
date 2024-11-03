@@ -106,7 +106,7 @@ arma::Col<size_t> QLearning<
 {
   // Take best possible action at a particular instance.
   arma::Col<size_t> bestActions(actionValues.n_cols);
-  arma::rowvec maxActionValues = arma::max(actionValues, 0);
+  arma::rowvec maxActionValues = max(actionValues, 0);
   for (size_t i = 0; i < actionValues.n_cols; ++i)
   {
     bestActions(i) = arma::as_scalar(
@@ -260,7 +260,7 @@ void QLearning<
         arma::size(atomSize, 1));
   }
 
-  arma::mat tZ = (arma::conv_to<arma::mat>::from(config.Discount() *
+  arma::mat tZ = (ConvTo<arma::mat>::From(config.Discount() *
       (support * (1 - isTerminal))).each_row() + sampledRewards);
   tZ = arma::clamp(tZ, config.VMin(), config.VMax());
   arma::mat b = (tZ - config.VMin()) / (config.VMax() - config.VMin()) *

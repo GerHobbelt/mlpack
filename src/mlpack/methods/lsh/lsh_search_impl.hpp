@@ -308,7 +308,7 @@ void LSHSearch<SortPolicy, MatType>::Train(MatType referenceSet,
   secondHashBinCounts.transform([effectiveBucketSize](size_t val)
       { return std::min(val, effectiveBucketSize); });
 
-  const size_t numRowsInTable = arma::accu(secondHashBinCounts > 0);
+  const size_t numRowsInTable = accu(secondHashBinCounts > 0);
   bucketContentSize.zeros(numRowsInTable);
   secondHashTable.resize(numRowsInTable);
 
@@ -343,8 +343,8 @@ void LSHSearch<SortPolicy, MatType>::Train(MatType referenceSet,
   } // Loop over tables.
 
   Log::Info << "Final hash table size: " << numRowsInTable << " rows, with a "
-            << "maximum length of " << arma::max(secondHashBinCounts) << ", "
-            << "totaling " << arma::accu(secondHashBinCounts) << " elements."
+            << "maximum length of " << max(secondHashBinCounts) << ", "
+            << "totaling " << accu(secondHashBinCounts) << " elements."
             << std::endl;
 }
 
@@ -739,8 +739,8 @@ void LSHSearch<SortPolicy, MatType>::ReturnIndicesFromTable(
 
   // Compute the primary hash value of each key of the query into a bucket of
   // the secondHashTable using the secondHashWeights.
-  hashMat.row(0) = arma::conv_to<arma::Row<size_t>> // Floor by typecasting
-      ::from(secondHashWeights.t() * allProjInTables);
+  hashMat.row(0) = ConvTo<arma::Row<size_t>> // Floor by typecasting
+      ::From(secondHashWeights.t() * allProjInTables);
   // Mod to compute 2nd-level codes.
   for (size_t i = 0; i < numTablesToSearch; ++i)
     hashMat(0, i) = (hashMat(0, i) % secondHashSize);
@@ -760,8 +760,8 @@ void LSHSearch<SortPolicy, MatType>::ReturnIndicesFromTable(
       // Map each probing bin to a bin in secondHashTable (just like we did for
       // the primary hash table).
       hashMat(arma::span(1, T), i) = // Compute code of rows 1:end of column i
-        arma::conv_to< arma::Col<size_t> >:: // floor by typecasting to size_t
-        from(secondHashWeights.t() * additionalProbingBins);
+        ConvTo<arma::Col<size_t>>:: // floor by typecasting to size_t
+        From(secondHashWeights.t() * additionalProbingBins);
       for (size_t p = 1; p < T + 1; ++p)
         hashMat(p, i) = (hashMat(p, i) % secondHashSize);
     }

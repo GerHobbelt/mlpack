@@ -66,7 +66,7 @@ class RectifierFunction
   {
     y.set_size(size(x));
     y.zeros();
-    y = SafeMax(y, x);
+    y = max(y, x);
   }
 
   /**
@@ -93,7 +93,7 @@ class RectifierFunction
                     const OutputType& /* y */,
                     DerivType& dy)
   {
-    dy = arma::conv_to<DerivType>::from(x > 0);
+    dy = ConvTo<DerivType>::From(x > 0);
   }
 }; // class RectifierFunction
 

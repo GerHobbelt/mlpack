@@ -221,22 +221,22 @@ inline void BayesianLinearRegression<ModelMatType>::Predict(
   if (!centerData && !scaleData)
   {
     stddev = std::sqrt(Variance() +
-        arma::accu(point % (matCovariance * point)));
-    inner = arma::accu(point % (matCovariance * point));
+        accu(point % (matCovariance * point)));
+    inner = accu(point % (matCovariance * point));
   }
   else if (centerData && !scaleData)
   {
-    inner = arma::accu((point - dataOffset) %
+    inner = accu((point - dataOffset) %
         (matCovariance * (point - dataOffset)));
   }
   else if (!centerData && scaleData)
   {
-    inner = arma::accu((point / dataScale) %
+    inner = accu((point / dataScale) %
         (matCovariance * (point / dataScale)));
   }
   else
   {
-    inner = arma::accu(((point - dataOffset) / dataScale) %
+    inner = accu(((point - dataOffset) / dataScale) %
         (matCovariance * ((point - dataOffset) / dataScale)));
   }
 
@@ -296,7 +296,7 @@ BayesianLinearRegression<ModelMatType>::RMSE(
 {
   typename GetDenseRowType<ResponsesType>::type predictions;
   Predict(data, predictions);
-  return sqrt(mean(square(responses - predictions)));
+  return std::sqrt(mean(square(responses - predictions)));
 }
 
 template<typename ModelMatType>
@@ -386,10 +386,10 @@ void BayesianLinearRegression<ModelMatType>::serialize(Archive& ar,
   {
     arma::colvec colvecTmp;
     ar(cereal::make_nvp("dataOffset", colvecTmp));
-    dataOffset = arma::conv_to<DenseVecType>::from(colvecTmp);
+    dataOffset = ConvTo<DenseVecType>::From(colvecTmp);
 
     ar(cereal::make_nvp("dataScale", colvecTmp));
-    dataScale = arma::conv_to<DenseVecType>::from(colvecTmp);
+    dataScale = ConvTo<DenseVecType>::From(colvecTmp);
 
     double dblTmp;
     ar(cereal::make_nvp("responsesOffset", dblTmp));
@@ -405,11 +405,11 @@ void BayesianLinearRegression<ModelMatType>::serialize(Archive& ar,
     gamma = (ElemType) dblTmp;
 
     ar(cereal::make_nvp("omega", colvecTmp));
-    omega = arma::conv_to<DenseVecType>::from(colvecTmp);
+    omega = ConvTo<DenseVecType>::From(colvecTmp);
 
     arma::mat matTmp;
     ar(cereal::make_nvp("matCovariance", matTmp));
-    matCovariance = arma::conv_to<ModelMatType>::from(matCovariance);
+    matCovariance = ConvTo<ModelMatType>::From(matCovariance);
   }
   else
   {

@@ -5,7 +5,15 @@
   * Fix `preprocess_split()` call in documentation for `LinearRegression` and
     `AdaBoost` Python classes (#3563).
 
+  * Added `Repeat` ANN layer type (#3565).
+
   * Remove `round()` implementation for old MSVC compilers (#3570).
+
+  * [R] Added inline plugin to the R bindings to allow for other R packages to link to headers (#3626, h/t @cgiachalis).
+
+  * [R] Removed extra gcc-specific options from `Makevars.win`  (#3627, h/t @kalibera).
+
+  * [R] Changed roxygen package-level documentation from using `@docType package` to `"_PACKAGE"`. (#3636)
 
 ### mlpack 4.3.0
 ###### 2023-11-27
