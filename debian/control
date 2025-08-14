@@ -15,7 +15,6 @@ Build-Depends: cmake, debhelper-compat (= 13),
 		python3-pytest-runner, python3-pip,
 		txt2man,
 Standards-Version: 4.7.2
-Rules-Requires-Root: no
 Homepage: https://www.mlpack.org/
 Vcs-Git: https://salsa.debian.org/science-team/mlpack.git
 Vcs-Browser: https://salsa.debian.org/science-team/mlpack
