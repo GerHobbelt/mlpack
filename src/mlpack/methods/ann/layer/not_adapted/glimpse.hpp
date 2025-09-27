@@ -402,7 +402,7 @@ class GlimpseType : public Layer<InputType, OutputType>
   //! Location-stored module location parameter.
   std::vector<OutputType> locationParameter;
 
-  //! Location-stored transformed gradient paramter.
+  //! Location-stored transformed gradient parameter.
   arma::Cube<typename OutputType::elem_type> gTemp;
 }; // class GlimpseType
 

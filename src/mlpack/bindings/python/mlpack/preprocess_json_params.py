@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-preprocess_json_params.py: utility functions for json paramter preprocessing
+preprocess_json_params.py: utility functions for json parameter preprocessing
                            (see set_cpp_param() and get_cpp_param() methods
                             in print_class_defn.hpp)
 

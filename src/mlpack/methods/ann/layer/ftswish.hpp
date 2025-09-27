@@ -47,7 +47,7 @@ class FTSwishType : public Layer<MatType>
  public:
   /**
    * Create the Flatten T Swish object using the specified parameters.
-   * The thresholded value T can be adjusted via T paramaters.
+   * The thresholded value T can be adjusted via T parameters.
    * When the x is < 0, T will be used instead of 0.
    * The default value of T is -0.20 as suggested in the paper.
    * @param T 

@@ -291,7 +291,7 @@ class TestPythonBinding(unittest.TestCase):
 
   def testPandasSeries(self):
     """
-    Test a Pandas Series input paramter
+    Test a Pandas Series input parameter
     """
     x = pd.Series(np.random.rand(100))
     z = copy.deepcopy(x)
@@ -311,7 +311,7 @@ class TestPythonBinding(unittest.TestCase):
 
   def testPandasSeriesForceCopy(self):
     """
-    Test a Pandas Series input paramter
+    Test a Pandas Series input parameter
     """
     x = pd.Series(np.random.rand(100))
 
@@ -979,7 +979,7 @@ class TestPythonBinding(unittest.TestCase):
 
   def testTwoDimensionCol(self):
     """
-    Test that we pass Two Dimension column vetor as input paramter
+    Test that we pass Two Dimension column vetor as input parameter
     """
     x = np.random.rand(100,1)
     z = copy.deepcopy(x)
@@ -999,7 +999,7 @@ class TestPythonBinding(unittest.TestCase):
 
   def testTwoDimensionColForceCopy(self):
     """
-    Test that we pass Two Dimension column vetor as input paramter
+    Test that we pass Two Dimension column vetor as input parameter
     """
     x = np.random.rand(100,1)
 

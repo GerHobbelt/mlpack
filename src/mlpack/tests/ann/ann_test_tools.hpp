@@ -40,7 +40,7 @@ double JacobianTest(ModuleType& module,
   module.Forward(input, output);
   jacobianA = arma::zeros(input.n_elem, output.n_elem);
 
-  // Share the input paramter matrix.
+  // Share the input parameter matrix.
   arma::mat sin = arma::mat(input.memptr(), input.n_rows, input.n_cols,
       false, false);
 
