@@ -4,9 +4,15 @@
 
 _????-??-??_
 
+ * Adapt `GRU` ANN layer to the new interface (#3955).
+
  * Fix warning on CRAN for bundled STB (#3950).
 
  * Fix potential MSVC constructor shadowing (#3958).
+
+ * Use a looser check for auto-detection of categorical file types (#3961).
+
+ * Accelerate `CELU` layer (#3975).
 
 ## mlpack 4.6.2
 
