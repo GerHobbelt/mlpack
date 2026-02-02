@@ -8,10 +8,10 @@ Last-Update: 2024-01-10
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/mlpack/bindings/python/setup.py.in b/src/mlpack/bindings/python/setup.py.in
-index 54cf2f0..1b4ad89 100644
+index 326fbc4..6eea9cd 100644
 --- a/src/mlpack/bindings/python/setup.py.in
 +++ b/src/mlpack/bindings/python/setup.py.in
-@@ -144,7 +144,7 @@ setup(name='mlpack',
+@@ -151,7 +151,7 @@ setup(name='mlpack',
            'Documentation': 'http://www.mlpack.org/doc/mlpack-${PACKAGE_VERSION}/python.html',
            'Source': 'https://github.com/mlpack/mlpack/',
            'Tracker': 'https://github.com/mlpack/mlpack/issues'},
