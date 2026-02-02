@@ -234,7 +234,7 @@ TEST_CASE("RandomizedPCADimensionalityReductionTest", "[PCATest]")
 TEST_CASE("QUICPCADimensionalityReductionTest", "[PCATest]")
 {
   arma::mat data, data1;
-  if (!data::Load("test_data_3_1000.csv", data))
+  if (!Load("test_data_3_1000.csv", data))
     FAIL("Cannot load dataset test_data_3_1000.csv");
   data1 = data;
 
@@ -428,7 +428,7 @@ TEMPLATE_TEST_CASE("PCAExpressionTest", "[PCATest]", ExactSVDPolicy,
 /**
  * Test PCA on 32-bit data.
  */
-TEMPLATE_TEST_CASE("PCAFloatTest", "[PCATest]", ExactSVDPolicy,
+TEMPLATE_TEST_CASE("PCAFloatTest", "[PCATest][tiny]", ExactSVDPolicy,
     RandomizedSVDPCAPolicy, RandomizedBlockKrylovSVDPolicy, QUICSVDPolicy)
 {
   using DecompositionPolicy = TestType;

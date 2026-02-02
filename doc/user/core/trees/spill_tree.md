@@ -38,13 +38,14 @@ a template typedef.
 
 ## See also
 
-<!-- TODO: add links to all distance-based algorithms and other trees? -->
-
  * [`SPTree`](sp_tree.md)
  * [`MeanSPTree`](mean_sp_tree.md)
  * [`NonOrtSPTree`](non_ort_sp_tree.md)
  * [`NonOrtMeanSPTree`](non_ort_mean_sp_tree.md)
  * [`BinarySpaceTree`](binary_space_tree.md)
+ * [mlpack trees](../trees.md)
+ * [`KNN`](../../methods/knn.md)
+ * [mlpack geometric algorithms](../../modeling.md#geometric-algorithms)
  * [An Investigation of Practical Approximate Nearest Neighbor Algorithms (pdf)](https://proceedings.neurips.cc/paper/2004/file/1102a326d5f7c9e04fc3c89d0ede88c9-Paper.pdf)
  * [Tree-Independent Dual-Tree Algorithms (pdf)](https://www.ratml.org/pub/pdf/2013tree.pdf)
 
@@ -333,7 +334,7 @@ on bound quantities for trees.
    - This is equivalent to calling `node.Bound().Center(center)`.
 
  * A `SpillTree` can be serialized with
-   [`data::Save()` and `data::Load()`](../../load_save.md#mlpack-objects).
+   [`Save()` and `Load()`](../../load_save.md#mlpack-models-and-objects).
 
 ## Bounding distances with the tree
 
@@ -510,7 +511,7 @@ the data.
      the right of `h`.
 
  * An `AxisOrthogonalHyperplane` object can be serialized with
-   [`data::Save()` and `data::Load()`](../../load_save.md#mlpack-objects).
+   [`Save()` and `Load()`](../../load_save.md#mlpack-models-and-objects).
 
 For more details, see the
 [the source code](/src/mlpack/core/tree/space_split/hyperplane.hpp).
@@ -555,7 +556,7 @@ able to represent any possible hyperplane.
      the bullet point above) is to the right of `h`.
 
  * A `Hyperplane` object can be serialized with
-   [`data::Save()` and `data::Load()`](../../load_save.md#mlpack-objects).
+   [`Save()` and `Load()`](../../load_save.md#mlpack-models-and-objects).
 
 For more details, see the
 [the source code](/src/mlpack/core/tree/space_split/hyperplane.hpp).
@@ -737,7 +738,7 @@ tree.
 ```c++
 // See https://datasets.mlpack.org/cloud.csv.
 arma::mat dataset;
-mlpack::data::Load("cloud.csv", dataset, true);
+mlpack::Load("cloud.csv", dataset, mlpack::Fatal);
 
 // Build the spill tree with a tau (margin) of 0.2 and a leaf size of 10.
 // (This means that nodes are split until they contain 10 or fewer points.)
@@ -783,7 +784,7 @@ and maximum distances between different nodes in the tree.
 ```c++
 // See https://datasets.mlpack.org/corel-histogram.csv.
 arma::mat dataset;
-mlpack::data::Load("corel-histogram.csv", dataset, true);
+mlpack::Load("corel-histogram.csv", dataset, mlpack::Fatal);
 
 // Convenience typedef for the tree type.
 using TreeType = mlpack::SpillTree<mlpack::EuclideanDistance,
@@ -858,7 +859,7 @@ Build a `SpillTree` on 32-bit floating point data and save it to disk.
 ```c++
 // See https://datasets.mlpack.org/corel-histogram.csv.
 arma::fmat dataset;
-mlpack::data::Load("corel-histogram.csv", dataset);
+mlpack::Load("corel-histogram.csv", dataset);
 
 // Build the SpillTree using 32-bit floating point data as the matrix type.
 // We will still use the default EmptyStatistic and EuclideanDistance
@@ -871,7 +872,7 @@ mlpack::SpillTree<mlpack::EuclideanDistance,
     std::move(dataset), 0.1, 20, 0.95);
 
 // Save the tree to disk with the name 'tree'.
-mlpack::data::Save("tree.bin", "tree", tree);
+mlpack::Save("tree.bin", tree);
 
 std::cout << "Saved tree with " << tree.Dataset().n_cols << " points to "
     << "'tree.bin'." << std::endl;
@@ -894,7 +895,7 @@ using TreeType = mlpack::SpillTree<mlpack::EuclideanDistance,
                                    mlpack::MidpointSpaceSplit>;
 
 TreeType tree;
-mlpack::data::Load("tree.bin", "tree", tree);
+mlpack::Load("tree.bin", tree);
 std::cout << "Tree loaded with " << tree.NumDescendants() << " points."
     << std::endl;
 
@@ -934,10 +935,8 @@ std::cout << overlapCount << " out of " << totalInternalNodeCount
 
 Use a defeatist traversal to find the approximate nearest neighbor of the third
 and fourth points in the `corel-histogram` dataset.  (Note: this can also be
-done more easily with the `KNN` class!  This example is a demonstration of how
-to use the defeatist traverser.)
-
-<!-- TODO: link to KNN class -->
+done more easily with the [`KNN`](../../methods/knn.md) class!  This example is
+a demonstration of how to use the defeatist traverser.)
 
 For this example, we must first define a
 [`RuleType` class](../../../developer/trees.md#rules).
@@ -1037,7 +1036,7 @@ class SpillNearestNeighborRule
 ```c++
 // See https://datasets.mlpack.org/corel-histogram.csv.
 arma::mat dataset;
-mlpack::data::Load("corel-histogram.csv", dataset, true);
+mlpack::Load("corel-histogram.csv", dataset, mlpack::Fatal);
 
 typedef mlpack::SpillTree<mlpack::EuclideanDistance,
                           mlpack::EmptyStatistic,

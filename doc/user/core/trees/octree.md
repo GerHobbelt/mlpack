@@ -1,13 +1,12 @@
 # `Octree`
 
-<!-- TODO: link to knn.md once it's done -->
-
 The `Octree` class implements the generalized octree, a hierarchical tree
-structure.  When built on data in two dimensions, it is also called a
-'quadtree'.  The generalized octree is most useful on data in only two or three
-dimensions, as its number of children is exponential in the data dimension:
-so, e.g., an octree node in two dimensions has up to four children; in three
-dimensions has up to eight; and so on.
+structure useful for tasks such as
+[nearest neighbor search](../../methods/knn.md).  When built on data in two
+dimensions, it is also called a 'quadtree'.  The generalized octree is most
+useful on data in only two or three dimensions, as its number of children is
+exponential in the data dimension: so, e.g., an octree node in two dimensions
+has up to four children; in three dimensions has up to eight; and so on.
 
 mlpack's `Octree` implementation differs from many textbook descriptions of
 quadtrees and octrees in that mlpack allows the bounding box for an `Octree`
@@ -34,11 +33,12 @@ additional functionality specific to octrees.
 
 ## See also
 
-<!-- TODO: add links to all distance-based algorithms and other trees? -->
-
+ * [mlpack trees](../trees.md)
+ * [`KNN`](../../methods/knn.md)
+ * [mlpack geometric algorithms](../../modeling.md#geometric-algorithms)
  * [Octree on Wikipedia](https://en.wikipedia.org/wiki/Octree)
  * [Quadtree on Wikipedia](https://en.wikipedia.org/wiki/Quadtree)
- * [Binary space partitioning on Wikipedia](https://dl.acm.org/doi/pdf/10.1145/361002.361007)
+ * [Binary space partitioning on Wikipedia](https://en.wikipedia.org/wiki/Binary_space_partitioning)
  * [Tree-Independent Dual-Tree Algorithms (pdf)](https://www.ratml.org/pub/pdf/2013tree.pdf)
 
 ## Template parameters
@@ -311,7 +311,7 @@ accessing them does not require any computation.
    - This is equivalent to calling `node.Bound().Center(center)`.
 
  * An `Octree` can be serialized with
-   [`data::Save()` and `data::Load()`](../../load_save.md#mlpack-objects).
+   [`Save()` and `Load()`](../../load_save.md#mlpack-models-and-objects).
 
 ## Bounding distances with the tree
 
@@ -404,7 +404,7 @@ tree.
 ```c++
 // See https://datasets.mlpack.org/iris.csv.
 arma::mat dataset;
-mlpack::data::Load("iris.csv", dataset, true);
+mlpack::Load("iris.csv", dataset, mlpack::Fatal);
 
 // Build the octree with a leaf size of 10.  (This means that nodes are split
 // until they contain 10 or fewer points.)
@@ -451,7 +451,7 @@ nodes in the tree.
 ```c++
 // See https://datasets.mlpack.org/lcdm_tiny.csv.
 arma::mat dataset;
-mlpack::data::Load("lcdm_tiny.csv", dataset, true);
+mlpack::Load("lcdm_tiny.csv", dataset, mlpack::Fatal);
 
 // Build octrees on the first half and the second half of points.
 mlpack::Octree<> tree1(dataset.cols(0, dataset.n_cols / 2));
@@ -517,7 +517,7 @@ Build an `Octree` on 32-bit floating point data and save it to disk.
 ```c++
 // See https://datasets.mlpack.org/iris.csv.
 arma::fmat dataset;
-mlpack::data::Load("iris.csv", dataset);
+mlpack::Load("iris.csv", dataset);
 
 // Build the Octree using 32-bit floating point data as the matrix type.
 // We will still use the default EmptyStatistic and EuclideanDistance
@@ -527,7 +527,7 @@ mlpack::Octree<mlpack::EuclideanDistance,
                arma::fmat> tree(std::move(dataset), 100);
 
 // Save the Octree to disk with the name 'tree'.
-mlpack::data::Save("tree.bin", "tree", tree);
+mlpack::Save("tree.bin", tree);
 
 std::cout << "Saved tree with " << tree.Dataset().n_cols << " points to "
     << "'tree.bin'." << std::endl;
@@ -548,7 +548,7 @@ using TreeType = mlpack::Octree<mlpack::EuclideanDistance,
                                 arma::fmat>;
 
 TreeType tree;
-mlpack::data::Load("tree.bin", "tree", tree);
+mlpack::Load("tree.bin", tree);
 std::cout << "Tree loaded with " << tree.NumDescendants() << " points."
     << std::endl;
 
@@ -591,7 +591,7 @@ Build an `Octree` and map between original points and new points.
 ```c++
 // See https://datasets.mlpack.org/lcdm_tiny.csv.
 arma::mat dataset;
-mlpack::data::Load("lcdm_tiny.csv", dataset, true);
+mlpack::Load("lcdm_tiny.csv", dataset, mlpack::Fatal);
 
 // Build the tree.
 std::vector<size_t> oldFromNew, newFromOld;

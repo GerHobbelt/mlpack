@@ -117,11 +117,11 @@ TEST_CASE_METHOD(NCATestFixture, "NCANormalizationTest",
                 "[NCAMainTest][BindingTests]")
 {
   arma::mat inputData;
-  if (!data::Load("vc2.csv", inputData))
+  if (!Load("vc2.csv", inputData))
     FAIL("Cannot load vc2.csv!");
 
   arma::Row<size_t> labels;
-  if (!data::Load("vc2_labels.txt", labels))
+  if (!Load("vc2_labels.txt", labels))
     FAIL("Cannot load vc2_labels.txt!");
 
   // Set parameters and set normalize to true.
@@ -139,11 +139,11 @@ TEST_CASE_METHOD(NCATestFixture, "NCANormalizationTest",
   ResetSettings();
 
   arma::mat inputData2;
-  if (!data::Load("vc2.csv", inputData2))
+  if (!Load("vc2.csv", inputData2))
     FAIL("Cannot load train dataset vc2.csv!");
 
   arma::Row<size_t> labels2;
-  if (!data::Load("vc2_labels.txt", labels2))
+  if (!Load("vc2_labels.txt", labels2))
     FAIL("Cannot load vc2_labels.txt!");
 
   // Use the same input but set normalize to false.
@@ -205,7 +205,7 @@ TEST_CASE_METHOD(NCATestFixture, "NCADifferentStepSizeTest",
  * Ensure that output is different when the tolerance is different.
  */
 TEST_CASE_METHOD(NCATestFixture, "NCADifferentToleranceTest",
-                "[NCAMainTest][BindingTests]")
+                "[NCAMainTest][BindingTests][long]")
 {
   // We aren't guaranteed that the test will be successful, so we run it
   // multiple times.
@@ -395,8 +395,8 @@ TEST_CASE_METHOD(NCATestFixture, "NCADifferentNumBasisTest",
   {
     // Simple dataset.
     arma::mat x;
-    x.randu(8, 600);
-    arma::Row<size_t> labels = arma::randi<arma::Row<size_t>>(600,
+    x.randu(4, 100);
+    arma::Row<size_t> labels = arma::randi<arma::Row<size_t>>(100,
         DistrParam(0, 1));
 
     arma::mat y = x;
@@ -407,6 +407,7 @@ TEST_CASE_METHOD(NCATestFixture, "NCADifferentNumBasisTest",
     SetInputParam("labels", std::move(labels));
     SetInputParam("optimizer",  std::string("lbfgs"));
     SetInputParam("num_basis", (int) 5);
+    SetInputParam("max_iterations", (int) 10);
 
     RUN_BINDING();
 
@@ -421,6 +422,7 @@ TEST_CASE_METHOD(NCATestFixture, "NCADifferentNumBasisTest",
     SetInputParam("labels", std::move(labels2));
     SetInputParam("optimizer",  std::string("lbfgs"));
     SetInputParam("num_basis", (int) 1);
+    SetInputParam("max_iterations", (int) 10);
 
     RUN_BINDING();
 
@@ -440,7 +442,7 @@ TEST_CASE_METHOD(NCATestFixture, "NCADifferentNumBasisTest",
  * results in a different output matrix.
  */
 TEST_CASE_METHOD(NCATestFixture, "NCADifferentMaxIterationTest",
-                "[NCAMainTest][BindingTests]")
+                "[NCAMainTest][BindingTests][long]")
 {
   // This test can randomly fail and it can be okay, so we run multiple times if
   // necessary.

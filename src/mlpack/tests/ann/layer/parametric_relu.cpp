@@ -104,16 +104,16 @@ double ComputeMSRE(arma::mat input, arma::mat target)
 TEST_CASE("PReLUIntegrationTest", "[ANNLayerTest]")
 {
   arma::mat data;
-  data::Load("boston_housing_price.csv", data, true /* fatal */);
+  Load("boston_housing_price.csv", data, Fatal + Transpose);
   arma::mat labels;
-  data::Load("boston_housing_price_responses.csv", labels, true /* fatal */);
+  Load("boston_housing_price_responses.csv", labels, Fatal + Transpose);
 
   // Sometimes the model may not optimize correctly, so we allow a few trials.
   bool success = false;
   for (size_t trial = 0; trial < 5; ++trial)
   {
     arma::mat trainData, testData, trainLabels, testLabels;
-    data::Split(data, labels, trainData, testData, trainLabels, testLabels,
+    Split(data, labels, trainData, testData, trainLabels, testLabels,
         0.2);
 
     FFN<L1Loss> model;
@@ -124,7 +124,13 @@ TEST_CASE("PReLUIntegrationTest", "[ANNLayerTest]")
     model.Add<Linear>(1);
 
     const size_t epochs = 500;
+    #if ENS_VERSION_MAJOR >= 3
+    ens::RMSProp optimizer(0.02, 8, 0.99, 1e-8, epochs * trainData.n_cols);
+    #else
+    // Older versions of ensmallen did not adjust the step size for the batch
+    // size.
     ens::RMSProp optimizer(0.0025, 8, 0.99, 1e-8, epochs * trainData.n_cols);
+    #endif
     model.Reset(data.n_rows);
     model.Train(trainData, trainLabels, optimizer);
 

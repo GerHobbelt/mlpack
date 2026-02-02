@@ -1,11 +1,9 @@
 # `CoverTree`
 
-<!-- TODO: link to knn.md once it's done -->
-
 The `CoverTree` class implements the cover tree, a hierarchical tree structure
 with favorable theoretical properties.  The cover tree is useful for efficient
-distance operations (such as nearest neighbor search) in low to moderate
-dimensions.
+distance operations (such as [nearest neighbor search](../../methods/knn.md)) in
+low to moderate dimensions.
 
 mlpack's `CoverTree` implementation supports three template parameters for
 configurable behavior, and implements all the functionality required by the
@@ -27,10 +25,11 @@ work with any [distance metric](../distances.md), not just
 
 ## See also
 
-<!-- TODO: add links to all distance-based algorithms and other trees? -->
-
  * [Cover tree on Wikipedia](https://en.wikipedia.org/wiki/Cover_tree)
  * [`KDTree`](kdtree.md)
+ * [mlpack trees](../trees.md)
+ * [`KNN`](../../methods/knn.md)
+ * [mlpack geometric algorithms](../../modeling.md#geometric-algorithms)
  * [Cover trees for nearest neighbor (pdf)](https://www.hunch.net/~jl/projects/cover_tree/paper/paper.pdf)
  * [Tree-Independent Dual-Tree Algorithms (pdf)](https://www.ratml.org/pub/pdf/2013tree.pdf)
 
@@ -269,7 +268,7 @@ accessing them does not require any computation.
      `node.Dataset().col(node.Point())` (e.g. the point held by `node`).
 
  * A `CoverTree` can be serialized with
-   [`data::Save()` and `data::Load()`](../../load_save.md#mlpack-objects).
+   [`Save()` and `Load()`](../../load_save.md#mlpack-models-and-objects).
 
 ## Bounding distances with the tree
 
@@ -371,7 +370,7 @@ tree.
 ```c++
 // See https://datasets.mlpack.org/cloud.csv.
 arma::mat dataset;
-mlpack::data::Load("cloud.csv", dataset, true);
+mlpack::Load("cloud.csv", dataset, mlpack::Fatal);
 
 // Build the cover tree with default options.
 //
@@ -412,7 +411,7 @@ maximum distances between different nodes in the tree.
 ```c++
 // See https://datasets.mlpack.org/corel-histogram.csv.
 arma::mat dataset;
-mlpack::data::Load("corel-histogram.csv", dataset, true);
+mlpack::Load("corel-histogram.csv", dataset, mlpack::Fatal);
 
 // Build cover trees on the first half and the second half of points.
 mlpack::CoverTree<> tree1(dataset.cols(0, dataset.n_cols / 2));
@@ -466,7 +465,7 @@ Build a `CoverTree` on 32-bit floating point data and save it to disk.
 ```c++
 // See https://datasets.mlpack.org/corel-histogram.csv.
 arma::fmat dataset;
-mlpack::data::Load("corel-histogram.csv", dataset);
+mlpack::Load("corel-histogram.csv", dataset);
 
 // Build the CoverTree using 32-bit floating point data as the matrix type.
 // We will still use the default EmptyStatistic and EuclideanDistance
@@ -476,7 +475,7 @@ mlpack::CoverTree<mlpack::EuclideanDistance,
                   arma::fmat> tree(dataset);
 
 // Save the CoverTree to disk with the name 'tree'.
-mlpack::data::Save("tree.bin", "tree", tree);
+mlpack::Save("tree.bin", tree);
 
 std::cout << "Saved tree with " << tree.Dataset().n_cols << " points to "
     << "'tree.bin'." << std::endl;
@@ -497,7 +496,7 @@ using TreeType = mlpack::CoverTree<mlpack::EuclideanDistance,
                                    arma::fmat>;
 
 TreeType tree;
-mlpack::data::Load("tree.bin", "tree", tree);
+mlpack::Load("tree.bin", tree);
 std::cout << "Tree loaded with " << tree.NumDescendants() << " points."
     << std::endl;
 

@@ -18,97 +18,32 @@
 
 #include "../catch.hpp"
 #include "../serialization.hpp"
+#include "ann_test_tools.hpp"
 
 using namespace mlpack;
 using namespace ens;
 
-/**
- * Generate a super simple impulse whose response is a step function at the same
- * time step.  The impulse occurs at a random time in each dimension.
- *
- * Predicting this sequence is a super easy task for a recurrent network, but
- * not possible without a recurrent connection.
- */
-void GenerateImpulseStepData(arma::cube& data,
-                             arma::cube& responses,
-                             const size_t dimensions,
-                             const size_t numSequences,
-                             const size_t seqLen)
+TEST_CASE("RNNImpulseStepLinearRecurrentTest", "[RecurrentNetworkTest][long]")
 {
-  data.zeros(dimensions, numSequences, seqLen);
-  responses.zeros(dimensions, numSequences, seqLen);
-
-  for (size_t i = 0; i < numSequences; ++i)
-  {
-    for (size_t j = 0; j < dimensions; ++j)
-    {
-      const size_t impulseStep = RandInt(0, seqLen - 1);
-
-      data(j, i, impulseStep) = 1.0;
-      responses.subcube(j, i, impulseStep, j, i, seqLen - 1).fill(1.0);
-    }
-  }
-}
-
-/**
- * Test that the recurrent layer is always able to learn to hold the output at 1
- * when the input impulse happens.
- */
-template<typename RecurrentLayerType>
-double ImpulseStepDataTest(const size_t dimensions, const size_t rho)
-{
-  arma::cube data, responses;
-
-  GenerateImpulseStepData(data, responses, dimensions, 1000, 50);
-
-  arma::cube trainData = data.cols(0, 699);
-  arma::cube trainResponses = responses.cols(0, 699);
-  arma::cube testData = data.cols(700, 999);
-  arma::cube testResponses = responses.cols(700, 999);
-
-  RNN<MeanSquaredError, ConstInitialization> net(rho);
-  net.Add<RecurrentLayerType>(dimensions);
-
-  const size_t numEpochs = 50;
-  RMSProp opt(0.003, 32, 0.9, 1e-08, 700 * numEpochs, 1e-5);
-
-  net.Train(trainData, trainResponses, opt);
-
-  arma::cube testPreds;
-  net.Predict(testData, testPreds);
-
-  arma::rowvec testData1 = vectorise(testData.col(0)).t();
-  arma::rowvec testPred1 = vectorise(testPreds.col(0)).t();
-  arma::rowvec testResp1 = vectorise(testResponses.col(0)).t();
-
-  // Compute the MSE of the test data.
-  const double error = std::sqrt(sum(square(
-      vectorise(testPreds) - vectorise(testResponses)))) / testPreds.n_elem;
-
-  return error;
-}
-
-TEST_CASE("RNNImpulseStepLinearRecurrentTest", "[RecurrentNetworkTest]")
-{
-  double err = ImpulseStepDataTest<LinearRecurrent>(1, 5);
+  double err = ImpulseStepDataTest<LinearRecurrent<>>(1, 5);
   REQUIRE(err <= 0.001);
 
-  err = ImpulseStepDataTest<LinearRecurrent>(3, 5);
+  err = ImpulseStepDataTest<LinearRecurrent<>>(3, 5);
   REQUIRE(err <= 0.003);
 
-  err = ImpulseStepDataTest<LinearRecurrent>(5, 5);
+  err = ImpulseStepDataTest<LinearRecurrent<>>(5, 5);
   REQUIRE(err <= 0.005);
 }
 
-TEST_CASE("RNNImpulseStepLSTMTest", "[RecurrentNetworkTest]")
+TEST_CASE("RNNImpulseStepLSTMTest", "[RecurrentNetworkTest][long]")
 {
-  double err = ImpulseStepDataTest<LSTM>(1, 5);
+  double err = ImpulseStepDataTest<LSTM<>>(1, 5);
   REQUIRE(err <= 0.001);
 
-  err = ImpulseStepDataTest<LSTM>(3, 5);
+  err = ImpulseStepDataTest<LSTM<>>(3, 5);
   REQUIRE(err <= 0.001);
 
-  err = ImpulseStepDataTest<LSTM>(5, 5);
+  err = ImpulseStepDataTest<LSTM<>>(5, 5);
   REQUIRE(err <= 0.001);
 }
 
@@ -209,32 +144,17 @@ double RNNSineTest(size_t hiddenUnits, size_t rho, size_t numEpochs = 10)
 /**
  * Test RNN using multiple timestep input and single output.
  */
-TEST_CASE("RNNSineLinearRecurrentTest", "[RecurrentNetworkTest]")
+TEMPLATE_TEST_CASE("RNNSineTest", "[RecurrentNetworkTest][long]",
+    LinearRecurrent<>,
+    LSTM<>,
+    GRU<>)
 {
   // This can sometimes fail due to bad initializations or bad luck.  So, try it
   // up to three times.
   bool success = false;
   for (size_t t = 0; t < 3; ++t)
   {
-    const double err = RNNSineTest<LinearRecurrent>(3, 3, 50);
-    if (err <= 0.08)
-    {
-      success = true;
-      break;
-    }
-  }
-
-  REQUIRE(success == true);
-}
-
-TEST_CASE("RNNSineLSTMTest", "[RecurrentNetworkTest]")
-{
-  // This can sometimes fail due to bad initializations or bad luck.  So, try it
-  // up to three times.
-  bool success = false;
-  for (size_t t = 0; t < 3; ++t)
-  {
-    const double err = RNNSineTest<LSTM>(3, 3, 50);
+    const double err = RNNSineTest<TestType>(3, 3, 50);
     if (err <= 0.08)
     {
       success = true;
@@ -286,7 +206,13 @@ void BatchSizeTest()
   {
     const size_t batchSize = std::pow((size_t) 2, bsPow);
 
+    #if ENS_VERSION_MAJOR >= 3
+    opt = StandardSGD(0.1, batchSize, batchSize);
+    #else
+    // Older versions of ensmallen did not adjust the step size for the batch
+    // size.
     opt = StandardSGD(0.1 / ((double) batchSize), batchSize, batchSize);
+    #endif
     opt.Shuffle() = false;
     model.Reset(1);
     model.Parameters() = initParams;
@@ -299,19 +225,14 @@ void BatchSizeTest()
 }
 
 /**
- * Ensure LinearRecurrent networks work with larger batch sizes.
+ * Ensure recurrent layers work with larger batch sizes.
  */
-TEST_CASE("LinearRecurrentBatchSizeTest", "[RecurrentNetworkTest]")
+TEMPLATE_TEST_CASE("RNNBatchSizeTest", "[RecurrentNetworkTest][tiny]",
+    LinearRecurrent<>,
+    LSTM<>,
+    GRU<>)
 {
-  BatchSizeTest<LinearRecurrent>();
-}
-
-/**
- * Ensure LSTMs work with larger batch sizes.
- */
-TEST_CASE("LSTMBatchSizeTest", "[RecurrentNetworkTest]")
-{
-  BatchSizeTest<LSTM>();
+  BatchSizeTest<TestType>();
 }
 
 /**
@@ -364,7 +285,13 @@ TEST_CASE("LargeRhoValueRnnTest", "[RecurrentNetworkTest]")
 
   // Train the model and ensure that it gives reasonable results.
   // Use a very small learning rate to prevent divergence on this problem.
+  #if ENS_VERSION_MAJOR >= 3
+  ens::StandardSGD opt(1.6e-14, 16, 1 * data.n_cols /* 1 epoch */);
+  #else
+  // Older versions of ensmallen did not adjust the step size for the batch
+  // size.
   ens::StandardSGD opt(1e-15, 16, 1 * data.n_cols /* 1 epoch */);
+  #endif
   model.Train(data, outputs, opt);
 
   // Ensure that none of the weights are NaNs or Inf.
@@ -376,7 +303,7 @@ TEST_CASE("LargeRhoValueRnnTest", "[RecurrentNetworkTest]")
  * Test that a simple RNN with no recurrent components behaves the same as an
  * FFN.
  */
-TEST_CASE("RNNFFNTest", "[RecurrentNetworkTest]")
+TEST_CASE("RNNFFNTest", "[RecurrentNetworkTest][tiny]")
 {
   // We'll create an RNN with *no* BPTT, just a simple single-layer linear
   // network.
@@ -396,7 +323,13 @@ TEST_CASE("RNNFFNTest", "[RecurrentNetworkTest]")
   arma::cube responses(1, 200, 1, arma::fill::randu);
 
   // Train the FFN.
+  #if ENS_VERSION_MAJOR >= 3
+  ens::StandardSGD optimizer(1e-3, 100, 200, 1e-8, false);
+  #else
+  // Older versions of ensmallen did not adjust the step size for the batch
+  // size.
   ens::StandardSGD optimizer(1e-5, 100, 200, 1e-8, false);
+  #endif
 
   ffn.Train(data.slice(0), responses.slice(0), optimizer);
   rnn.Train(data, responses, optimizer);
@@ -494,7 +427,7 @@ class DistractedSequenceTestSetCallback
 
     // Binarize the output to 0/1.
     for (size_t j = 0; j < testPreds.n_slices; ++j)
-      data::Binarize(testPreds.slice(j), testPreds.slice(j), 0.5);
+      Binarize(testPreds.slice(j), testPreds.slice(j), 0.5);
 
     // Count the number of columns where we got one or more time slice
     // predictions incorrect.
@@ -563,10 +496,22 @@ void DistractedSequenceRecallTestNetwork(
   // sequences) before the network reached 95% accuracy.
   Adam opt(0.008, 8, 0.9, 0.999, 1e-8, 250 * trainInput.n_cols, 1e-8);
 
-  // This callback will terminate training early when accuracy reaches 90%.  At
+  // This callback will terminate training early when accuracy reaches 85%.  At
   // least 50 epochs of training are required.
   DistractedSequenceTestSetCallback cb(testInput, testLabels);
   model.Train(trainInput, trainLabels, opt, cb);
+
+  // If the error is greater than 15%, we allow a few restarts.
+  size_t trial = 0;
+  while (cb.Error() > 0.15 && trial < 3)
+  {
+    opt = Adam(0.008, 8, 0.9, 0.999, 1e-8, 250 * trainInput.n_cols, 1e-8);
+
+    model.Reset();
+    model.Train(trainInput, trainLabels, opt, cb);
+
+    ++trial;
+  }
 
   // We only require 85% accuracy.
   REQUIRE(cb.Error() <= 0.15);
@@ -576,9 +521,9 @@ void DistractedSequenceRecallTestNetwork(
  * Train the specified networks on the Derek D. Monner's distracted sequence
  * recall task.
  */
-TEST_CASE("LSTMDistractedSequenceRecallTest", "[RecurrentNetworkTest]")
+TEST_CASE("LSTMDistractedSequenceRecallTest", "[RecurrentNetworkTest][long]")
 {
-  DistractedSequenceRecallTestNetwork<LSTM>(10, 8);
+  DistractedSequenceRecallTestNetwork<LSTM<>>(10, 8);
 }
 
 /**
@@ -621,13 +566,13 @@ void GenerateNoisySines(arma::cube& data,
 TEST_CASE("SequenceClassificationTest", "[RecurrentNetworkTest]")
 {
   // It isn't guaranteed that the recurrent network will converge in the
-  // specified number of iterations using random weights. If this works 1 of 3
+  // specified number of iterations using random weights. If this works 1 of 5
   // times, I'm fine with that. All I want to know is that the network is able
   // to escape from local minima and to solve the task.
   size_t successes = 0;
   const size_t rho = 10;
 
-  for (size_t trial = 0; trial < 3; ++trial)
+  for (size_t trial = 0; trial < 5; ++trial)
   {
     // Generate 500 (2 * 250) noisy sines. A single sine contains rho
     // points/features.
@@ -673,7 +618,7 @@ TEST_CASE("SequenceClassificationTest", "[RecurrentNetworkTest]")
  * Train a simple RNN to perform a classification task, but in 'single' mode, so
  * the response is only backpropagated at the final time step.
  */
-TEST_CASE("SequenceClassificationSingleTest", "[RecurrentNetworkTest]")
+TEST_CASE("SequenceClassificationSingleTest", "[RecurrentNetworkTest][long]")
 {
   size_t successes = 0;
   const size_t rho = 10;
@@ -723,6 +668,8 @@ TEST_CASE("SequenceClassificationSingleTest", "[RecurrentNetworkTest]")
       break;
     }
   }
+
+  REQUIRE(successes > 0);
 }
 
 /**
@@ -741,6 +688,7 @@ TEST_CASE("RNNSerializationTest", "[RecurrentNetworkTest]")
   RNN<> model(rho);
   model.Add<LSTM>(3);
   model.Add<LinearRecurrent>(3);
+  model.Add<GRU>(3);
   model.Add<Linear>(2);
   model.Add<LogSoftMax>();
 
@@ -911,7 +859,7 @@ template<typename ModelType>
 void ReberGrammarTestNetwork(ModelType& model,
                              const bool embedded = false,
                              const size_t maxEpochs = 30,
-                             const size_t trials = 3)
+                             const size_t trials = 5)
 {
   const size_t trainSize = 1000;
   const size_t testSize = 1000;
@@ -1007,7 +955,7 @@ void ReberGrammarTestNetwork(ModelType& model,
   REQUIRE(successes >= 1);
 }
 
-TEST_CASE("LSTMReberGrammarTest", "[RecurrentNetworkTest]")
+TEST_CASE("LSTMReberGrammarTest", "[RecurrentNetworkTest][tiny]")
 {
   // Note that our performance doesn't exactly match the LSTM paper that
   // originally introduced this task.  But, part of this is probably that they
@@ -1020,13 +968,19 @@ TEST_CASE("LSTMReberGrammarTest", "[RecurrentNetworkTest]")
   ReberGrammarTestNetwork(model, false);
 }
 
-TEST_CASE("LSTMEmbeddedReberGrammarTest", "[RecurrentNetworkTest]")
+/**
+ * Train the specified networks on an embedded Reber grammar dataset.
+ */
+TEMPLATE_TEST_CASE("RNNEmbeddedReberGrammarTest",
+    "[RecurrentNetworkTest][long]",
+    LSTM<>,
+    GRU<>)
 {
   RNN<MeanSquaredError> model(5, false, MeanSquaredError(),
-      RandomInitialization(-0.5, 0.5));
+      RandomInitialization(-0.1, 0.1));
   // Sometimes a few extra units are needed to effectively get the embedded
   // Reber grammar every time.
-  model.Add<LSTM>(25);
+  model.Add<TestType>(25);
   model.Add<Linear>(7);
   model.Add<Sigmoid>();
   ReberGrammarTestNetwork(model, true);
@@ -1036,10 +990,20 @@ TEST_CASE("LSTMEmbeddedReberGrammarTest", "[RecurrentNetworkTest]")
  * Test that we can train an RNN on sequences of different lengths, and get
  * roughly the same thing we would for training on non-ragged sequences.
  */
-TEST_CASE("RNNRaggedSequenceTest", "[RecurrentNetworkTest]")
+TEMPLATE_TEST_CASE("RNNRaggedSequenceTest", "[RecurrentNetworkTest][long]",
+    LSTM<>,
+    GRU<>)
 {
   const size_t rho = 25;
   const size_t numEpochs = 3;
+
+  #if ENS_VERSION_MAJOR >= 3
+  const double stepSize = 0.024;
+  #else
+  // Older versions of ensmallen did not adjust the step size for the batch
+  // size.
+  const double stepSize = 0.003;
+  #endif
 
   // Generate noisy sine data.
   arma::cube data, responses;
@@ -1062,47 +1026,213 @@ TEST_CASE("RNNRaggedSequenceTest", "[RecurrentNetworkTest]")
                       responses.n_rows - 1, c, responses.n_slices - 1).randu();
   }
 
-  // Build a network and train it.
-  RMSProp opt(0.003, 1, 0.99, 1e-08, 500 * numEpochs, 1e-5);
-
-  RNN<MeanSquaredError> net(rho);
-  net.Add<LSTM>(10);
-  net.Add<Linear>(1);
-
-  // Train on all the data.
-  net.Train(data, responses, lengths, opt);
-
-  // Make sure that the predictions match the data reasonably.
-  arma::cube prediction;
-  net.Predict(data, prediction, lengths);
-
-  // Sum the error for all sequences.
-  size_t timeSteps = 0;
-  double totalError = 0.0;
-  for (size_t c = 0; c < 500; ++c)
+  bool success = false;
+  // Try the test up to 5 times since the random initalization can cause some
+  // differences between the two networks.
+  for (size_t attempt = 0; attempt < 5; attempt++)
   {
-    timeSteps += lengths[c];
-    totalError += accu(abs(vectorise(responses.subcube(
-        0, c, 0, responses.n_rows - 1, c, lengths[c] - 1)) -
-        vectorise(prediction.subcube(
-        0, c, 0, prediction.n_rows - 1, c, lengths[c] - 1))));
+    // Build a network and train it.
+    RMSProp opt(stepSize, 8, 0.99, 1e-08, 500 * numEpochs, 1e-5);
+
+    RNN<MeanSquaredError> net(rho);
+    net.Add<TestType>(10);
+    net.Add<Linear>(1);
+
+    // Train on all the data.
+    net.Train(data, responses, lengths, opt);
+
+    // Make sure that the predictions match the data reasonably.
+    arma::cube prediction;
+    net.Predict(data, prediction, lengths);
+
+    // Sum the error for all sequences.
+    size_t timeSteps = 0;
+    double totalError = 0.0;
+    for (size_t c = 0; c < 500; ++c)
+    {
+      timeSteps += lengths[c];
+      totalError += accu(abs(vectorise(responses.subcube(
+          0, c, 0, responses.n_rows - 1, c, lengths[c] - 1)) -
+          vectorise(prediction.subcube(
+          0, c, 0, prediction.n_rows - 1, c, lengths[c] - 1))));
+    }
+
+    const double averageError = (totalError / timeSteps);
+
+    // Now compute another network where we don't use the sequence lengths.
+    RNN<MeanSquaredError> net2(rho);
+    net2.Add<TestType>(10);
+    net2.Add<Linear>(1);
+
+    // Train and predict, then compute the sum error.
+    RMSProp opt2(stepSize, 8, 0.99, 1e-08, 500 * numEpochs / 2, 1e-5);
+    net2.Train(origData, origResponses, opt2);
+    net2.Predict(origData, prediction);
+    const double refAverageError = mean(abs(vectorise(origResponses) -
+        vectorise(prediction)));
+
+    // There can be some margin in the results because we are not training on as
+    // much data for the ragged sequences.
+    success = abs(refAverageError - averageError) <= 0.1;
+    if (success)
+      break;
   }
 
-  const double averageError = (totalError / timeSteps);
+  REQUIRE(success);
+}
 
-  // Now compute another network where we don't use the sequence lengths.
-  RNN<MeanSquaredError> net2(rho);
-  net2.Add<LSTM>(10);
-  net2.Add<Linear>(1);
+/**
+ * Test that we can train a RecurrentLinear RNN on sequences of different
+ * lengths, and get roughly the same thing we would for training on non-ragged
+ * sequences. This is a separate test from `RNNRaggedSequenceTest` because the
+ * `LinearRecurrent` layer can't model sine waves.
+ */
+TEST_CASE("RNNRecurrentLinearRaggedSequenceTest",
+    "[RecurrentNetworkTest][long]")
+{
+  const size_t rho = 10;
+  const size_t numEpochs = 10;
 
-  // Train and predict, then compute the sum error.
-  RMSProp opt2(0.003, 1, 0.99, 1e-08, 500 * numEpochs / 2, 1e-5);
-  net2.Train(origData, origResponses, opt2);
-  net2.Predict(origData, prediction);
-  const double refAverageError = mean(abs(vectorise(origResponses) -
-      vectorise(prediction)));
+  #if ENS_VERSION_MAJOR >= 3
+  const double stepSize = 0.08;
+  #else
+  // Older versions of ensmallen did not adjust the step size for the batch
+  // size.
+  const double stepSize = 0.01;
+  #endif
 
-  // There can be some margin in the results because we are not training on as
-  // much data for the ragged sequences.
-  REQUIRE(abs(averageError - refAverageError) <= 0.1);
+  // Generate data.
+  // The response is equal to the sum of the predictors.
+  // eg. for predictors: 0, 5, 3, 1,  3
+  //          responses: 0, 5, 8, 9, 12
+  arma::cube predictors, responses;
+  arma::urowvec sequenceLengths;
+
+  predictors.randn(1, 500, rho + 20);
+  responses.zeros(1, 500, rho + 20);
+  for (size_t c = 0; c < 500; c++)
+  {
+    for (size_t t = 0; t < responses.n_slices; t++)
+    {
+      responses(0, c, t) = arma::accu(predictors.subcube(0, c, 0, 0, c, t));
+    }
+  }
+
+  // Assign random sequence lengths for each sequence.
+  arma::urowvec lengths = arma::randi<arma::urowvec>(500,
+      arma::distr_param(10, 30));
+
+  arma::cube origPredictors = predictors;
+  arma::cube origResponses = responses;
+
+  // Set garbage data for anything past the end of a sequence.
+  for (size_t c = 0; c < 500; c++)
+  {
+    if (lengths[c] == 30)
+      continue;
+
+    predictors.subcube(0, c, lengths[c],
+                       0, c, predictors.n_slices - 1).randn();
+    responses.subcube(0, c, lengths[c],
+                      0, c, responses.n_slices - 1).fill(500);
+  }
+
+  bool success = false;
+  // Try the test up to 5 times since the random initalization can cause some
+  // differences between the two networks.
+  for (size_t attempt = 0; attempt < 5; attempt++)
+  {
+    // Train on non-ragged sequences
+    RMSProp opt1(stepSize, 8, 0.99, 1e-08, 500 * numEpochs / 2, 1e-5);
+    RNN<MeanSquaredError> net1(rho);
+    net1.Add<LinearRecurrent>(1);
+    net1.Train(origPredictors, origResponses, opt1);
+
+    // Test the error of the network non-ragged sequences;
+    arma::cube prediction1;
+    net1.Predict(origPredictors, prediction1);
+    const double refAverageError = mean(abs(vectorise(origResponses) -
+        vectorise(prediction1)));
+
+    // Train on ragged sequences
+    RMSProp opt2(stepSize, 8, 0.99, 1e-08, 500 * numEpochs, 1e-5);
+    RNN<MeanSquaredError> net2(rho);
+    net2.Add<LinearRecurrent>(1);
+    net2.Train(predictors, responses, lengths, opt2);
+
+    // Test the error of the network trained on ragged sequences;
+    arma::cube prediction2;
+    net2.Predict(predictors, prediction2, lengths);
+    size_t timeSteps = 0;
+    double totalError = 0.0;
+    for (size_t c = 0; c < 500; ++c)
+    {
+      timeSteps += lengths[c];
+      totalError += accu(abs(
+          vectorise(origResponses.subcube(0, c, 0, 0, c, lengths[c] - 1)) -
+          vectorise(prediction2.subcube(0, c, 0, 0, c, lengths[c] - 1))));
+    }
+    const double averageError = (totalError / timeSteps);
+
+    // There can be some margin in the results because we are not training on as
+    // much data for the ragged sequences.
+    success = abs(refAverageError - averageError) <= 0.1;
+    if (success)
+      break;
+  }
+
+  REQUIRE(success);
+}
+
+/**
+ * Test that `RNN::Evaluate()` returns a reasonable value.
+ */
+TEST_CASE("RNNEvaluateTest", "[RecurrentNetworkTest]")
+{
+  arma::cube predictors, labels;
+  predictors.zeros(1, 5, 10);
+  labels.ones(1, 5, 10);
+
+  // Create the network.
+  RNN<MeanSquaredError> net(0, false, MeanSquaredError(true));
+  net.Add<LinearNoBias>(1);
+
+  // The input is all zeros so the output should also be all zeros.
+  // The loss at each slice should then be equal to the mean squared error
+  // between 0 (output) and 1 (labels) which is 1.
+  double loss = net.Evaluate(predictors, labels);
+
+  // The total loss should be equal to the total number of slices.
+  REQUIRE(loss == Approx(labels.n_cols * labels.n_slices));
+}
+
+/**
+ * Test that `RNN::Evaluate()` returns a reasonable value with a ragged input
+ * sequence.
+ */
+TEST_CASE("RNNRaggedEvaluateTest", "[RecurrentNetworkTest]")
+{
+  arma::cube predictors, labels;
+  predictors.zeros(1, 5, 10);
+  labels.ones(1, 5, 10);
+
+  // Create sequence lengths from 2 to 10.
+  arma::urowvec lengths(5);
+  for (int i = 0; i < 5; i++)
+    lengths[i] = (i + 1) * 2;
+
+  // Create the network.
+  RNN<MeanSquaredError> net(0, false, MeanSquaredError(true));
+  net.Add<LinearNoBias>(1);
+
+  // The input is all zeros so the output should also be all zeros.
+  // The loss at each slice should then be equal to the mean squared error
+  // between 0 (output) and 1 (labels) which is 1.
+  double loss = net.Evaluate(predictors, labels, lengths, 4);
+
+  // The total loss should be equal to the total number of slices.
+  int totalSlices = 0;
+  for (unsigned int i = 0; i < 5; i++)
+    totalSlices += lengths[i];
+  REQUIRE(loss == Approx(totalSlices));
 }

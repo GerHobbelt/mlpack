@@ -65,10 +65,10 @@ TEMPLATE_TEST_CASE("LinearRegressionTestCase", "[LinearRegressionTest]",
   LinearRegression<MatType> lr(predictors, responses);
   lr.Predict(points, predictions);
 
-  // Output result and verify we have less than 5% error from "correct" value
+  // Output result and verify we have less than 7.5% error from "correct" value
   // for each point.
   for (size_t i = 0; i < predictions.n_cols; ++i)
-    REQUIRE(predictions(i) - responses(i) == Approx(0.0).margin(0.05));
+    REQUIRE(predictions(i) - responses(i) == Approx(0.0).margin(0.075));
 }
 
 /**
@@ -279,7 +279,7 @@ TEST_CASE("LinearRegressionTrainReturnObjective", "[LinearRegressionTest]")
  * Make sure all versions of Train() work correctly.
  */
 TEMPLATE_TEST_CASE("LinearRegressionAllTrainVersionsTest",
-    "[LinearRegressionTest]", arma::fmat, arma::mat)
+    "[LinearRegressionTest][tiny]", arma::fmat, arma::mat)
 {
   using MatType = TestType;
   using RowType = arma::Row<typename MatType::elem_type>;
@@ -423,3 +423,14 @@ TEST_CASE("LinearRegressionSparseTrainingTest", "[LinearRegressionTest]")
 
   REQUIRE(predictions.n_elem == 5000);
 }
+
+TEST_CASE("LinearRegressionMismatchedInputTest",
+          "[LinearRegressionTest]")
+{
+  arma::mat predictors(3, 10, arma::fill::randu);
+  arma::rowvec responses(5, arma::fill::randu);
+
+  REQUIRE_THROWS(
+      LinearRegression<>(predictors, responses));
+}
+

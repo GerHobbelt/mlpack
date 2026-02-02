@@ -64,4 +64,9 @@ for a full list of algorithms.
 
 Computations based on distance metrics.
 
-<!-- TODO: add some -->
+ * [`KNN`](methods/knn.md): `k`-nearest-neighbor search (exact and approximate)
+   with tree-based algorithms.
+ * [`KFN`](methods/kfn.md): `k`-furthest-neighbor search (exact and approximate)
+   with tree-based algorithms.
+
+<!-- TODO: add more -->

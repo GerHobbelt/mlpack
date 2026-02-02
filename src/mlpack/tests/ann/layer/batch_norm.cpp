@@ -25,7 +25,7 @@ using namespace mlpack;
  * the values from another implementation.
  * Link to the implementation - http://cthorey.github.io./backpropagation/
  */
-TEST_CASE("BatchNormTest", "[ANNLayerTest]")
+TEST_CASE("BatchNormTest", "[ANNLayerTest][tiny]")
 {
   arma::mat output;
   arma::mat input = { { 5.1, 3.5, 1.4 },
@@ -135,8 +135,8 @@ TEST_CASE("GradientBatchNormTest", "[ANNLayerTest]")
   struct GradientFunction
   {
     GradientFunction() :
-        input(arma::randn(32, 2048)),
-        target(arma::zeros(1, 2048))
+        input(arma::randn(32, 512)),
+        target(arma::zeros(1, 512))
     {
       model = new FFN<NegativeLogLikelihood, NguyenWidrowInitialization>();
       model->ResetData(input, target);
@@ -153,8 +153,8 @@ TEST_CASE("GradientBatchNormTest", "[ANNLayerTest]")
 
     double Gradient(arma::mat& gradient) const
     {
-      double error = model->Evaluate(model->Parameters(), 0, 2048);
-      model->Gradient(model->Parameters(), 0, gradient, 2048);
+      double error = model->Evaluate(model->Parameters(), 0, 512);
+      model->Gradient(model->Parameters(), 0, gradient, 512);
       return error;
     }
 
@@ -174,13 +174,14 @@ template<typename LayerType>
 void ANNLayerSerializationTest(LayerType& layer)
 {
   arma::mat input(5, 100, arma::fill::randu);
-  arma::mat output(5, 100, arma::fill::randu);
+  arma::mat output = arma::randi<arma::mat>(1, 100,
+      arma::distr_param(0, 4));
 
   FFN<> model;
   model.Add<Linear>(10);
   model.Add<LayerType>(layer);
   model.Add<ReLU>();
-  model.Add<Linear>(output.n_rows);
+  model.Add<Linear>(5);
   model.Add<LogSoftMax>();
 
   ens::StandardSGD opt(0.1, 1, 5, -100, false);

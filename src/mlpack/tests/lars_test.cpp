@@ -125,7 +125,7 @@ TEMPLATE_TEST_CASE("LARSTestLassoGram", "[LARSTest]", arma::fmat, arma::mat)
   LassoTest<TestType>(100, 10, false, false, true, true);
 }
 
-TEMPLATE_TEST_CASE("LARSTestElasticNetCholesky", "[LARSTest]", arma::fmat,
+TEMPLATE_TEST_CASE("LARSTestElasticNetCholesky", "[LARSTest][tiny]", arma::fmat,
     arma::mat)
 {
   LassoTest<TestType>(100, 10, true, true, false, false);
@@ -134,7 +134,7 @@ TEMPLATE_TEST_CASE("LARSTestElasticNetCholesky", "[LARSTest]", arma::fmat,
   LassoTest<TestType>(100, 10, true, true, true, true);
 }
 
-TEMPLATE_TEST_CASE("LARSTestElasticNetGram", "[LARSTest]", arma::fmat,
+TEMPLATE_TEST_CASE("LARSTestElasticNetGram", "[LARSTest][tiny]", arma::fmat,
     arma::mat)
 {
   LassoTest<TestType>(100, 10, true, false, false, false);
@@ -151,9 +151,9 @@ TEST_CASE("CholeskySingularityTest", "[LARSTest]")
   arma::mat X;
   arma::mat Y;
 
-  if (!data::Load("lars_dependent_x.csv", X))
+  if (!Load("lars_dependent_x.csv", X))
     FAIL("Cannot load dataset lars_dependent_x.csv");
-  if (!data::Load("lars_dependent_y.csv", Y))
+  if (!Load("lars_dependent_y.csv", Y))
     FAIL("Cannot load dataset lars_dependent_y.csv");
 
   arma::rowvec y = Y.row(0);
@@ -178,9 +178,9 @@ TEST_CASE("NoCholeskySingularityTest", "[LARSTest]")
   arma::mat X;
   arma::mat Y;
 
-  if (!data::Load("lars_dependent_x.csv", X))
+  if (!Load("lars_dependent_x.csv", X))
     FAIL("Cannot load dataset lars_dependent_x.csv");
-  if (!data::Load("lars_dependent_y.csv", Y))
+  if (!Load("lars_dependent_y.csv", Y))
     FAIL("Cannot load dataset lars_dependent_y.csv");
 
   arma::rowvec y = Y.row(0);
@@ -200,7 +200,7 @@ TEST_CASE("NoCholeskySingularityTest", "[LARSTest]")
 }
 
 // Make sure that Predict() provides reasonable enough solutions.
-TEST_CASE("PredictTest", "[LARSTest]")
+TEST_CASE("PredictTest", "[LARSTest][long]")
 {
   for (size_t i = 0; i < 2; ++i)
   {
@@ -272,7 +272,7 @@ TEST_CASE("PredictTest", "[LARSTest]")
 
 // This is the same as PredictTest, but for arma::fmat, and it allows multiple
 // trials for run to deal with the lower precision of floats.
-TEST_CASE("PredictFloatTest", "[LARSTest]")
+TEST_CASE("PredictFloatTest", "[LARSTest][long]")
 {
   for (size_t i = 0; i < 2; ++i)
   {
@@ -569,9 +569,9 @@ TEST_CASE("LARSTrainReturnCorrelation", "[LARSTest]")
   arma::mat X;
   arma::mat Y;
 
-  if (!data::Load("lars_dependent_x.csv", X))
+  if (!Load("lars_dependent_x.csv", X))
     FAIL("Cannot load dataset lars_dependent_x.csv");
-  if (!data::Load("lars_dependent_y.csv", Y))
+  if (!Load("lars_dependent_y.csv", Y))
     FAIL("Cannot load dataset lars_dependent_y.csv");
 
   arma::rowvec y = Y.row(0);
@@ -616,9 +616,9 @@ TEMPLATE_TEST_CASE("LARSTestComputeError", "[LARSTest]", arma::fmat, arma::mat)
   MatType X;
   MatType Y;
 
-  if (!data::Load("lars_dependent_x.csv", X))
+  if (!Load("lars_dependent_x.csv", X))
     FAIL("Cannot load dataset lars_dependent_x.csv");
-  if (!data::Load("lars_dependent_y.csv", Y))
+  if (!Load("lars_dependent_y.csv", Y))
     FAIL("Cannot load dataset lars_dependent_y.csv");
 
   arma::Row<ElemType> y = Y.row(0);
@@ -643,9 +643,9 @@ TEST_CASE("LARSCopyConstructorTest", "[LARSTest]")
   arma::rowvec targets;
 
   // Load training input and predictions for testing.
-  if (!data::Load("lars_dependent_x.csv", features))
+  if (!Load("lars_dependent_x.csv", features))
     FAIL("Cannot load dataset lars_dependent_x.csv");
-  if (!data::Load("lars_dependent_y.csv", Y))
+  if (!Load("lars_dependent_y.csv", Y))
     FAIL("Cannot load dataset lars_dependent_y.csv");
   targets = Y.row(0);
 
@@ -702,7 +702,7 @@ TEST_CASE("LARSFitInterceptTest", "[LARSTest]")
 
 // Make sure that Predict() provides reasonable enough solutions when we are
 // fitting an intercept.
-TEST_CASE("PredictFitInterceptTest", "[LARSTest]")
+TEST_CASE("PredictFitInterceptTest", "[LARSTest][long]")
 {
   for (size_t i = 0; i < 2; ++i)
   {
@@ -747,7 +747,7 @@ TEST_CASE("PredictFitInterceptTest", "[LARSTest]")
 
 // Make sure that Predict() provides reasonable enough solutions when we are
 // normalizing data.
-TEST_CASE("PredictNormalizeDataTest", "[LARSTest]")
+TEST_CASE("PredictNormalizeDataTest", "[LARSTest][long]")
 {
   for (size_t i = 0; i < 2; ++i)
   {
@@ -790,7 +790,7 @@ TEST_CASE("PredictNormalizeDataTest", "[LARSTest]")
 
 // Make sure that Predict() provides reasonable enough solutions when we are
 // fitting an intercept and normalizing data.
-TEST_CASE("PredictFitInterceptNormalizeDataTest", "[LARSTest]")
+TEST_CASE("PredictFitInterceptNormalizeDataTest", "[LARSTest][long]")
 {
   for (size_t i = 0; i < 2; ++i)
   {
@@ -873,21 +873,24 @@ void CheckKKT(const arma::vec& beta,
 
 TEST_CASE("LARSTestKKT", "[LARSTest]")
 {
-  // Each row of F corresponds to a test.
-  //
-  // For each test i,
-  //    F(0, i) is the matrix of covariates X, and
-  //    F(1, i) is the matrix (vector) of responses/observations y.
-  arma::field<arma::mat> F;
-  F.load("lars_kkt.bin");
+  // There are 10 test cases for which we have the matrix of covariates and
+  // responses.
+  const size_t tests = 10;
 
   bool useCholesky = true;
   LARS<> lars(useCholesky, 1.0, 0.0);
 
-  for (size_t i = 0; i < F.n_cols; i++)
+  for (size_t i = 0; i < tests; i++)
   {
-    arma::mat X = std::move(F(0, i));
-    arma::rowvec y = std::move(F(1, i));
+    std::ostringstream nameX, nameY;
+    nameX << "lars_kkt_X_" << i << ".csv";
+    nameY << "lars_kkt_y_" << i << ".csv";
+
+    arma::mat X;
+    X.load(nameX.str(), arma::csv_ascii);
+    arma::rowvec y;
+    y.load(nameY.str(), arma::csv_ascii);
+
     const arma::rowvec xMean = arma::mean(X, 0);
     arma::rowvec xStds = arma::stddev(X, 0, 0);
     xStds.replace(0.0, 1.0);
@@ -1297,7 +1300,8 @@ TEST_CASE("LARSSelectBetaInvalidLambda1Test", "[LARSTest]")
 }
 
 // Test that we can train a sparse model on dense data.
-TEMPLATE_TEST_CASE("LARSSparseModelDenseData", "[LARSTest]", float, double)
+TEMPLATE_TEST_CASE("LARSSparseModelDenseData", "[LARSTest][long]", float,
+    double)
 {
   using eT = TestType;
 

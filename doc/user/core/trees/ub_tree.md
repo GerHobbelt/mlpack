@@ -1,11 +1,10 @@
 # `UBTree`
 
-<!-- TODO: link to knn.md once it's done -->
-
 The `UBTree` class implements the universal B-tree, a `k`-dimensional space
 partitioning tree based on the B-tree.  The `UBTree` class can be used for
-efficient distance operations (such as nearest neighbor search) in low
-dimensions---typically less than 100.
+efficient distance operations (such as
+[nearest neighbor search](../../methods/knn.md)) in low dimensions---typically
+less than 100.
 
 The univeral B-tree considers each point to have an
 [address](binary_space_tree.md#addressing-in-a-cellbound), which is an ordered
@@ -26,13 +25,14 @@ additional functionality specific to UB-trees.
 
 ## See also
 
-<!-- TODO: add links to all distance-based algorithms and other trees? -->
-
+ * [`BinarySpaceTree`](binary_space_tree.md)
+ * [mlpack trees](../trees.md)
+ * [`KNN`](../../methods/knn.md)
+ * [mlpack geometric algorithms](../../modeling.md#geometric-algorithms)
  * [UB-tree on Wikipedia](https://en.wikipedia.org/wiki/UB-tree)
  * [Z-ordering on Wikipedia](https://en.wikipedia.org/wiki/Z-order_curve)
- * [`BinarySpaceTree`](binary_space_tree.md)
  * [The Universal B-tree for multidimensional indexing (pdf)](https://www.mlpack.org/papers/bayer96.pdf)
- * [Binary space partitioning on Wikipedia](https://dl.acm.org/doi/pdf/10.1145/361002.361007)
+ * [Binary space partitioning on Wikipedia](https://en.wikipedia.org/wiki/Binary_space_partitioning)
  * [Tree-Independent Dual-Tree Algorithms (pdf)](https://www.ratml.org/pub/pdf/2013tree.pdf)
 
 ## Template parameters
@@ -310,7 +310,7 @@ accessing them does not require any computation.
    - This is equivalent to calling `node.Bound().Center(center)`.
 
  * A `UBTree` can be serialized with
-   [`data::Save()` and `data::Load()`](../../load_save.md#mlpack-objects).
+   [`Save()` and `Load()`](../../load_save.md#mlpack-models-and-objects).
 
 ## Bounding distances with the tree
 
@@ -415,7 +415,7 @@ tree.
 ```c++
 // See https://datasets.mlpack.org/cloud.csv.
 arma::mat dataset;
-mlpack::data::Load("cloud.csv", dataset, true);
+mlpack::Load("cloud.csv", dataset, mlpack::Fatal);
 
 // Build the UB-tree with a leaf size of 10.  (This means that nodes are split
 // until they contain 10 or fewer points.)
@@ -472,7 +472,7 @@ maximum distances between different nodes in the tree.
 ```c++
 // See https://datasets.mlpack.org/corel-histogram.csv.
 arma::mat dataset;
-mlpack::data::Load("corel-histogram.csv", dataset, true);
+mlpack::Load("corel-histogram.csv", dataset, mlpack::Fatal);
 
 // Build UB-trees on the first half and the second half of points.
 mlpack::UBTree<> tree1(dataset.cols(0, dataset.n_cols / 2));
@@ -538,7 +538,7 @@ Build a `UBTree` on 32-bit floating point data and save it to disk.
 ```c++
 // See https://datasets.mlpack.org/corel-histogram.csv.
 arma::fmat dataset;
-mlpack::data::Load("corel-histogram.csv", dataset);
+mlpack::Load("corel-histogram.csv", dataset);
 
 // Build the UBTree using 32-bit floating point data as the matrix type.
 // We will still use the default EmptyStatistic and EuclideanDistance
@@ -548,7 +548,7 @@ mlpack::UBTree<mlpack::EuclideanDistance,
                arma::fmat> tree(std::move(dataset), 100);
 
 // Save the UBTree to disk with the name 'tree'.
-mlpack::data::Save("tree.bin", "tree", tree);
+mlpack::Save("tree.bin", tree);
 
 std::cout << "Saved tree with " << tree.Dataset().n_cols << " points to "
     << "'tree.bin'." << std::endl;
@@ -569,7 +569,7 @@ using TreeType = mlpack::UBTree<mlpack::EuclideanDistance,
                                 arma::fmat>;
 
 TreeType tree;
-mlpack::data::Load("tree.bin", "tree", tree);
+mlpack::Load("tree.bin", tree);
 std::cout << "Tree loaded with " << tree.NumDescendants() << " points."
     << std::endl;
 
@@ -612,7 +612,7 @@ Build a `UBTree` and map between original points and new points.
 ```c++
 // See https://datasets.mlpack.org/cloud.csv.
 arma::mat dataset;
-mlpack::data::Load("cloud.csv", dataset, true);
+mlpack::Load("cloud.csv", dataset, mlpack::Fatal);
 
 // Build the tree.
 std::vector<size_t> oldFromNew, newFromOld;

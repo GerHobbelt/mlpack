@@ -23,9 +23,10 @@ functionality is required, then the R tree or other variants of
 
 ## See also
 
-<!-- TODO: add links to all distance-based algorithms and other trees? -->
-
  * [`RectangleTree`](rectangle_tree.md)
+ * [mlpack trees](../trees.md)
+ * [`KNN`](../../methods/knn.md)
+ * [mlpack geometric algorithms](../../modeling.md#geometric-algorithms)
  * [R-Tree on Wikipedia](https://en.wikipedia.org/wiki/R-tree)
  * [R-Trees: A Dynamic Index Structure for Spatial Searching (pdf)](http://www-db.deis.unibo.it/courses/SI-LS/papers/Gut84.pdf)
  * [Tree-Independent Dual-Tree Algorithms (pdf)](https://www.ratml.org/pub/pdf/2013tree.pdf)
@@ -310,7 +311,7 @@ on bound quantities for trees.
    - This is equivalent to calling `node.Bound().Center(center)`.
 
  * An `RTree` can be serialized with
-   [`data::Save()` and `data::Load()`](../../load_save.md#mlpack-objects).
+   [`Save()` and `Load()`](../../load_save.md#mlpack-models-and-objects).
 
 ## Bounding distances with the tree
 
@@ -389,7 +390,7 @@ tree.
 ```c++
 // See https://datasets.mlpack.org/cloud.csv.
 arma::mat dataset;
-mlpack::data::Load("cloud.csv", dataset, true);
+mlpack::Load("cloud.csv", dataset, mlpack::Fatal);
 
 // Build the R tree with a leaf size of 10.  (This means that leaf nodes
 // cannot contain more than 10 points.)
@@ -440,7 +441,7 @@ maximum distances between different nodes in the tree.
 ```c++
 // See https://datasets.mlpack.org/corel-histogram.csv.
 arma::mat dataset;
-mlpack::data::Load("corel-histogram.csv", dataset, true);
+mlpack::Load("corel-histogram.csv", dataset, mlpack::Fatal);
 
 // Build trees on the first half and the second half of points.
 mlpack::RTree<> tree1(dataset.cols(0, dataset.n_cols / 2));
@@ -493,7 +494,7 @@ Build an `RTree` on 32-bit floating point data and save it to disk.
 ```c++
 // See https://datasets.mlpack.org/corel-histogram.csv.
 arma::fmat dataset;
-mlpack::data::Load("corel-histogram.csv", dataset);
+mlpack::Load("corel-histogram.csv", dataset);
 
 // Build the RTree using 32-bit floating point data as the matrix type.  We will
 // still use the default EmptyStatistic and EuclideanDistance parameters.  A
@@ -503,7 +504,7 @@ mlpack::RTree<mlpack::EuclideanDistance,
               arma::fmat> tree(std::move(dataset), 100);
 
 // Save the tree to disk with the name 'tree'.
-mlpack::data::Save("tree.bin", "tree", tree);
+mlpack::Save("tree.bin", tree);
 
 std::cout << "Saved tree with " << tree.Dataset().n_cols << " points to "
     << "'tree.bin'." << std::endl;
@@ -524,7 +525,7 @@ using TreeType = mlpack::RTree<mlpack::EuclideanDistance,
                                arma::fmat>;
 
 TreeType tree;
-mlpack::data::Load("tree.bin", "tree", tree);
+mlpack::Load("tree.bin", tree);
 std::cout << "Tree loaded with " << tree.NumDescendants() << " points."
     << std::endl;
 
@@ -565,7 +566,7 @@ some information, and then remove a few randomly chosen points.
 ```c++
 // See https://datasets.mlpack.org/corel-histogram.csv.
 arma::mat dataset;
-mlpack::data::Load("corel-histogram.csv", dataset, true);
+mlpack::Load("corel-histogram.csv", dataset, mlpack::Fatal);
 
 // Create an empty tree of the right dimensionality.
 mlpack::RTree<> t(dataset.n_rows);

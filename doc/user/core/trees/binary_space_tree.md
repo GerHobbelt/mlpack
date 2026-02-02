@@ -36,11 +36,11 @@ may require a template typedef.
 
 ## See also
 
-<!-- TODO: add links to all distance-based algorithms and other trees? -->
-
- * [`KDTree`](kdtree.md)
- * [`MeanSplitKDTree`](mean_split_kdtree.md)
- * [Binary space partitioning on Wikipedia](https://dl.acm.org/doi/pdf/10.1145/361002.361007)
+ * [mlpack trees](../trees.md)
+ * [`KNN`](../../methods/knn.md)
+ * [`KFN`](../../methods/kfn.md)
+ * [mlpack geometric algorithms](../../modeling.md#geometric-algorithms)
+ * [Binary space partitioning on Wikipedia](https://en.wikipedia.org/wiki/Binary_space_partitioning)
  * [Tree-Independent Dual-Tree Algorithms (pdf)](https://www.ratml.org/pub/pdf/2013tree.pdf)
 
 ## Template parameters
@@ -325,7 +325,7 @@ on bound quantities for trees.
    - This is equivalent to calling `node.Bound().Center(center)`.
 
  * A `BinarySpaceTree` can be serialized with
-   [`data::Save()` and `data::Load()`](../../load_save.md#mlpack-objects).
+   [`Save()` and `Load()`](../../load_save.md#mlpack-models-and-objects).
 
 ## Bounding distances with the tree
 
@@ -533,7 +533,7 @@ accessed and modified.
    by `b`.
 
  * An `HRectBound` can be serialized with
-   [`data::Save()` and `data::Load()`](../../load_save.md#mlpack-objects).
+   [`Save()` and `Load()`](../../load_save.md#mlpack-models-and-objects).
 
 ***Note:*** if a custom `ElemType` was specified in the constructor, then:
 
@@ -903,7 +903,7 @@ The properties of the `BallBound` can be directly accessed and modified.
    `center`.  `center` should be of type `arma::vec`.
 
  * A `BallBound` can be serialized with
-   [`data::Save()` and `data::Load()`](../../load_save.md#mlpack-objects).
+   [`Save()` and `Load()`](../../load_save.md#mlpack-models-and-objects).
 
 ***Note:*** if a custom `ElemType` and/or `VecType` were specified in the
 constructor, then:
@@ -1222,7 +1222,7 @@ be accessed and modified.
    by `b`.
 
  * A `HollowBallBound` can be serialized with
-   [`data::Save()` and `data::Load()`](../../load_save.md#mlpack-objects).
+   [`Save()` and `Load()`](../../load_save.md#mlpack-models-and-objects).
 
 ***Note:*** if a custom `ElemType` was specified in the constructor, then:
 
@@ -1586,7 +1586,7 @@ bound](#growing-the-bound-2) for ways to grow a `CellBound`.
    by `b`.
 
  * A `CellBound` can be serialized with
-   [`data::Save()` and `data::Load()`](../../load_save.md#mlpack-objects).
+   [`Save()` and `Load()`](../../load_save.md#mlpack-models-and-objects).
 
 ***Note:*** if a custom `ElemType` was specified in the constructor, then:
 
@@ -1910,6 +1910,12 @@ mlpack provides a few existing `StatisticType` classes, and a custom
 
  * [`EmptyStatistic`](#emptystatistic): an empty statistic class that does not
    hold any information
+ * [`NearestNeighborStat`](#nearestneighborstat): a statistic class storing data
+   relevant during nearest neighbor search, used by
+   [`KNN`](../../methods/knn.md).
+ * [`FurthestNeighborStat`](#nearestneighborstat): a statistic class storing
+   data relevant during furthest neighbor search, used by
+   [`KNN`](../../methods/kfn.md).
  * [Custom `StatisticType`s](#custom-statistictypes): implement a fully custom
    `StatisticType`
 
@@ -1923,6 +1929,40 @@ default `StatisticType` template parameter for mlpack trees.
 
 The class ***does not hold any members and provides no functionality***.
 [See the implementation.](/src/mlpack/core/tree/statistic.hpp)
+
+### `NearestNeighborStat`
+
+The `NearestNeighborStat` class is a utility structure that holds a number of
+bounding quantities used in tree-based algorithms for nearest neighbor search.
+The held quantities are used internally by the
+[`RuleType`](../../../developer/trees.md#rules) used for nearest neighbor
+search, and these quantities are detailed in the
+[tree-independent dual tree algorithms paper (pdf)](https://www.ratml.org/pub/pdf/2013tree.pdf).
+
+In general, there is no need to directly interact with the
+`NearestNeighborStat`, and classes such as [`KNN`](../../methods/knn.md) provide
+a convenience typedef (e.g. `KNN::TreeType`) that corresponds to the tree type
+with `NearestNeighborStat` as the `StatisticType`.
+
+For more details, see
+[the source code](/src/mlpack/methods/neighbor_search/neighbor_search_stat.hpp).
+
+### `FurthestNeighborStat`
+
+The `FurthestNeighborStat` class is a utility structure that holds a number of
+bounding quantities used in tree-based algorithms for furthest neighbor search.
+The held quantities are used internally by the
+[`RuleType`](../../../developer/trees.md#rules) used for furthest neighbor
+search, and these quantities are detailed in the
+[tree-independent dual tree algorithms paper (pdf)](https://www.ratml.org/pub/pdf/2013tree.pdf).
+
+In general, there is no need to directly interact with the
+`FurthestNeighborStat`, and classes such as [`KFN`](../../methods/kfn.md)
+provide a convenience typedef (e.g. `KFN::TreeType`) that corresponds to the
+tree type with `FurthestNeighborStat` as the `StatisticType`.
+
+For more details, see
+[the source code](/src/mlpack/methods/neighbor_search/neighbor_search_stat.hpp).
 
 ### Custom `StatisticType`s
 
@@ -2228,7 +2268,7 @@ about the tree.
 ```c++
 // See https://datasets.mlpack.org/cloud.csv.
 arma::mat dataset;
-mlpack::data::Load("cloud.csv", dataset, true);
+mlpack::Load("cloud.csv", dataset, mlpack::Fatal);
 
 // Build the binary space tree with a leaf size of 10.  (This means that nodes
 // are split until they contain 10 or fewer points.)
@@ -2274,7 +2314,7 @@ and maximum distances between different nodes in the tree.
 ```c++
 // See https://datasets.mlpack.org/corel-histogram.csv.
 arma::mat dataset;
-mlpack::data::Load("corel-histogram.csv", dataset, true);
+mlpack::Load("corel-histogram.csv", dataset, mlpack::Fatal);
 
 // Convenience typedef for the tree type.
 using TreeType = mlpack::BinarySpaceTree<mlpack::EuclideanDistance,
@@ -2346,7 +2386,7 @@ Build a `BinarySpaceTree` on 32-bit floating point data and save it to disk.
 ```c++
 // See https://datasets.mlpack.org/corel-histogram.csv.
 arma::fmat dataset;
-mlpack::data::Load("corel-histogram.csv", dataset);
+mlpack::Load("corel-histogram.csv", dataset);
 
 // Build the BinarySpaceTree using 32-bit floating point data as the matrix
 // type.  We will still use the default EmptyStatistic and EuclideanDistance
@@ -2358,7 +2398,7 @@ mlpack::BinarySpaceTree<mlpack::EuclideanDistance,
                         mlpack::MidpointSplit> tree(std::move(dataset), 100);
 
 // Save the tree to disk with the name 'tree'.
-mlpack::data::Save("tree.bin", "tree", tree);
+mlpack::Save("tree.bin", tree);
 
 std::cout << "Saved tree with " << tree.Dataset().n_cols << " points to "
     << "'tree.bin'." << std::endl;
@@ -2381,7 +2421,7 @@ using TreeType = mlpack::BinarySpaceTree<mlpack::EuclideanDistance,
                                          mlpack::MidpointSplit>;
 
 TreeType tree;
-mlpack::data::Load("tree.bin", "tree", tree);
+mlpack::Load("tree.bin", tree);
 std::cout << "Tree loaded with " << tree.NumDescendants() << " points."
     << std::endl;
 
@@ -2424,7 +2464,7 @@ Build a `BinarySpaceTree` and map between original points and new points.
 ```c++
 // See https://datasets.mlpack.org/cloud.csv.
 arma::mat dataset;
-mlpack::data::Load("cloud.csv", dataset, true);
+mlpack::Load("cloud.csv", dataset, mlpack::Fatal);
 
 // Build the tree.
 std::vector<size_t> oldFromNew, newFromOld;

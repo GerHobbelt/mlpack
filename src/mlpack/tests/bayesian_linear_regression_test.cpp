@@ -17,7 +17,6 @@
 #include "catch.hpp"
 
 using namespace mlpack;
-using namespace mlpack::data;
 
 void GenerateProblem(arma::mat& matX,
                      arma::rowvec& y,
@@ -34,7 +33,7 @@ void GenerateProblem(arma::mat& matX,
 // Ensure that predictions are close enough to the target
 // for a free noise dataset.
 TEST_CASE("BayesianLinearRegressionRegressionTest",
-          "[BayesianLinearRegressionTest]")
+          "[BayesianLinearRegressionTest][tiny]")
 {
   arma::mat matX;
   arma::rowvec y, predictions;

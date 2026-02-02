@@ -70,7 +70,7 @@ cmake \
 |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | C906      | [Bootlin toolchain link](https://toolchains.bootlin.com/releases_riscv64-lp64d.html)| [Sysroot and toolchain prefix](#c906) | [C906 on riscv](https://www.riscvschool.com/2023/03/09/t-head-xuantie-c906-risc-v/) |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| x280      | [Bootlin toolchain link](https://toolchains.bootlin.com/releases_riscv64-lp64d.html)| [Sysroot and toolchain prefix](#x280) | [x280 on SiFive](https://www.sifive.cn/api/document-file?uid=x280-datasheet) |
+| x280      | [Bootlin toolchain link](https://toolchains.bootlin.com/releases_riscv64-lp64d.html)| [Sysroot and toolchain prefix](#x280) | [SiFive x280 product brief](https://www.sifive.com/document-file/sifive-intelligence-x280-product-brief) |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | KATAMI    | [Bootlin toolchain link](https://toolchains.bootlin.com/releases_x86-i686.html)     | [Sysroot and toolchain prefix](#katami) |[Pentium 3 on Wikipedia](https://en.wikipedia.org/wiki/Pentium_III)          |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -78,7 +78,12 @@ cmake \
 |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | COPPERMINE | [Bootlin toolchain link](https://toolchains.bootlin.com/releases_x86-i686.html)   | [Sysroot and toolchain prefix](#coppermine) |[Pentium 3 on Wikipedia](https://en.wikipedia.org/wiki/Pentium_III)       |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-
+| POWERPCG4 | [Bootlin toolchain link](https://toolchains.bootlin.com/releases_powerpc-440fp.html)   | [Sysroot and toolchain prefix](#powerpcg4) |[Power Mac G4 Cube](https://en.wikipedia.org/wiki/Power_Mac_G4_Cube), [BAE RAD750](https://en.wikipedia.org/wiki/RAD750) |
+|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| MIPS24K | [Bootlin toolchain link](https://toolchains.bootlin.com/releases_mips32.html)   | [Sysroot and toolchain prefix](#mips24k) |[MIPS32k on Wikipedia](https://en.wikipedia.org/wiki/MIPS_architecture#MIPS32/MIPS64) [VoCore Ultimate](http://vocore.io/v2u.html) |
+|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ULTRASPARC | [Bootlin toolchain link](https://toolchains.bootlin.com/releases_sparc64.html)   | [Sysroot and toolchain prefix](#ultrasparc) |[UltraSPARC on Wikipedia](https://en.wikipedia.org/wiki/UltraSPARC)        |
+|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 If you didn't see your architecture in the table above, use the closest
 architecture with a similar word size, or, adapt the parameters directly in
 `CMake/crosscompile-arch-config.cmake` and feel free to open a pull request so we can get
@@ -188,3 +193,29 @@ the new architecture added to this table.
 -DTOOLCHAIN_PREFIX=/path/to/bootlin/toolchain/x86-i686--glibc--stable-2024.02-1/bin/x86-i686-buildroot-linux-gnueabihf-
 -DCMAKE_SYSROOT=/path/to/bootlin/toolchain/x86-i686--glibc--stable-2024.02-1/x86-i686-buildroot-linux-gnueabihf/sysroot
 ```
+
+### POWERPCG4
+
+```
+-DTOOLCHAIN_PREFIX=/path/to/bootlin/toolchain/powerpc-440fp--glibc--stable-2024.02-1/bin/powerpc-buildroot-linux-gnu-
+-DCMAKE_SYSROOT=/path/to/bootlin/toolchain/powerpc-440fp--glibc--stable-2024.02-1/powerpc-buildroot-linux-gnu/sysroot
+```
+
+### MIPS24K
+
+```
+-DTOOLCHAIN_PREFIX=/path/to/bootlin/toolchain/mips32--glibc--stable-2024.02-1/bin/mips32-buildroot-linux-gnu-
+-DCMAKE_SYSROOT=/path/to/bootlin/toolchain/mips32--glibc--stable-2024.02-1/mips32-buildroot-linux-gnu/sysroot
+```
+
+### ULTRASPARC
+
+```
+-DTOOLCHAIN_PREFIX=/path/to/bootlin/toolchain/sparc64--glibc--stable-2024.05-1/bin/sparc64-buildroot-linux-gnu-
+-DCMAKE_SYSROOT=/path/to/bootlin/toolchain/sparc64--glibc--stable-2024.05-1/sparc64-buildroot-linux-gnu/sysroot
+```
+
+***Note:*** the sparc64 instruction set does not support unaligned loads;
+therefore, if [image operations](../user/load_save.md#image-data) are being
+performed, add `#define STBIR_MEMCPY_NOUNALIGNED` to your code before including
+mlpack, or add the compiler option `-DSTBIR_MEMCPY_NOUNALIGNED`.

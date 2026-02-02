@@ -464,12 +464,12 @@ TEST_CASE("ExhaustiveSyntheticTest", "[RangeSearchTest]")
  *
  * Errors are produced if the results are not identical.
  */
-TEST_CASE("DualTreeVsNaive1", "[RangeSearchTest]")
+TEST_CASE("DualTreeVsNaive1", "[RangeSearchTest][tiny]")
 {
   arma::mat dataForTree;
 
   // Hard-coded filename: bad!
-  if (!data::Load("test_data_3_1000.csv", dataForTree))
+  if (!Load("test_data_3_1000.csv", dataForTree))
     FAIL("Cannot load test dataset test_data_3_1000.csv!");
 
   // Set up matrices to work with.
@@ -519,7 +519,7 @@ TEST_CASE("DualTreeVsNaive2", "[RangeSearchTest]")
 
   // Hard-coded filename: bad!
   // Code duplication: also bad!
-  if (!data::Load("test_data_3_1000.csv", dataForTree))
+  if (!Load("test_data_3_1000.csv", dataForTree))
     FAIL("Cannot load test dataset test_data_3_1000.csv!");
 
   // Set up matrices to work with.
@@ -568,7 +568,7 @@ TEST_CASE("SingleTreeVsNaive", "[RangeSearchTest]")
 
   // Hard-coded filename: bad!
   // Code duplication: also bad!
-  if (!data::Load("test_data_3_1000.csv", dataForTree))
+  if (!Load("test_data_3_1000.csv", dataForTree))
     FAIL("Cannot load test dataset test_data_3_1000.csv!");
 
   // Set up matrices to work with (may not be necessary with no ALIAS_MATRIX?).
@@ -609,7 +609,7 @@ TEST_CASE("SingleTreeVsNaive", "[RangeSearchTest]")
  * Ensure that dual tree range search with cover trees works by comparing
  * with the kd-tree implementation.
  */
-TEST_CASE("RSCoverTreeTest", "[RangeSearchTest]")
+TEST_CASE("RSCoverTreeTest", "[RangeSearchTest][long]")
 {
   arma::mat data;
   data.randu(8, 1000); // 1000 points in 8 dimensions.

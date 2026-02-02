@@ -1,11 +1,9 @@
 # `MeanSplitBallTree`
 
-<!-- TODO: link to knn.md once it's done -->
-
 The `MeanSplitBallTree` class represents a `k`-dimensional binary space
 partitioning tree where each node contains points within a ball.  This is a
-well-known data structure for efficient distance operations (such as nearest
-neighbor search) in low to moderate dimensions.
+well-known data structure for efficient distance operations (such as
+[nearest neighbor search](../../methods/knn.md)) in low to moderate dimensions.
 
 In general, a `MeanSplitBallTree` will be a better balanced tree and have fewer
 nodes than a [`BallTree`](ball_tree.md).  However, counterintuitively, a more
@@ -28,13 +26,14 @@ additional functionality specific to ball trees.
 
 ## See also
 
-<!-- TODO: add links to all distance-based algorithms and other trees? -->
-
  * [`BallTree`](ball_tree.md)
+ * [mlpack trees](../trees.md)
+ * [`KNN`](../../methods/knn.md)
+ * [mlpack geometric algorithms](../../modeling.md#geometric-algorithms)
  * [Ball tree on Wikipedia](https://en.wikipedia.org/wiki/Ball_tree)
  * [`BinarySpaceTree`](binary_space_tree.md)
  * [`MeanSplit`](binary_space_tree.md#meansplit)
- * [Binary space partitioning on Wikipedia](https://dl.acm.org/doi/pdf/10.1145/361002.361007)
+ * [Binary space partitioning on Wikipedia](https://en.wikipedia.org/wiki/Binary_space_partitioning)
  * [Tree-Independent Dual-Tree Algorithms (pdf)](https://www.ratml.org/pub/pdf/2013tree.pdf)
 
 ## Template parameters
@@ -315,7 +314,7 @@ so accessing them does not require any computation.
    - This is equivalent to calling `node.Bound().Center(center)`.
 
  * A `MeanSplitBallTree` can be serialized with
-   [`data::Save()` and `data::Load()`](../../load_save.md#mlpack-objects).
+   [`Save()` and `Load()`](../../load_save.md#mlpack-models-and-objects).
 
 ## Bounding distances with the tree
 
@@ -420,7 +419,7 @@ about the tree.
 ```c++
 // See https://datasets.mlpack.org/cloud.csv.
 arma::mat dataset;
-mlpack::data::Load("cloud.csv", dataset, true);
+mlpack::Load("cloud.csv", dataset, mlpack::Fatal);
 
 // Build the ball tree with a leaf size of 10.  (This means that nodes are split
 // until they contain 10 or fewer points.)
@@ -457,7 +456,7 @@ minimum and maximum distances between nodes in the trees.
 ```c++
 // See https://datasets.mlpack.org/corel-histogram.csv.
 arma::mat dataset;
-mlpack::data::Load("corel-histogram.csv", dataset, true);
+mlpack::Load("corel-histogram.csv", dataset, mlpack::Fatal);
 
 // Build ball trees on the first half and the second half of points.
 mlpack::MeanSplitBallTree<> tree1(dataset.cols(0, dataset.n_cols / 2));
@@ -523,7 +522,7 @@ Build a `MeanSplitBallTree` on 32-bit floating point data and save it to disk.
 ```c++
 // See https://datasets.mlpack.org/corel-histogram.csv.
 arma::fmat dataset;
-mlpack::data::Load("corel-histogram.csv", dataset);
+mlpack::Load("corel-histogram.csv", dataset);
 
 // Build the MeanSplitBallTree using 32-bit floating point data as the matrix
 // type.  We will still use the default EmptyStatistic and EuclideanDistance
@@ -533,7 +532,7 @@ mlpack::MeanSplitBallTree<mlpack::EuclideanDistance,
                           arma::fmat> tree(std::move(dataset), 100);
 
 // Save the MeanSplitBallTree to disk with the name 'tree'.
-mlpack::data::Save("tree.bin", "tree", tree);
+mlpack::Save("tree.bin", tree);
 
 std::cout << "Saved tree with " << tree.Dataset().n_cols << " points to "
     << "'tree.bin'." << std::endl;
@@ -554,7 +553,7 @@ using TreeType = mlpack::MeanSplitBallTree<mlpack::EuclideanDistance,
                                            arma::fmat>;
 
 TreeType tree;
-mlpack::data::Load("tree.bin", "tree", tree);
+mlpack::Load("tree.bin", tree);
 std::cout << "Tree loaded with " << tree.NumDescendants() << " points."
     << std::endl;
 
@@ -597,7 +596,7 @@ Build a `MeanSplitBallTree` and map between original points and new points.
 ```c++
 // See https://datasets.mlpack.org/cloud.csv.
 arma::mat dataset;
-mlpack::data::Load("cloud.csv", dataset, true);
+mlpack::Load("cloud.csv", dataset, mlpack::Fatal);
 
 // Build the tree.
 std::vector<size_t> oldFromNew, newFromOld;

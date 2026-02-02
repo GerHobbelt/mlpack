@@ -1,11 +1,9 @@
 # `VPTree`
 
-<!-- TODO: link to knn.md once it's done -->
-
 The `VPTree` class represents a `k`-dimensional vantage point tree,
 and is a well-known data structure for efficient distance operations (such as
-nearest neighbor search) in low dimensions---typically less than 100.  The
-vantage point tree is also known as the 'metric tree'.
+[nearest neighbor search](../../methods/knn.md)) in low dimensions---typically
+less than 100.  The vantage point tree is also known as the 'metric tree'.
 
 A vantage point tree is a binary tree where each node selects a 'vantage
 point', and child nodes partition points into those that are nearer to the
@@ -27,12 +25,13 @@ additional functionality specific to vantage point trees.
 
 ## See also
 
-<!-- TODO: add links to all distance-based algorithms and other trees? -->
-
- * [Vantage point tree on Wikipedia](https://en.wikipedia.org/wiki/Vantage-point_tree)
  * [`BinarySpaceTree`](binary_space_tree.md)
- * [Binary space partitioning on Wikipedia](https://dl.acm.org/doi/pdf/10.1145/361002.361007)
- * [Data structures and algorithms for nearest neighbor search in general metric spaces (pdf)](https://dl.acm.org/doi/pdf/10.5555/313559.313789)
+ * [mlpack trees](../trees.md)
+ * [`KNN`](../../methods/knn.md)
+ * [mlpack geometric algorithms](../../modeling.md#geometric-algorithms)
+ * [Vantage point tree on Wikipedia](https://en.wikipedia.org/wiki/Vantage-point_tree)
+ * [Binary space partitioning on Wikipedia](https://en.wikipedia.org/wiki/Binary_space_partitioning)
+ * [Data structures and algorithms for nearest neighbor search in general metric spaces (pdf)](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=d625237a1cbba894c46cb1220667326c506bfc82)
  * [Satisfying General Proximity/Similarity Queries with Metric Trees (pdf)](https://www.mlpack.org/papers/uhlmann91.pdf)
  * [Tree-Independent Dual-Tree Algorithms (pdf)](https://www.ratml.org/pub/pdf/2013tree.pdf)
 
@@ -300,7 +299,7 @@ accessing them does not require any computation.
    - This is equivalent to calling `node.Bound().Center(center)`.
 
  * A `VPTree` can be serialized with
-   [`data::Save()` and `data::Load()`](../../load_save.md#mlpack-objects).
+   [`Save()` and `Load()`](../../load_save.md#mlpack-models-and-objects).
 
 ## Bounding distances with the tree
 
@@ -405,7 +404,7 @@ tree.
 ```c++
 // See https://datasets.mlpack.org/cloud.csv.
 arma::mat dataset;
-mlpack::data::Load("cloud.csv", dataset, true);
+mlpack::Load("cloud.csv", dataset, mlpack::Fatal);
 
 // Build the vp-tree with a leaf size of 10.  (This means that nodes are split
 // until they contain 10 or fewer points.)
@@ -464,7 +463,7 @@ bounding quantities.
 ```c++
 // See https://datasets.mlpack.org/corel-histogram.csv.
 arma::mat dataset;
-mlpack::data::Load("corel-histogram.csv", dataset, true);
+mlpack::Load("corel-histogram.csv", dataset, mlpack::Fatal);
 
 // Build vp-trees on the first half and the second half of points.
 mlpack::VPTree<> tree1(dataset.cols(0, dataset.n_cols / 2));
@@ -530,7 +529,7 @@ Build a `VPTree` on 32-bit floating point data and save it to disk.
 ```c++
 // See https://datasets.mlpack.org/corel-histogram.csv.
 arma::fmat dataset;
-mlpack::data::Load("corel-histogram.csv", dataset);
+mlpack::Load("corel-histogram.csv", dataset);
 
 // Build the VPTree using 32-bit floating point data as the matrix type.
 // We will still use the default EmptyStatistic and EuclideanDistance
@@ -540,7 +539,7 @@ mlpack::VPTree<mlpack::EuclideanDistance,
                arma::fmat> tree(std::move(dataset), 100);
 
 // Save the VPTree to disk with the name 'tree'.
-mlpack::data::Save("tree.bin", "tree", tree);
+mlpack::Save("tree.bin", tree);
 
 std::cout << "Saved tree with " << tree.Dataset().n_cols << " points to "
     << "'tree.bin'." << std::endl;
@@ -561,7 +560,7 @@ using TreeType = mlpack::VPTree<mlpack::EuclideanDistance,
                                 arma::fmat>;
 
 TreeType tree;
-mlpack::data::Load("tree.bin", "tree", tree);
+mlpack::Load("tree.bin", tree);
 std::cout << "Tree loaded with " << tree.NumDescendants() << " points."
     << std::endl;
 
@@ -604,7 +603,7 @@ Build a `VPTree` and map between original points and new points.
 ```c++
 // See https://datasets.mlpack.org/cloud.csv.
 arma::mat dataset;
-mlpack::data::Load("cloud.csv", dataset, true);
+mlpack::Load("cloud.csv", dataset, mlpack::Fatal);
 
 // Build the tree.
 std::vector<size_t> oldFromNew, newFromOld;

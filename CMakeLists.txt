@@ -247,11 +247,13 @@ if (USE_SYSTEM_STB)
   set(MLPACK_USE_SYSTEM_STB ON)
 endif ()
 
+set(MLPACK_DONT_FIND_MLPACK 1)
 if (CMAKE_CROSSCOMPILING OR DOWNLOAD_DEPENDENCIES)
   fetch_mlpack(ON)
 else()
   find_mlpack()
 endif()
+unset(MLPACK_DONT_FIND_MLPACK)
 
 # Include directories for the previous dependencies.
 set(MLPACK_INCLUDE_DIRS ${MLPACK_INCLUDE_DIRS} ${ARMADILLO_INCLUDE_DIRS})
@@ -301,34 +303,6 @@ else ()
   set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/)
 endif ()
 
-# Determine whether or not this is a git repository, so that we can set the
-# version number if necessary.
-find_package(Git)
-set (USING_GIT "NO")
-if (GIT_FOUND)
-  # Run 'git rev-parse HEAD' to find out if this is a working copy. If the
-  # return code is not 0, then it isn't.
-  execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
-      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-      OUTPUT_VARIABLE MLPACK_TMP_REV_INFO
-      ERROR_VARIABLE MLPACK_TMP_REV_INFO_ERROR
-      RESULT_VARIABLE MLPACK_TMP_REV_INFO_RESULT
-      OUTPUT_STRIP_TRAILING_WHITESPACE)
-  if (${MLPACK_TMP_REV_INFO_RESULT} EQUAL 0)
-    set (USING_GIT "YES")
-    add_definitions(-DMLPACK_GIT_VERSION)
-    include(CMake/CreateGitVersionHeader.cmake)
-
-    add_custom_target(mlpack_gitversion ALL
-        COMMAND ${CMAKE_COMMAND} -P CMake/CreateGitVersionHeader.cmake
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        COMMENT "Updating gitversion.hpp (if necessary)")
-  # Add gitversion.hpp to the list of sources.
-  set(MLPACK_SRCS ${MLPACK_SRCS}
-      "${CMAKE_CURRENT_SOURCE_DIR}/src/mlpack/core/util/gitversion.hpp")
-  endif ()
-endif ()
-
 # Make a target to generate the man page documentation, but only if we are on a
 # UNIX-like system.
 if (BUILD_CLI_EXECUTABLES AND UNIX)
@@ -355,7 +329,7 @@ if (BUILD_CLI_EXECUTABLES AND UNIX)
 endif ()
 
 # Modify config.hpp as necessary.
-file(READ ${CMAKE_SOURCE_DIR}/src/mlpack/config.hpp CONFIG_CONTENTS)
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/src/mlpack/config.hpp CONFIG_CONTENTS)
 if (BFD_DL_AVAILABLE)
   string(REGEX REPLACE "// #define MLPACK_HAS_BFD_DL\n"
       "#define MLPACK_HAS_BFD_DL\n" CONFIG_CONTENTS "${CONFIG_CONTENTS}")
@@ -448,11 +422,11 @@ if (PKG_CONFIG_FOUND)
   set(MLPACK_VERSION_STRING "@MLPACK_VERSION_STRING@")
   configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/CMake/mlpack.pc.in
-    ${CMAKE_BINARY_DIR}/CMake/mlpack.pc.in.partial @ONLY)
+    ${CMAKE_CURRENT_BINARY_DIR}/CMake/mlpack.pc.in.partial @ONLY)
 
   add_custom_target(pkgconfig ALL
       ${CMAKE_COMMAND}
-          -D MLPACK_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
+          -D MLPACK_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
           -P "${CMAKE_CURRENT_SOURCE_DIR}/CMake/GeneratePkgConfig.cmake"
       COMMENT "Generating mlpack.pc (pkg-config) file.")
 
