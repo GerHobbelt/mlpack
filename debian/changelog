@@ -1,3 +1,9 @@
+mlpack (4.7.0-2) unstable; urgency=medium
+
+  * Build depend on ccache
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Thu, 05 Feb 2026 13:02:30 +0000
+
 mlpack (4.7.0-1) unstable; urgency=medium
 
   * Bump policy and update scripts

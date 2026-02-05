@@ -5,6 +5,7 @@ Uploaders: Barak A. Pearlmutter <bap@debian.org>
 Build-Depends: cmake, debhelper-compat (= 13),
 		python3-numpy-dev,
 		pkgconf,
+		ccache,
 		libcereal-dev,
 		libarmadillo-dev,
 		libensmallen-dev (>= 2.10.0),
