@@ -62,7 +62,7 @@ add_r_binding(lars lars_train "skip")
 add_r_binding(lars lars_predict "skip")
 add_markdown_docs(lars lars "cli;python;julia;go;r" "python;r")
 
-add_all_bindings(linear_svm linear_svm "Classification")
+#add_all_bindings(linear_svm linear_svm "Classification")
 add_all_bindings(lmnn lmnn "Transformations")
 add_all_bindings(local_coordinate_coding local_coordinate_coding
     "Transformations")
@@ -89,7 +89,7 @@ add_all_bindings(neighbor_search knn "Geometry")
 add_all_bindings(neighbor_search kfn "Geometry")
 add_all_bindings(nmf nmf "Misc. / Other")
 add_all_bindings(pca pca "Transformations")
-add_all_bindings(perceptron perceptron "Classification")
+#add_all_bindings(perceptron perceptron "Classification")
 add_all_bindings(preprocess preprocess_split "Preprocessing")
 add_all_bindings(preprocess preprocess_binarize "Preprocessing")
 add_all_bindings(preprocess preprocess_describe "Preprocessing")
@@ -98,7 +98,7 @@ add_all_bindings(preprocess preprocess_one_hot_encoding "Preprocessing")
 add_all_bindings(radical radical "Transformations")
 #add_all_bindings(random_forest random_forest "Classification")
 add_all_bindings(rann krann "Geometry")
-add_all_bindings(softmax_regression softmax_regression "Classification")
+#add_all_bindings(softmax_regression softmax_regression "Classification")
 add_all_bindings(sparse_coding sparse_coding "Transformations")
 
 # Now, define the "special" bindings that are different somehow.
@@ -129,6 +129,30 @@ add_r_binding(decision_tree decision_tree_classify "skip")
 add_r_binding(decision_tree decision_tree_probabilities "skip")
 add_markdown_docs(decision_tree decision_tree "cli;python;julia;go;r" "python;r")
 
+# perceptron
+add_category(perceptron "Classification")
+group_bindings(perceptron perceptron "train;classify")
+add_python_wrapper(perceptron perceptron)
+add_julia_class(perceptron perceptron)
+add_cli_executable(perceptron perceptron)
+add_go_binding(perceptron perceptron)
+add_r_binding(perceptron perceptron "include")
+add_r_binding(perceptron perceptron_train "skip")
+add_r_binding(perceptron perceptron_classify "skip")
+add_markdown_docs(perceptron perceptron "cli;python;julia;go;r" "python;r")
+
+# linear svm
+add_category(linear_svm "Classification")
+group_bindings(linear_svm linear_svm "train;classify;scores")
+add_python_wrapper(linear_svm linear_svm)
+add_julia_class(linear_svm linear_svm)
+add_cli_executable(linear_svm linear_svm)
+add_go_binding(linear_svm linear_svm)
+add_r_binding(linear_svm linear_svm "include")
+add_r_binding(linear_svm linear_svm_train "skip")
+add_r_binding(linear_svm linear_svm_classify "skip")
+add_r_binding(linear_svm linear_svm_scores "skip")
+add_markdown_docs(linear_svm linear_svm "cli;python;julia;go;r" "python;r")
 
 # Adaboost has a Python wrapper class that encapsulates its functionality in a
 # few methods.
@@ -171,6 +195,20 @@ add_r_binding(naive_bayes nbc_classify "skip")
 add_r_binding(naive_bayes nbc_probabilities "skip")
 add_markdown_docs(naive_bayes nbc "cli;python;julia;go;r" "python;r")
 
+#add_all_bindings(softmax_regression softmax_regression "Classification")
+add_category(softmax_regression "Classification")
+group_bindings(softmax_regression softmax_regression "train;classify;probabilities")
+add_python_wrapper(softmax_regression softmax_regression)
+add_julia_class(softmax_regression softmax_regression)
+add_cli_executable(softmax_regression softmax_regression)
+add_go_binding(softmax_regression softmax_regression)
+add_r_binding(softmax_regression softmax_regression "include")
+add_r_binding(softmax_regression softmax_regression_train "skip")
+add_r_binding(softmax_regression softmax_regression_classify "skip")
+add_r_binding(softmax_regression softmax_regression_probabilities "skip")
+add_markdown_docs(softmax_regression softmax_regression "cli;python;julia;go;r" "python;r")
+
+
 
 # Linear Regression has a Python wrapper class that encapsulates its
 # functionality in a few methods.
@@ -178,7 +216,6 @@ add_category(linear_regression "Regression")
 group_bindings(linear_regression linear_regression "train;predict")
 add_python_wrapper(linear_regression linear_regression)
 add_julia_class(linear_regression linear_regression)
-
 add_cli_executable(linear_regression linear_regression)
 add_go_binding(linear_regression linear_regression)
 add_r_binding(linear_regression linear_regression "include")

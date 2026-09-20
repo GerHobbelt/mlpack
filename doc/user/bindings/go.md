@@ -304,7 +304,7 @@ recommendations, _ := mlpack.Cf(param)
 
  - [Collaborative Filtering on Wikipedia](https://en.wikipedia.org/wiki/Collaborative_filtering)
  - [Matrix factorization on Wikipedia](https://en.wikipedia.org/wiki/Matrix_factorization_(recommender_systems))
- - [Matrix factorization techniques for recommender systems (pdf)](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=cf17f85a0a7991fa01dbfb3e5878fbf71ea4bdc5)
+ - [Matrix factorization techniques for recommender systems (pdf)](https://www.cs.columbia.edu/~blei/fogm/2023F/readings/KorenBellVolinsky2009.pdf)
  - [CFType class documentation](https://github.com/mlpack/mlpack/blob/master/src/mlpack/methods/cf/cf.hpp)
 
 ## Dbscan()
@@ -1799,125 +1799,6 @@ _, test_predictions := mlpack.Lars(param)
  - [Least angle regression (pdf)](https://mlpack.org/papers/lars.pdf)
  - [LARS C++ class documentation](../../user/methods/lars.md)
 
-## LinearSvm()
-{: #linear_svm }
-
-#### Linear SVM is an L2-regularized support vector machine.
-{: #linear_svm_descr }
-
-```go
-import (
-  "mlpack.org/v1/mlpack"
-  "gonum.org/v1/gonum/mat"
-)
-
-// Initialize optional parameters for LinearSvm().
-param := mlpack.LinearSvmOptions()
-param.Delta = 1
-param.Epochs = 50
-param.InputModel = nil
-param.Labels = mat.NewDense(1, 1, nil)
-param.Lambda = 0.0001
-param.MaxIterations = 10000
-param.NoIntercept = false
-param.NumClasses = 0
-param.Optimizer = "lbfgs"
-param.Seed = 0
-param.Shuffle = false
-param.StepSize = 0.01
-param.Test = mat.NewDense(1, 1, nil)
-param.TestLabels = mat.NewDense(1, 1, nil)
-param.Tolerance = 1e-10
-param.Training = mat.NewDense(1, 1, nil)
-param.Verbose = false
-
-output_model, predictions, probabilities := mlpack.LinearSvm(param)
-```
-
-An implementation of linear SVM for multiclass classification. Given labeled data, a model can be trained and saved for future use; or, a pre-trained model can be used to classify new points. [Detailed documentation](#linear_svm_detailed-documentation).
-
-
-
-### Input options
-There are two types of input options: required options, which are passed directly to the function call, and optional options, which are passed via an initialized struct, which allows keyword access to each of the options.
-
-| ***name*** | ***type*** | ***description*** | ***default*** |
-|------------|------------|-------------------|---------------|
-| `CheckInputMatrices` | [`bool`](#doc_bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `false` |
-| `Delta` | [`float64`](#doc_float64) | Margin of difference between correct class and other classes. | `1` |
-| `Epochs` | [`int`](#doc_int) | Maximum number of full epochs over dataset for psgd | `50` |
-| `InputModel` | [`linearsvmModel`](#doc_model) | Existing model (parameters). | `nil` |
-| `Labels` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | A matrix containing labels (0 or 1) for the points in the training set (y). | `mat.NewDense(1, 1, nil)` |
-| `Lambda` | [`float64`](#doc_float64) | L2-regularization parameter for training. | `0.0001` |
-| `MaxIterations` | [`int`](#doc_int) | Maximum iterations for optimizer (0 indicates no limit). | `10000` |
-| `NoIntercept` | [`bool`](#doc_bool) | Do not add the intercept term to the model. | `false` |
-| `NumClasses` | [`int`](#doc_int) | Number of classes for classification; if unspecified (or 0), the number of classes found in the labels will be used. | `0` |
-| `Optimizer` | [`string`](#doc_string) | Optimizer to use for training ('lbfgs' or 'psgd'). | `"lbfgs"` |
-| `Seed` | [`int`](#doc_int) | Random seed.  If 0, 'std::time(NULL)' is used. | `0` |
-| `Shuffle` | [`bool`](#doc_bool) | Don't shuffle the order in which data points are visited for parallel SGD. | `false` |
-| `StepSize` | [`float64`](#doc_float64) | Step size for parallel SGD optimizer. | `0.01` |
-| `Test` | [`*mat.Dense`](#doc_a__mat_Dense) | Matrix containing test dataset. | `mat.NewDense(1, 1, nil)` |
-| `TestLabels` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | Matrix containing test labels. | `mat.NewDense(1, 1, nil)` |
-| `Tolerance` | [`float64`](#doc_float64) | Convergence tolerance for optimizer. | `1e-10` |
-| `Training` | [`*mat.Dense`](#doc_a__mat_Dense) | A matrix containing the training set (the matrix of predictors, X). | `mat.NewDense(1, 1, nil)` |
-| `Verbose` | [`bool`](#doc_bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `false` |
-
-### Output options
-
-Output options are returned via Go's support for multiple return values, in the order listed below.
-
-| ***name*** | ***type*** | ***description*** |
-|------------|------------|-------------------|
-| `OutputModel` | [`linearsvmModel`](#doc_model) | Output for trained linear svm model. | 
-| `Predictions` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | If test data is specified, this matrix is where the predictions for the test set will be saved. | 
-| `Probabilities` | [`*mat.Dense`](#doc_a__mat_Dense) | If test data is specified, this matrix is where the class probabilities for the test set will be saved. | 
-
-### Detailed documentation
-{: #linear_svm_detailed-documentation }
-
-An implementation of linear SVMs that uses either L-BFGS or parallel SGD (stochastic gradient descent) to train the model.
-
-This program allows loading a linear SVM model (via the `InputModel` parameter) or training a linear SVM model given training data (specified with the `Training` parameter), or both those things at once.  In addition, this program allows classification on a test dataset (specified with the `Test` parameter) and the classification results may be saved with the `Predictions` output parameter. The trained linear SVM model may be saved using the `OutputModel` output parameter.
-
-The training data, if specified, may have class labels as its last dimension.  Alternately, the `Labels` parameter may be used to specify a separate vector of labels.
-
-When a model is being trained, there are many options.  L2 regularization (to prevent overfitting) can be specified with the `Lambda` option, and the number of classes can be manually specified with the `NumClasses`and if an intercept term is not desired in the model, the `NoIntercept` parameter can be specified.Margin of difference between correct class and other classes can be specified with the `Delta` option.The optimizer used to train the model can be specified with the `Optimizer` parameter.  Available options are 'psgd' (parallel stochastic gradient descent) and 'lbfgs' (the L-BFGS optimizer).  There are also various parameters for the optimizer; the `MaxIterations` parameter specifies the maximum number of allowed iterations, and the `Tolerance` parameter specifies the tolerance for convergence.  For the parallel SGD optimizer, the `StepSize` parameter controls the step size taken at each iteration by the optimizer and the maximum number of epochs (specified with `Epochs`). If the objective function for your data is oscillating between Inf and 0, the step size is probably too large.  There are more parameters for the optimizers, but the C++ interface must be used to access these.
-
-Optionally, the model can be used to predict the labels for another matrix of data points, if `Test` is specified.  The `Test` parameter can be specified without the `Training` parameter, so long as an existing linear SVM model is given with the `InputModel` parameter.  The output predictions from the linear SVM model may be saved with the `Predictions` parameter.
-
-### Example
-As an example, to train a LinaerSVM on the data '`data`' with labels '`labels`' with L2 regularization of 0.1, saving the model to '`lsvm_model`', the following command may be used:
-
-```go
-// Initialize optional parameters for LinearSvm().
-param := mlpack.LinearSvmOptions()
-param.Training = data
-param.Labels = labels
-param.Lambda = 0.1
-param.Delta = 1
-param.NumClasses = 0
-
-lsvm_model, _, _ := mlpack.LinearSvm(param)
-```
-
-Then, to use that model to predict classes for the dataset '`test`', storing the output predictions in '`predictions`', the following command may be used: 
-
-```go
-// Initialize optional parameters for LinearSvm().
-param := mlpack.LinearSvmOptions()
-param.InputModel = &lsvm_model
-param.Test = test
-
-_, predictions, _ := mlpack.LinearSvm(param)
-```
-
-### See also
-
- - [RandomForest()](#random_forest)
- - [LogisticRegression()](#logistic_regression)
- - [LinearSVM on Wikipedia](https://en.wikipedia.org/wiki/Support-vector_machine)
- - [LinearSVM C++ class documentation](../../user/methods/linear_svm.md)
-
 ## Lmnn()
 {: #lmnn }
 
@@ -2443,7 +2324,7 @@ centroids, _ := mlpack.MeanShift(data, param)
  - [Kmeans()](#kmeans)
  - [Dbscan()](#dbscan)
  - [Mean shift on Wikipedia](https://en.wikipedia.org/wiki/Mean_shift)
- - [Mean Shift, Mode Seeking, and Clustering (pdf)](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=1c168275c59ba382588350ee1443537f59978183)
+ - [Mean Shift, Mode Seeking, and Clustering (pdf)](https://members.loria.fr/MOBerger/Enseignement/Master2/Exposes/meanShiftCluster.pdf)
  - [mlpack::mean_shift::MeanShift C++ class documentation](../../user/methods/mean_shift.md)
 
 ## Nca()
@@ -2890,96 +2771,6 @@ data_mod := mlpack.Pca(data, param)
 
  - [Principal component analysis on Wikipedia](https://en.wikipedia.org/wiki/Principal_component_analysis)
  - [PCA C++ class documentation](../../user/methods/pca.md)
-
-## Perceptron()
-{: #perceptron }
-
-#### Perceptron
-{: #perceptron_descr }
-
-```go
-import (
-  "mlpack.org/v1/mlpack"
-  "gonum.org/v1/gonum/mat"
-)
-
-// Initialize optional parameters for Perceptron().
-param := mlpack.PerceptronOptions()
-param.InputModel = nil
-param.Labels = mat.NewDense(1, 1, nil)
-param.MaxIterations = 1000
-param.Test = mat.NewDense(1, 1, nil)
-param.Training = mat.NewDense(1, 1, nil)
-param.Verbose = false
-
-output_model, predictions := mlpack.Perceptron(param)
-```
-
-An implementation of a perceptron---a single level neural network--=for classification.  Given labeled data, a perceptron can be trained and saved for future use; or, a pre-trained perceptron can be used for classification on new points. [Detailed documentation](#perceptron_detailed-documentation).
-
-
-
-### Input options
-There are two types of input options: required options, which are passed directly to the function call, and optional options, which are passed via an initialized struct, which allows keyword access to each of the options.
-
-| ***name*** | ***type*** | ***description*** | ***default*** |
-|------------|------------|-------------------|---------------|
-| `CheckInputMatrices` | [`bool`](#doc_bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `false` |
-| `InputModel` | [`perceptronModel`](#doc_model) | Input perceptron model. | `nil` |
-| `Labels` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | A matrix containing labels for the training set. | `mat.NewDense(1, 1, nil)` |
-| `MaxIterations` | [`int`](#doc_int) | The maximum number of iterations the perceptron is to be run | `1000` |
-| `Test` | [`*mat.Dense`](#doc_a__mat_Dense) | A matrix containing the test set. | `mat.NewDense(1, 1, nil)` |
-| `Training` | [`*mat.Dense`](#doc_a__mat_Dense) | A matrix containing the training set. | `mat.NewDense(1, 1, nil)` |
-| `Verbose` | [`bool`](#doc_bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `false` |
-
-### Output options
-
-Output options are returned via Go's support for multiple return values, in the order listed below.
-
-| ***name*** | ***type*** | ***description*** |
-|------------|------------|-------------------|
-| `OutputModel` | [`perceptronModel`](#doc_model) | Output for trained perceptron model. | 
-| `Predictions` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | The matrix in which the predicted labels for the test set will be written. | 
-
-### Detailed documentation
-{: #perceptron_detailed-documentation }
-
-This program implements a perceptron, which is a single level neural network. The perceptron makes its predictions based on a linear predictor function combining a set of weights with the feature vector.  The perceptron learning rule is able to converge, given enough iterations (specified using the `MaxIterations` parameter), if the data supplied is linearly separable.  The perceptron is parameterized by a matrix of weight vectors that denote the numerical weights of the neural network.
-
-This program allows loading a perceptron from a model (via the `InputModel` parameter) or training a perceptron given training data (via the `Training` parameter), or both those things at once.  In addition, this program allows classification on a test dataset (via the `Test` parameter) and the classification results on the test set may be saved with the `Predictions` output parameter.  The perceptron model may be saved with the `OutputModel` output parameter.
-
-### Example
-The training data given with the `Training` option may have class labels as its last dimension (so, if the training data is in CSV format, labels should be the last column).  Alternately, the `Labels` parameter may be used to specify a separate matrix of labels.
-
-All these options make it easy to train a perceptron, and then re-use that perceptron for later classification.  The invocation below trains a perceptron on `training_data` with labels `training_labels`, and saves the model to `perceptron_model`.
-
-```go
-// Initialize optional parameters for Perceptron().
-param := mlpack.PerceptronOptions()
-param.Training = training_data
-param.Labels = training_labels
-
-perceptron_model, _ := mlpack.Perceptron(param)
-```
-
-Then, this model can be re-used for classification on the test data `test_data`.  The example below does precisely that, saving the predicted classes to `predictions`.
-
-```go
-// Initialize optional parameters for Perceptron().
-param := mlpack.PerceptronOptions()
-param.InputModel = &perceptron_model
-param.Test = test_data
-
-_, predictions := mlpack.Perceptron(param)
-```
-
-Note that all of the options may be specified at once: predictions may be calculated right after training a model, and model training can occur even if an existing perceptron model is passed with the `InputModel` parameter.  However, note that the number of classes and the dimensionality of all data must match.  So you cannot pass a perceptron model trained on 2 classes and then re-train with a 4-class dataset.  Similarly, attempting classification on a 3-dimensional dataset with a perceptron that has been trained on 8 dimensions will cause an error.
-
-### See also
-
- - [Adaboost()](#adaboost)
- - [Perceptron on Wikipedia](https://en.wikipedia.org/wiki/Perceptron)
- - [Perceptron C++ class documentation](../../user/methods/perceptron.md)
 
 ## PreprocessSplit()
 {: #preprocess_split }
@@ -3609,106 +3400,6 @@ The output matrices are organized such that row i and column j in the neighbors 
  - [Rank-approximate nearest neighbor search: Retaining meaning and speed in high dimensions (pdf)](https://proceedings.neurips.cc/paper_files/paper/2009/file/ddb30680a691d157187ee1cf9e896d03-Paper.pdf)
  - [RASearch C++ class documentation](https://github.com/mlpack/mlpack/blob/master/src/mlpack/methods/rann/ra_search.hpp)
 
-## SoftmaxRegression()
-{: #softmax_regression }
-
-#### Softmax Regression
-{: #softmax_regression_descr }
-
-```go
-import (
-  "mlpack.org/v1/mlpack"
-  "gonum.org/v1/gonum/mat"
-)
-
-// Initialize optional parameters for SoftmaxRegression().
-param := mlpack.SoftmaxRegressionOptions()
-param.InputModel = nil
-param.Labels = mat.NewDense(1, 1, nil)
-param.Lambda = 0.0001
-param.MaxIterations = 400
-param.NoIntercept = false
-param.NumberOfClasses = 0
-param.Test = mat.NewDense(1, 1, nil)
-param.TestLabels = mat.NewDense(1, 1, nil)
-param.Training = mat.NewDense(1, 1, nil)
-param.Verbose = false
-
-output_model, predictions, probabilities := mlpack.SoftmaxRegression(param)
-```
-
-An implementation of softmax regression for classification, which is a multiclass generalization of logistic regression.  Given labeled data, a softmax regression model can be trained and saved for future use, or, a pre-trained softmax regression model can be used for classification of new points. [Detailed documentation](#softmax_regression_detailed-documentation).
-
-
-
-### Input options
-There are two types of input options: required options, which are passed directly to the function call, and optional options, which are passed via an initialized struct, which allows keyword access to each of the options.
-
-| ***name*** | ***type*** | ***description*** | ***default*** |
-|------------|------------|-------------------|---------------|
-| `CheckInputMatrices` | [`bool`](#doc_bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `false` |
-| `InputModel` | [`softmaxRegression`](#doc_model) | File containing existing model (parameters). | `nil` |
-| `Labels` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | A matrix containing labels (0 or 1) for the points in the training set (y). The labels must order as a row. | `mat.NewDense(1, 1, nil)` |
-| `Lambda` | [`float64`](#doc_float64) | L2-regularization constant | `0.0001` |
-| `MaxIterations` | [`int`](#doc_int) | Maximum number of iterations before termination. | `400` |
-| `NoIntercept` | [`bool`](#doc_bool) | Do not add the intercept term to the model. | `false` |
-| `NumberOfClasses` | [`int`](#doc_int) | Number of classes for classification; if unspecified (or 0), the number of classes found in the labels will be used. | `0` |
-| `Test` | [`*mat.Dense`](#doc_a__mat_Dense) | Matrix containing test dataset. | `mat.NewDense(1, 1, nil)` |
-| `TestLabels` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | Matrix containing test labels. | `mat.NewDense(1, 1, nil)` |
-| `Training` | [`*mat.Dense`](#doc_a__mat_Dense) | A matrix containing the training set (the matrix of predictors, X). | `mat.NewDense(1, 1, nil)` |
-| `Verbose` | [`bool`](#doc_bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `false` |
-
-### Output options
-
-Output options are returned via Go's support for multiple return values, in the order listed below.
-
-| ***name*** | ***type*** | ***description*** |
-|------------|------------|-------------------|
-| `OutputModel` | [`softmaxRegression`](#doc_model) | File to save trained softmax regression model to. | 
-| `Predictions` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | Matrix to save predictions for test dataset into. | 
-| `Probabilities` | [`*mat.Dense`](#doc_a__mat_Dense) | Matrix to save class probabilities for test dataset into. | 
-
-### Detailed documentation
-{: #softmax_regression_detailed-documentation }
-
-This program performs softmax regression, a generalization of logistic regression to the multiclass case, and has support for L2 regularization.  The program is able to train a model, load  an existing model, and give predictions (and optionally their accuracy) for test data.
-
-Training a softmax regression model is done by giving a file of training points with the `Training` parameter and their corresponding labels with the `Labels` parameter. The number of classes can be manually specified with the `NumberOfClasses` parameter, and the maximum number of iterations of the L-BFGS optimizer can be specified with the `MaxIterations` parameter.  The L2 regularization constant can be specified with the `Lambda` parameter and if an intercept term is not desired in the model, the `NoIntercept` parameter can be specified.
-
-The trained model can be saved with the `OutputModel` output parameter. If training is not desired, but only testing is, a model can be loaded with the `InputModel` parameter.  At the current time, a loaded model cannot be trained further, so specifying both `InputModel` and `Training` is not allowed.
-
-The program is also able to evaluate a model on test data.  A test dataset can be specified with the `Test` parameter. Class predictions can be saved with the `Predictions` output parameter.  If labels are specified for the test data with the `TestLabels` parameter, then the program will print the accuracy of the predictions on the given test set and its corresponding labels.
-
-### Example
-For example, to train a softmax regression model on the data `dataset` with labels `labels` with a maximum of 1000 iterations for training, saving the trained model to `sr_model`, the following command can be used: 
-
-```go
-// Initialize optional parameters for SoftmaxRegression().
-param := mlpack.SoftmaxRegressionOptions()
-param.Training = dataset
-param.Labels = labels
-
-sr_model, _, _ := mlpack.SoftmaxRegression(param)
-```
-
-Then, to use `sr_model` to classify the test points in `test_points`, saving the output predictions to `predictions`, the following command can be used:
-
-```go
-// Initialize optional parameters for SoftmaxRegression().
-param := mlpack.SoftmaxRegressionOptions()
-param.InputModel = &sr_model
-param.Test = test_points
-
-_, predictions, _ := mlpack.SoftmaxRegression(param)
-```
-
-### See also
-
- - [LogisticRegression()](#logistic_regression)
- - [RandomForest()](#random_forest)
- - [Multinomial logistic regression (softmax regression) on Wikipedia](https://en.wikipedia.org/wiki/Multinomial_logistic_regression)
- - [SoftmaxRegression C++ class documentation](../../user/methods/softmax_regression.md)
-
 ## SparseCoding()
 {: #sparse_coding }
 
@@ -3816,7 +3507,7 @@ codes, _, _ := mlpack.SparseCoding(param)
  - [LocalCoordinateCoding()](#local_coordinate_coding)
  - [Sparse dictionary learning on Wikipedia](https://en.wikipedia.org/wiki/Sparse_dictionary_learning)
  - [Efficient sparse coding algorithms (pdf)](https://proceedings.neurips.cc/paper_files/paper/2006/file/2d71b2ae158c7c5912cc0bbde2bb9d95-Paper.pdf)
- - [Regularization and variable selection via the elastic net](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=46217f372a75dddc2254fdbc6b9418ba3554e453)
+ - [Regularization and variable selection via the elastic net (pdf)](https://sites.stat.washington.edu/courses/stat527/s13/readings/zouhastie05.pdf)
  - [SparseCoding C++ class documentation](../../user/methods/sparse_coding.md)
 
 ## RandomForest()
@@ -4039,6 +3730,217 @@ _, predictions, _ := mlpack.DecisionTree(param)
  - [Induction of Decision Trees (pdf)](https://www.hunch.net/~coms-4771/quinlan.pdf)
  - [DecisionTree C++ class documentation](../../user/methods/decision_tree.md)
 
+## Perceptron()
+{: #perceptron }
+
+#### Perceptron
+{: #perceptron_descr }
+
+```go
+import (
+  "mlpack.org/v1/mlpack"
+  "gonum.org/v1/gonum/mat"
+)
+
+// Initialize optional parameters for Perceptron().
+param := mlpack.PerceptronOptions()
+param.InputModel = nil
+param.Labels = mat.NewDense(1, 1, nil)
+param.MaxIterations = 1000
+param.Test = mat.NewDense(1, 1, nil)
+param.Training = mat.NewDense(1, 1, nil)
+param.Verbose = false
+
+output_model, predictions := mlpack.Perceptron(param)
+```
+
+An implementation of a perceptron---a single level neural network---for classification.  Given labeled data, a perceptron can be trained and saved for future use; or, a pre-trained perceptron can be used for classification on new points. [Detailed documentation](#perceptron_detailed-documentation).
+
+
+
+### Input options
+There are two types of input options: required options, which are passed directly to the function call, and optional options, which are passed via an initialized struct, which allows keyword access to each of the options.
+
+| ***name*** | ***type*** | ***description*** | ***default*** |
+|------------|------------|-------------------|---------------|
+| `CheckInputMatrices` | [`bool`](#doc_bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `false` |
+| `InputModel` | [`perceptronModel`](#doc_model) | Input perceptron model. | `nil` |
+| `Labels` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | A matrix containing labels for the training set. | `mat.NewDense(1, 1, nil)` |
+| `MaxIterations` | [`int`](#doc_int) | The maximum number of iterations the perceptron is to be run | `1000` |
+| `Test` | [`*mat.Dense`](#doc_a__mat_Dense) | A matrix containing the test set. | `mat.NewDense(1, 1, nil)` |
+| `Training` | [`*mat.Dense`](#doc_a__mat_Dense) | A matrix containing the training set. | `mat.NewDense(1, 1, nil)` |
+| `Verbose` | [`bool`](#doc_bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `false` |
+
+### Output options
+
+Output options are returned via Go's support for multiple return values, in the order listed below.
+
+| ***name*** | ***type*** | ***description*** |
+|------------|------------|-------------------|
+| `OutputModel` | [`perceptronModel`](#doc_model) | Output for trained perceptron model. | 
+| `Predictions` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | The matrix in which the predicted labels for the test set will be written. | 
+
+### Detailed documentation
+{: #perceptron_detailed-documentation }
+
+This program implements a perceptron, which is a single level neural network. The perceptron makes its predictions based on a linear predictor function combining a set of weights with the feature vector.  The perceptron learning rule is able to converge, given enough iterations (specified using the `MaxIterations` parameter), if the data supplied is linearly separable.  The perceptron is parameterized by a matrix of weight vectors that denote the numerical weights of the neural network.
+
+This program allows loading a perceptron from a model (via the `InputModel` parameter) or training a perceptron given training data (via the `Training` parameter), or both those things at once.  In addition, this program allows classification on a test dataset (via the `Test` parameter) and the classification results on the test set may be saved with the `Predictions` output parameter.  The perceptron model may be saved with the `OutputModel` output parameter.
+
+### Example
+The training data given with the `Training` option may have class labels as its last dimension (so, if the training data is in CSV format, labels should be the last column).  Alternately, the `Labels` parameter may be used to specify a separate matrix of labels.
+
+All these options make it easy to train a perceptron, and then re-use that perceptron for later classification.  The invocation below trains a perceptron on `training_data` with labels `training_labels`, and saves the model to `perceptron_model`.
+
+```go
+// Initialize optional parameters for Perceptron().
+param := mlpack.PerceptronOptions()
+param.Training = training_data
+param.Labels = training_labels
+
+perceptron_model, _ := mlpack.Perceptron(param)
+```
+
+Then, this model can be re-used for classification on the test data `test_data`.  The example below does precisely that, saving the predicted classes to `predictions`.
+
+```go
+// Initialize optional parameters for Perceptron().
+param := mlpack.PerceptronOptions()
+param.InputModel = &perceptron_model
+param.Test = test_data
+
+_, predictions := mlpack.Perceptron(param)
+```
+
+Note that all of the options may be specified at once: predictions may be calculated right after training a model, and model training can occur even if an existing perceptron model is passed with the `InputModel` parameter.  However, note that the number of classes and the dimensionality of all data must match.  So you cannot pass a perceptron model trained on 2 classes and then re-train with a 4-class dataset.  Similarly, attempting classification on a 3-dimensional dataset with a perceptron that has been trained on 8 dimensions will cause an error.
+
+### See also
+
+ - [Adaboost()](#adaboost)
+ - [Perceptron on Wikipedia](https://en.wikipedia.org/wiki/Perceptron)
+ - [Perceptron C++ class documentation](../../user/methods/perceptron.md)
+
+## LinearSvm()
+{: #linear_svm }
+
+#### Linear SVM is an L2-regularized support vector machine.
+{: #linear_svm_descr }
+
+```go
+import (
+  "mlpack.org/v1/mlpack"
+  "gonum.org/v1/gonum/mat"
+)
+
+// Initialize optional parameters for LinearSvm().
+param := mlpack.LinearSvmOptions()
+param.Delta = 1
+param.Epochs = 50
+param.InputModel = nil
+param.Labels = mat.NewDense(1, 1, nil)
+param.Lambda = 0.0001
+param.MaxIterations = 10000
+param.NoIntercept = false
+param.NumClasses = 0
+param.Optimizer = "lbfgs"
+param.Seed = 0
+param.Shuffle = false
+param.StepSize = 0.01
+param.Test = mat.NewDense(1, 1, nil)
+param.TestLabels = mat.NewDense(1, 1, nil)
+param.Tolerance = 1e-10
+param.Training = mat.NewDense(1, 1, nil)
+param.Verbose = false
+
+output_model, predictions, probabilities := mlpack.LinearSvm(param)
+```
+
+An implementation of linear SVM for multiclass classification. Given labeled data, a model can be trained and saved for future use; or, a pre-trained model can be used to classify new points. [Detailed documentation](#linear_svm_detailed-documentation).
+
+
+
+### Input options
+There are two types of input options: required options, which are passed directly to the function call, and optional options, which are passed via an initialized struct, which allows keyword access to each of the options.
+
+| ***name*** | ***type*** | ***description*** | ***default*** |
+|------------|------------|-------------------|---------------|
+| `CheckInputMatrices` | [`bool`](#doc_bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `false` |
+| `Delta` | [`float64`](#doc_float64) | Margin of difference between correct class and other classes. | `1` |
+| `Epochs` | [`int`](#doc_int) | Maximum number of full epochs over dataset for psgd | `50` |
+| `InputModel` | [`linearsvmModel`](#doc_model) | Existing model (parameters). | `nil` |
+| `Labels` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | A matrix containing labels (0 or 1) for the points in the training set (y). | `mat.NewDense(1, 1, nil)` |
+| `Lambda` | [`float64`](#doc_float64) | L2-regularization parameter for training. | `0.0001` |
+| `MaxIterations` | [`int`](#doc_int) | Maximum iterations for optimizer (0 indicates no limit). | `10000` |
+| `NoIntercept` | [`bool`](#doc_bool) | Do not add the intercept term to the model. | `false` |
+| `NumClasses` | [`int`](#doc_int) | Number of classes for classification; if unspecified (or 0), the number of classes found in the labels will be used. | `0` |
+| `Optimizer` | [`string`](#doc_string) | Optimizer to use for training ('lbfgs' or 'psgd'). | `"lbfgs"` |
+| `Seed` | [`int`](#doc_int) | Random seed.  If 0, 'std::time(NULL)' is used. | `0` |
+| `Shuffle` | [`bool`](#doc_bool) | Don't shuffle the order in which data points are visited for parallel SGD. | `false` |
+| `StepSize` | [`float64`](#doc_float64) | Step size for parallel SGD optimizer. | `0.01` |
+| `Test` | [`*mat.Dense`](#doc_a__mat_Dense) | Matrix containing test dataset. | `mat.NewDense(1, 1, nil)` |
+| `TestLabels` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | Matrix containing test labels. | `mat.NewDense(1, 1, nil)` |
+| `Tolerance` | [`float64`](#doc_float64) | Convergence tolerance for optimizer. | `1e-10` |
+| `Training` | [`*mat.Dense`](#doc_a__mat_Dense) | A matrix containing the training set (the matrix of predictors, X). | `mat.NewDense(1, 1, nil)` |
+| `Verbose` | [`bool`](#doc_bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `false` |
+
+### Output options
+
+Output options are returned via Go's support for multiple return values, in the order listed below.
+
+| ***name*** | ***type*** | ***description*** |
+|------------|------------|-------------------|
+| `OutputModel` | [`linearsvmModel`](#doc_model) | Output for trained linear svm model. | 
+| `Predictions` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | If test data is specified, this matrix is where the predictions for the test set will be saved. | 
+| `Probabilities` | [`*mat.Dense`](#doc_a__mat_Dense) | If test data is specified, this matrix is where the class probabilities for the test set will be saved. | 
+
+### Detailed documentation
+{: #linear_svm_detailed-documentation }
+
+An implementation of linear SVMs that uses either L-BFGS or parallel SGD (stochastic gradient descent) to train the model.
+
+This program allows loading a linear SVM model (via the `InputModel` parameter) or training a linear SVM model given training data (specified with the `Training` parameter), or both those things at once.  In addition, this program allows classification on a test dataset (specified with the `Test` parameter) and the classification results may be saved with the `Predictions` output parameter. The trained linear SVM model may be saved using the `OutputModel` output parameter.
+
+The training data, if specified, may have class labels as its last dimension.  Alternately, the `Labels` parameter may be used to specify a separate vector of labels.
+
+When a model is being trained, there are many options.  L2 regularization (to prevent overfitting) can be specified with the `Lambda` option, and the number of classes can be manually specified with the `NumClasses`and if an intercept term is not desired in the model, the `NoIntercept` parameter can be specified.
+
+Margin of difference between correct class and other classes can be specified with the `Delta` option.The optimizer used to train the model can be specified with the `Optimizer` parameter.  Available options are 'psgd' (parallel stochastic gradient descent) and 'lbfgs' (the L-BFGS optimizer).  There are also various parameters for the optimizer; the `MaxIterations` parameter specifies the maximum number of allowed iterations, and the `Tolerance` parameter specifies the tolerance for convergence.  For the parallel SGD optimizer, the `StepSize` parameter controls the step size taken at each iteration by the optimizer and the maximum number of epochs (specified with `Epochs`). If the objective function for your data is oscillating between Inf and 0, the step size is probably too large.  There are more parameters for the optimizers, but the C++ interface must be used to access these.
+
+Optionally, the model can be used to predict the labels for another matrix of data points, if `Test` is specified.  The `Test` parameter can be specified without the `Training` parameter, so long as an existing linear SVM model is given with the `InputModel` parameter.  The output predictions from the linear SVM model may be saved with the `Predictions` parameter.
+
+### Example
+As an example, to train a LinaerSVM on the data '`data`' with labels '`labels`' with L2 regularization of 0.1, saving the model to '`lsvm_model`', the following command may be used:
+
+```go
+// Initialize optional parameters for LinearSvm().
+param := mlpack.LinearSvmOptions()
+param.Training = data
+param.Labels = labels
+param.Lambda = 0.1
+param.Delta = 1
+param.NumClasses = 0
+
+lsvm_model, _, _ := mlpack.LinearSvm(param)
+```
+
+Then, to use that model to predict classes for the dataset '`test`', storing the output predictions in '`predictions`', the following command may be used: 
+
+```go
+// Initialize optional parameters for LinearSvm().
+param := mlpack.LinearSvmOptions()
+param.InputModel = &lsvm_model
+param.Test = test
+
+_, predictions, _ := mlpack.LinearSvm(param)
+```
+
+### See also
+
+ - [RandomForest()](#random_forest)
+ - [LogisticRegression()](#logistic_regression)
+ - [LinearSVM on Wikipedia](https://en.wikipedia.org/wiki/Support-vector_machine)
+ - [LinearSVM C++ class documentation](../../user/methods/linear_svm.md)
+
 ## Adaboost()
 {: #adaboost }
 
@@ -4246,7 +4148,7 @@ _, predictions, class_probs := mlpack.HoeffdingTree(param)
 
  - [DecisionTree()](#decision_tree)
  - [RandomForest()](#random_forest)
- - [Mining High-Speed Data Streams (pdf)](http://dm.cs.washington.edu/papers/vfdt-kdd00.pdf)
+ - [Mining High-Speed Data Streams (pdf)](https://www.cs.rhodes.edu/~welshc/COMP465_S15/Papers/kdd00.pdf)
  - [HoeffdingTree class documentation](../../user/methods/hoeffding_tree.md)
 
 ## Nbc()
@@ -4344,6 +4246,106 @@ _, predictions, _ := mlpack.Nbc(param)
  - [RandomForest()](#random_forest)
  - [Naive Bayes classifier on Wikipedia](https://en.wikipedia.org/wiki/Naive_Bayes_classifier)
  - [NaiveBayesClassifier C++ class documentation](../../user/methods/naive_bayes_classifier.md)
+
+## SoftmaxRegression()
+{: #softmax_regression }
+
+#### Softmax Regression
+{: #softmax_regression_descr }
+
+```go
+import (
+  "mlpack.org/v1/mlpack"
+  "gonum.org/v1/gonum/mat"
+)
+
+// Initialize optional parameters for SoftmaxRegression().
+param := mlpack.SoftmaxRegressionOptions()
+param.InputModel = nil
+param.Labels = mat.NewDense(1, 1, nil)
+param.Lambda = 0.0001
+param.MaxIterations = 400
+param.NoIntercept = false
+param.NumberOfClasses = 0
+param.Test = mat.NewDense(1, 1, nil)
+param.TestLabels = mat.NewDense(1, 1, nil)
+param.Training = mat.NewDense(1, 1, nil)
+param.Verbose = false
+
+output_model, predictions, probabilities := mlpack.SoftmaxRegression(param)
+```
+
+An implementation of softmax regression for classification, which is a multiclass generalization of logistic regression.  Given labeled data, a softmax regression model can be trained and saved for future use, or, a pre-trained softmax regression model can be used for classification of new points. [Detailed documentation](#softmax_regression_detailed-documentation).
+
+
+
+### Input options
+There are two types of input options: required options, which are passed directly to the function call, and optional options, which are passed via an initialized struct, which allows keyword access to each of the options.
+
+| ***name*** | ***type*** | ***description*** | ***default*** |
+|------------|------------|-------------------|---------------|
+| `CheckInputMatrices` | [`bool`](#doc_bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `false` |
+| `InputModel` | [`softmaxRegression`](#doc_model) | File containing existing model (parameters). | `nil` |
+| `Labels` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | A matrix containing labels (0 or 1) for the points in the training set (y). The labels must order as a row. | `mat.NewDense(1, 1, nil)` |
+| `Lambda` | [`float64`](#doc_float64) | L2-regularization constant | `0.0001` |
+| `MaxIterations` | [`int`](#doc_int) | Maximum number of iterations before termination. | `400` |
+| `NoIntercept` | [`bool`](#doc_bool) | Do not add the intercept term to the model. | `false` |
+| `NumberOfClasses` | [`int`](#doc_int) | Number of classes for classification; if unspecified (or 0), the number of classes found in the labels will be used. | `0` |
+| `Test` | [`*mat.Dense`](#doc_a__mat_Dense) | Matrix containing test dataset. | `mat.NewDense(1, 1, nil)` |
+| `TestLabels` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | Matrix containing test labels. | `mat.NewDense(1, 1, nil)` |
+| `Training` | [`*mat.Dense`](#doc_a__mat_Dense) | A matrix containing the training set (the matrix of predictors, X). | `mat.NewDense(1, 1, nil)` |
+| `Verbose` | [`bool`](#doc_bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `false` |
+
+### Output options
+
+Output options are returned via Go's support for multiple return values, in the order listed below.
+
+| ***name*** | ***type*** | ***description*** |
+|------------|------------|-------------------|
+| `OutputModel` | [`softmaxRegression`](#doc_model) | File to save trained softmax regression model to. | 
+| `Predictions` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | Matrix to save predictions for test dataset into. | 
+| `Probabilities` | [`*mat.Dense`](#doc_a__mat_Dense) | Matrix to save class probabilities for test dataset into. | 
+
+### Detailed documentation
+{: #softmax_regression_detailed-documentation }
+
+This program performs softmax regression, a generalization of logistic regression to the multiclass case, and has support for L2 regularization.  The program is able to train a model, load  an existing model, and give predictions (and optionally their accuracy) for test data.
+
+Training a softmax regression model is done by giving a file of training points with the `Training` parameter and their corresponding labels with the `Labels` parameter. The number of classes can be manually specified with the `NumberOfClasses` parameter, and the maximum number of iterations of the L-BFGS optimizer can be specified with the `MaxIterations` parameter.  The L2 regularization constant can be specified with the `Lambda` parameter and if an intercept term is not desired in the model, the `NoIntercept` parameter can be specified.
+
+The trained model can be saved with the `OutputModel` output parameter. If training is not desired, but only testing is, a model can be loaded with the `InputModel` parameter.  At the current time, a loaded model cannot be trained further, so specifying both `InputModel` and `Training` is not allowed.
+
+The program is also able to evaluate a model on test data.  A test dataset can be specified with the `Test` parameter. Class predictions can be saved with the `Predictions` output parameter.  If labels are specified for the test data with the `TestLabels` parameter, then the program will print the accuracy of the predictions on the given test set and its corresponding labels.
+
+### Example
+For example, to train a softmax regression model on the data `dataset` with labels `labels` with a maximum of 1000 iterations for training, saving the trained model to `sr_model`, the following command can be used: 
+
+```go
+// Initialize optional parameters for SoftmaxRegression().
+param := mlpack.SoftmaxRegressionOptions()
+param.Training = dataset
+param.Labels = labels
+
+sr_model, _, _ := mlpack.SoftmaxRegression(param)
+```
+
+Then, to use `sr_model` to classify the test points in `test_points`, saving the output predictions to `predictions`, the following command can be used:
+
+```go
+// Initialize optional parameters for SoftmaxRegression().
+param := mlpack.SoftmaxRegressionOptions()
+param.InputModel = &sr_model
+param.Test = test_points
+
+_, predictions, _ := mlpack.SoftmaxRegression(param)
+```
+
+### See also
+
+ - [LogisticRegression()](#logistic_regression)
+ - [RandomForest()](#random_forest)
+ - [Multinomial logistic regression (softmax regression) on Wikipedia](https://en.wikipedia.org/wiki/Multinomial_logistic_regression)
+ - [SoftmaxRegression C++ class documentation](../../user/methods/softmax_regression.md)
 
 ## LinearRegression()
 {: #linear_regression }

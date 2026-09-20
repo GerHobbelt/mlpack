@@ -261,7 +261,7 @@ julia> recommendations, _ = cf(input_model=model, query=users,
 
  - [Collaborative Filtering on Wikipedia](https://en.wikipedia.org/wiki/Collaborative_filtering)
  - [Matrix factorization on Wikipedia](https://en.wikipedia.org/wiki/Matrix_factorization_(recommender_systems))
- - [Matrix factorization techniques for recommender systems (pdf)](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=cf17f85a0a7991fa01dbfb3e5878fbf71ea4bdc5)
+ - [Matrix factorization techniques for recommender systems (pdf)](https://www.cs.columbia.edu/~blei/fogm/2023F/readings/KorenBellVolinsky2009.pdf)
  - [CFType class documentation](https://github.com/mlpack/mlpack/blob/master/src/mlpack/methods/cf/cf.hpp)
 
 ## dbscan()
@@ -1485,99 +1485,6 @@ julia> _, test_predictions = lars(input_model=lasso_model,
  - [Least angle regression (pdf)](https://mlpack.org/papers/lars.pdf)
  - [LARS C++ class documentation](../../user/methods/lars.md)
 
-## linear_svm()
-{: #linear_svm }
-
-#### Linear SVM is an L2-regularized support vector machine.
-{: #linear_svm_descr }
-
-```julia
-julia> using mlpack: linear_svm
-julia> output_model, predictions, probabilities = linear_svm( ;
-          delta=1.0, epochs=50, input_model=nothing, labels=Int[],
-          lambda=0.0001, max_iterations=10000, no_intercept=false,
-          num_classes=0, optimizer="lbfgs", seed=0, shuffle=false,
-          step_size=0.01, test=zeros(0, 0), test_labels=Int[], tolerance=1e-10,
-          training=zeros(0, 0), verbose=false)
-```
-
-An implementation of linear SVM for multiclass classification. Given labeled data, a model can be trained and saved for future use; or, a pre-trained model can be used to classify new points. [Detailed documentation](#linear_svm_detailed-documentation).
-
-
-
-### Input options
-
-| ***name*** | ***type*** | ***description*** | ***default*** |
-|------------|------------|-------------------|---------------|
-| `check_input_matrices` | [`Bool`](#doc_Bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `false` |
-| `delta` | [`Float64`](#doc_Float64) | Margin of difference between correct class and other classes. | `1.0` |
-| `epochs` | [`Int`](#doc_Int) | Maximum number of full epochs over dataset for psgd | `50` |
-| `input_model` | [`LinearSVMModel`](#doc_model) | Existing model (parameters). | `nothing` |
-| `labels` | [`Int vector-like`](#doc_Int_vector_like) | A matrix containing labels (0 or 1) for the points in the training set (y). | `Int[]` |
-| `lambda` | [`Float64`](#doc_Float64) | L2-regularization parameter for training. | `0.0001` |
-| `max_iterations` | [`Int`](#doc_Int) | Maximum iterations for optimizer (0 indicates no limit). | `10000` |
-| `no_intercept` | [`Bool`](#doc_Bool) | Do not add the intercept term to the model. | `false` |
-| `num_classes` | [`Int`](#doc_Int) | Number of classes for classification; if unspecified (or 0), the number of classes found in the labels will be used. | `0` |
-| `optimizer` | [`String`](#doc_String) | Optimizer to use for training ('lbfgs' or 'psgd'). | `"lbfgs"` |
-| `seed` | [`Int`](#doc_Int) | Random seed.  If 0, 'std::time(NULL)' is used. | `0` |
-| `shuffle` | [`Bool`](#doc_Bool) | Don't shuffle the order in which data points are visited for parallel SGD. | `false` |
-| `step_size` | [`Float64`](#doc_Float64) | Step size for parallel SGD optimizer. | `0.01` |
-| `test` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | Matrix containing test dataset. | `zeros(0, 0)` |
-| `test_labels` | [`Int vector-like`](#doc_Int_vector_like) | Matrix containing test labels. | `Int[]` |
-| `tolerance` | [`Float64`](#doc_Float64) | Convergence tolerance for optimizer. | `1e-10` |
-| `training` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | A matrix containing the training set (the matrix of predictors, X). | `zeros(0, 0)` |
-| `verbose` | [`Bool`](#doc_Bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `false` |
-
-### Output options
-
-Results are returned as a tuple, and can be unpacked directly into return values or stored directly as a tuple; undesired results can be ignored with the _ keyword.
-
-| ***name*** | ***type*** | ***description*** |
-|------------|------------|-------------------|
-| `output_model` | [`LinearSVMModel`](#doc_model) | Output for trained linear svm model. | 
-| `predictions` | [`Int vector-like`](#doc_Int_vector_like) | If test data is specified, this matrix is where the predictions for the test set will be saved. | 
-| `probabilities` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | If test data is specified, this matrix is where the class probabilities for the test set will be saved. | 
-
-### Detailed documentation
-{: #linear_svm_detailed-documentation }
-
-An implementation of linear SVMs that uses either L-BFGS or parallel SGD (stochastic gradient descent) to train the model.
-
-This program allows loading a linear SVM model (via the `input_model` parameter) or training a linear SVM model given training data (specified with the `training` parameter), or both those things at once.  In addition, this program allows classification on a test dataset (specified with the `test` parameter) and the classification results may be saved with the `predictions` output parameter. The trained linear SVM model may be saved using the `output_model` output parameter.
-
-The training data, if specified, may have class labels as its last dimension.  Alternately, the `labels` parameter may be used to specify a separate vector of labels.
-
-When a model is being trained, there are many options.  L2 regularization (to prevent overfitting) can be specified with the `lambda` option, and the number of classes can be manually specified with the `num_classes`and if an intercept term is not desired in the model, the `no_intercept` parameter can be specified.Margin of difference between correct class and other classes can be specified with the `delta` option.The optimizer used to train the model can be specified with the `optimizer` parameter.  Available options are 'psgd' (parallel stochastic gradient descent) and 'lbfgs' (the L-BFGS optimizer).  There are also various parameters for the optimizer; the `max_iterations` parameter specifies the maximum number of allowed iterations, and the `tolerance` parameter specifies the tolerance for convergence.  For the parallel SGD optimizer, the `step_size` parameter controls the step size taken at each iteration by the optimizer and the maximum number of epochs (specified with `epochs`). If the objective function for your data is oscillating between Inf and 0, the step size is probably too large.  There are more parameters for the optimizers, but the C++ interface must be used to access these.
-
-Optionally, the model can be used to predict the labels for another matrix of data points, if `test` is specified.  The `test` parameter can be specified without the `training` parameter, so long as an existing linear SVM model is given with the `input_model` parameter.  The output predictions from the linear SVM model may be saved with the `predictions` parameter.
-
-### Example
-As an example, to train a LinaerSVM on the data '``data``' with labels '``labels``' with L2 regularization of 0.1, saving the model to '``lsvm_model``', the following command may be used:
-
-```julia
-julia> using CSV
-julia> data = CSV.read("data.csv")
-julia> labels = CSV.read("labels.csv"; type=Int)
-julia> lsvm_model, _, _ = linear_svm(delta=1, labels=labels,
-            lambda=0.1, num_classes=0, training=data)
-```
-
-Then, to use that model to predict classes for the dataset '``test``', storing the output predictions in '``predictions``', the following command may be used: 
-
-```julia
-julia> using CSV
-julia> test = CSV.read("test.csv")
-julia> _, predictions, _ = linear_svm(input_model=lsvm_model,
-            test=test)
-```
-
-### See also
-
- - [random_forest()](#random_forest)
- - [logistic_regression()](#logistic_regression)
- - [LinearSVM on Wikipedia](https://en.wikipedia.org/wiki/Support-vector_machine)
- - [LinearSVM C++ class documentation](../../user/methods/linear_svm.md)
-
 ## lmnn()
 {: #lmnn }
 
@@ -2000,7 +1907,7 @@ julia> centroids, _ = mean_shift(data)
  - [kmeans()](#kmeans)
  - [dbscan()](#dbscan)
  - [Mean shift on Wikipedia](https://en.wikipedia.org/wiki/Mean_shift)
- - [Mean Shift, Mode Seeking, and Clustering (pdf)](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=1c168275c59ba382588350ee1443537f59978183)
+ - [Mean Shift, Mode Seeking, and Clustering (pdf)](https://members.loria.fr/MOBerger/Enseignement/Master2/Exposes/meanShiftCluster.pdf)
  - [mlpack::mean_shift::MeanShift C++ class documentation](../../user/methods/mean_shift.md)
 
 ## nca()
@@ -2359,81 +2266,6 @@ julia> data_mod = pca(data; decomposition_method="randomized",
 
  - [Principal component analysis on Wikipedia](https://en.wikipedia.org/wiki/Principal_component_analysis)
  - [PCA C++ class documentation](../../user/methods/pca.md)
-
-## perceptron()
-{: #perceptron }
-
-#### Perceptron
-{: #perceptron_descr }
-
-```julia
-julia> using mlpack: perceptron
-julia> output_model, predictions = perceptron( ; input_model=nothing,
-          labels=Int[], max_iterations=1000, test=zeros(0, 0), training=zeros(0,
-          0), verbose=false)
-```
-
-An implementation of a perceptron---a single level neural network--=for classification.  Given labeled data, a perceptron can be trained and saved for future use; or, a pre-trained perceptron can be used for classification on new points. [Detailed documentation](#perceptron_detailed-documentation).
-
-
-
-### Input options
-
-| ***name*** | ***type*** | ***description*** | ***default*** |
-|------------|------------|-------------------|---------------|
-| `check_input_matrices` | [`Bool`](#doc_Bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `false` |
-| `input_model` | [`PerceptronModel`](#doc_model) | Input perceptron model. | `nothing` |
-| `labels` | [`Int vector-like`](#doc_Int_vector_like) | A matrix containing labels for the training set. | `Int[]` |
-| `max_iterations` | [`Int`](#doc_Int) | The maximum number of iterations the perceptron is to be run | `1000` |
-| `test` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | A matrix containing the test set. | `zeros(0, 0)` |
-| `training` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | A matrix containing the training set. | `zeros(0, 0)` |
-| `verbose` | [`Bool`](#doc_Bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `false` |
-
-### Output options
-
-Results are returned as a tuple, and can be unpacked directly into return values or stored directly as a tuple; undesired results can be ignored with the _ keyword.
-
-| ***name*** | ***type*** | ***description*** |
-|------------|------------|-------------------|
-| `output_model` | [`PerceptronModel`](#doc_model) | Output for trained perceptron model. | 
-| `predictions` | [`Int vector-like`](#doc_Int_vector_like) | The matrix in which the predicted labels for the test set will be written. | 
-
-### Detailed documentation
-{: #perceptron_detailed-documentation }
-
-This program implements a perceptron, which is a single level neural network. The perceptron makes its predictions based on a linear predictor function combining a set of weights with the feature vector.  The perceptron learning rule is able to converge, given enough iterations (specified using the `max_iterations` parameter), if the data supplied is linearly separable.  The perceptron is parameterized by a matrix of weight vectors that denote the numerical weights of the neural network.
-
-This program allows loading a perceptron from a model (via the `input_model` parameter) or training a perceptron given training data (via the `training` parameter), or both those things at once.  In addition, this program allows classification on a test dataset (via the `test` parameter) and the classification results on the test set may be saved with the `predictions` output parameter.  The perceptron model may be saved with the `output_model` output parameter.
-
-### Example
-The training data given with the `training` option may have class labels as its last dimension (so, if the training data is in CSV format, labels should be the last column).  Alternately, the `labels` parameter may be used to specify a separate matrix of labels.
-
-All these options make it easy to train a perceptron, and then re-use that perceptron for later classification.  The invocation below trains a perceptron on ``training_data`` with labels ``training_labels``, and saves the model to ``perceptron_model``.
-
-```julia
-julia> using CSV
-julia> training_data = CSV.read("training_data.csv")
-julia> training_labels = CSV.read("training_labels.csv"; type=Int)
-julia> perceptron_model, _ = perceptron(labels=training_labels,
-            training=training_data)
-```
-
-Then, this model can be re-used for classification on the test data ``test_data``.  The example below does precisely that, saving the predicted classes to ``predictions``.
-
-```julia
-julia> using CSV
-julia> test_data = CSV.read("test_data.csv")
-julia> _, predictions = perceptron(input_model=perceptron_model,
-            test=test_data)
-```
-
-Note that all of the options may be specified at once: predictions may be calculated right after training a model, and model training can occur even if an existing perceptron model is passed with the `input_model` parameter.  However, note that the number of classes and the dimensionality of all data must match.  So you cannot pass a perceptron model trained on 2 classes and then re-train with a 4-class dataset.  Similarly, attempting classification on a 3-dimensional dataset with a perceptron that has been trained on 8 dimensions will cause an error.
-
-### See also
-
- - [adaboost()](#adaboost)
- - [Perceptron on Wikipedia](https://en.wikipedia.org/wiki/Perceptron)
- - [Perceptron C++ class documentation](../../user/methods/perceptron.md)
 
 ## preprocess_split()
 {: #preprocess_split }
@@ -2939,89 +2771,6 @@ The output matrices are organized such that row i and column j in the neighbors 
  - [Rank-approximate nearest neighbor search: Retaining meaning and speed in high dimensions (pdf)](https://proceedings.neurips.cc/paper_files/paper/2009/file/ddb30680a691d157187ee1cf9e896d03-Paper.pdf)
  - [RASearch C++ class documentation](https://github.com/mlpack/mlpack/blob/master/src/mlpack/methods/rann/ra_search.hpp)
 
-## softmax_regression()
-{: #softmax_regression }
-
-#### Softmax Regression
-{: #softmax_regression_descr }
-
-```julia
-julia> using mlpack: softmax_regression
-julia> output_model, predictions, probabilities = softmax_regression(
-          ; input_model=nothing, labels=Int[], lambda=0.0001,
-          max_iterations=400, no_intercept=false, number_of_classes=0,
-          test=zeros(0, 0), test_labels=Int[], training=zeros(0, 0),
-          verbose=false)
-```
-
-An implementation of softmax regression for classification, which is a multiclass generalization of logistic regression.  Given labeled data, a softmax regression model can be trained and saved for future use, or, a pre-trained softmax regression model can be used for classification of new points. [Detailed documentation](#softmax_regression_detailed-documentation).
-
-
-
-### Input options
-
-| ***name*** | ***type*** | ***description*** | ***default*** |
-|------------|------------|-------------------|---------------|
-| `check_input_matrices` | [`Bool`](#doc_Bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `false` |
-| `input_model` | [`SoftmaxRegression`](#doc_model) | File containing existing model (parameters). | `nothing` |
-| `labels` | [`Int vector-like`](#doc_Int_vector_like) | A matrix containing labels (0 or 1) for the points in the training set (y). The labels must order as a row. | `Int[]` |
-| `lambda` | [`Float64`](#doc_Float64) | L2-regularization constant | `0.0001` |
-| `max_iterations` | [`Int`](#doc_Int) | Maximum number of iterations before termination. | `400` |
-| `no_intercept` | [`Bool`](#doc_Bool) | Do not add the intercept term to the model. | `false` |
-| `number_of_classes` | [`Int`](#doc_Int) | Number of classes for classification; if unspecified (or 0), the number of classes found in the labels will be used. | `0` |
-| `test` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | Matrix containing test dataset. | `zeros(0, 0)` |
-| `test_labels` | [`Int vector-like`](#doc_Int_vector_like) | Matrix containing test labels. | `Int[]` |
-| `training` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | A matrix containing the training set (the matrix of predictors, X). | `zeros(0, 0)` |
-| `verbose` | [`Bool`](#doc_Bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `false` |
-
-### Output options
-
-Results are returned as a tuple, and can be unpacked directly into return values or stored directly as a tuple; undesired results can be ignored with the _ keyword.
-
-| ***name*** | ***type*** | ***description*** |
-|------------|------------|-------------------|
-| `output_model` | [`SoftmaxRegression`](#doc_model) | File to save trained softmax regression model to. | 
-| `predictions` | [`Int vector-like`](#doc_Int_vector_like) | Matrix to save predictions for test dataset into. | 
-| `probabilities` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | Matrix to save class probabilities for test dataset into. | 
-
-### Detailed documentation
-{: #softmax_regression_detailed-documentation }
-
-This program performs softmax regression, a generalization of logistic regression to the multiclass case, and has support for L2 regularization.  The program is able to train a model, load  an existing model, and give predictions (and optionally their accuracy) for test data.
-
-Training a softmax regression model is done by giving a file of training points with the `training` parameter and their corresponding labels with the `labels` parameter. The number of classes can be manually specified with the `number_of_classes` parameter, and the maximum number of iterations of the L-BFGS optimizer can be specified with the `max_iterations` parameter.  The L2 regularization constant can be specified with the `lambda` parameter and if an intercept term is not desired in the model, the `no_intercept` parameter can be specified.
-
-The trained model can be saved with the `output_model` output parameter. If training is not desired, but only testing is, a model can be loaded with the `input_model` parameter.  At the current time, a loaded model cannot be trained further, so specifying both `input_model` and `training` is not allowed.
-
-The program is also able to evaluate a model on test data.  A test dataset can be specified with the `test` parameter. Class predictions can be saved with the `predictions` output parameter.  If labels are specified for the test data with the `test_labels` parameter, then the program will print the accuracy of the predictions on the given test set and its corresponding labels.
-
-### Example
-For example, to train a softmax regression model on the data ``dataset`` with labels ``labels`` with a maximum of 1000 iterations for training, saving the trained model to ``sr_model``, the following command can be used: 
-
-```julia
-julia> using CSV
-julia> dataset = CSV.read("dataset.csv")
-julia> labels = CSV.read("labels.csv"; type=Int)
-julia> sr_model, _, _ = softmax_regression(labels=labels,
-            training=dataset)
-```
-
-Then, to use ``sr_model`` to classify the test points in ``test_points``, saving the output predictions to ``predictions``, the following command can be used:
-
-```julia
-julia> using CSV
-julia> test_points = CSV.read("test_points.csv")
-julia> _, predictions, _ = softmax_regression(input_model=sr_model,
-            test=test_points)
-```
-
-### See also
-
- - [logistic_regression()](#logistic_regression)
- - [random_forest()](#random_forest)
- - [Multinomial logistic regression (softmax regression) on Wikipedia](https://en.wikipedia.org/wiki/Multinomial_logistic_regression)
- - [SoftmaxRegression C++ class documentation](../../user/methods/softmax_regression.md)
-
 ## sparse_coding()
 {: #sparse_coding }
 
@@ -3107,7 +2856,7 @@ julia> codes, _, _ = sparse_coding(input_model=model,
  - [local_coordinate_coding()](#local_coordinate_coding)
  - [Sparse dictionary learning on Wikipedia](https://en.wikipedia.org/wiki/Sparse_dictionary_learning)
  - [Efficient sparse coding algorithms (pdf)](https://proceedings.neurips.cc/paper_files/paper/2006/file/2d71b2ae158c7c5912cc0bbde2bb9d95-Paper.pdf)
- - [Regularization and variable selection via the elastic net](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=46217f372a75dddc2254fdbc6b9418ba3554e453)
+ - [Regularization and variable selection via the elastic net (pdf)](https://sites.stat.washington.edu/courses/stat527/s13/readings/zouhastie05.pdf)
  - [SparseCoding C++ class documentation](../../user/methods/sparse_coding.md)
 
 ## random_forest()
@@ -3288,6 +3037,176 @@ julia> _, predictions, _ = decision_tree(input_model=tree,
  - [Induction of Decision Trees (pdf)](https://www.hunch.net/~coms-4771/quinlan.pdf)
  - [DecisionTree C++ class documentation](../../user/methods/decision_tree.md)
 
+## perceptron()
+{: #perceptron }
+
+#### Perceptron
+{: #perceptron_descr }
+
+```julia
+julia> using mlpack: perceptron
+julia> output_model, predictions = perceptron( ; input_model=nothing,
+          labels=Int[], max_iterations=1000, test=zeros(0, 0), training=zeros(0,
+          0), verbose=false)
+```
+
+An implementation of a perceptron---a single level neural network---for classification.  Given labeled data, a perceptron can be trained and saved for future use; or, a pre-trained perceptron can be used for classification on new points. [Detailed documentation](#perceptron_detailed-documentation).
+
+
+
+### Input options
+
+| ***name*** | ***type*** | ***description*** | ***default*** |
+|------------|------------|-------------------|---------------|
+| `check_input_matrices` | [`Bool`](#doc_Bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `false` |
+| `input_model` | [`PerceptronModel`](#doc_model) | Input perceptron model. | `nothing` |
+| `labels` | [`Int vector-like`](#doc_Int_vector_like) | A matrix containing labels for the training set. | `Int[]` |
+| `max_iterations` | [`Int`](#doc_Int) | The maximum number of iterations the perceptron is to be run | `1000` |
+| `test` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | A matrix containing the test set. | `zeros(0, 0)` |
+| `training` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | A matrix containing the training set. | `zeros(0, 0)` |
+| `verbose` | [`Bool`](#doc_Bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `false` |
+
+### Output options
+
+Results are returned as a tuple, and can be unpacked directly into return values or stored directly as a tuple; undesired results can be ignored with the _ keyword.
+
+| ***name*** | ***type*** | ***description*** |
+|------------|------------|-------------------|
+| `output_model` | [`PerceptronModel`](#doc_model) | Output for trained perceptron model. | 
+| `predictions` | [`Int vector-like`](#doc_Int_vector_like) | The matrix in which the predicted labels for the test set will be written. | 
+
+### Detailed documentation
+{: #perceptron_detailed-documentation }
+
+This program implements a perceptron, which is a single level neural network. The perceptron makes its predictions based on a linear predictor function combining a set of weights with the feature vector.  The perceptron learning rule is able to converge, given enough iterations (specified using the `max_iterations` parameter), if the data supplied is linearly separable.  The perceptron is parameterized by a matrix of weight vectors that denote the numerical weights of the neural network.
+
+This program allows loading a perceptron from a model (via the `input_model` parameter) or training a perceptron given training data (via the `training` parameter), or both those things at once.  In addition, this program allows classification on a test dataset (via the `test` parameter) and the classification results on the test set may be saved with the `predictions` output parameter.  The perceptron model may be saved with the `output_model` output parameter.
+
+### Example
+The training data given with the `training` option may have class labels as its last dimension (so, if the training data is in CSV format, labels should be the last column).  Alternately, the `labels` parameter may be used to specify a separate matrix of labels.
+
+All these options make it easy to train a perceptron, and then re-use that perceptron for later classification.  The invocation below trains a perceptron on ``training_data`` with labels ``training_labels``, and saves the model to ``perceptron_model``.
+
+```julia
+julia> using CSV
+julia> training_data = CSV.read("training_data.csv")
+julia> training_labels = CSV.read("training_labels.csv"; type=Int)
+julia> perceptron_model, _ = perceptron(labels=training_labels,
+            training=training_data)
+```
+
+Then, this model can be re-used for classification on the test data ``test_data``.  The example below does precisely that, saving the predicted classes to ``predictions``.
+
+```julia
+julia> using CSV
+julia> test_data = CSV.read("test_data.csv")
+julia> _, predictions = perceptron(input_model=perceptron_model,
+            test=test_data)
+```
+
+Note that all of the options may be specified at once: predictions may be calculated right after training a model, and model training can occur even if an existing perceptron model is passed with the `input_model` parameter.  However, note that the number of classes and the dimensionality of all data must match.  So you cannot pass a perceptron model trained on 2 classes and then re-train with a 4-class dataset.  Similarly, attempting classification on a 3-dimensional dataset with a perceptron that has been trained on 8 dimensions will cause an error.
+
+### See also
+
+ - [adaboost()](#adaboost)
+ - [Perceptron on Wikipedia](https://en.wikipedia.org/wiki/Perceptron)
+ - [Perceptron C++ class documentation](../../user/methods/perceptron.md)
+
+## linear_svm()
+{: #linear_svm }
+
+#### Linear SVM is an L2-regularized support vector machine.
+{: #linear_svm_descr }
+
+```julia
+julia> using mlpack: linear_svm
+julia> output_model, predictions, probabilities = linear_svm( ;
+          delta=1.0, epochs=50, input_model=nothing, labels=Int[],
+          lambda=0.0001, max_iterations=10000, no_intercept=false,
+          num_classes=0, optimizer="lbfgs", seed=0, shuffle=false,
+          step_size=0.01, test=zeros(0, 0), test_labels=Int[], tolerance=1e-10,
+          training=zeros(0, 0), verbose=false)
+```
+
+An implementation of linear SVM for multiclass classification. Given labeled data, a model can be trained and saved for future use; or, a pre-trained model can be used to classify new points. [Detailed documentation](#linear_svm_detailed-documentation).
+
+
+
+### Input options
+
+| ***name*** | ***type*** | ***description*** | ***default*** |
+|------------|------------|-------------------|---------------|
+| `check_input_matrices` | [`Bool`](#doc_Bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `false` |
+| `delta` | [`Float64`](#doc_Float64) | Margin of difference between correct class and other classes. | `1.0` |
+| `epochs` | [`Int`](#doc_Int) | Maximum number of full epochs over dataset for psgd | `50` |
+| `input_model` | [`LinearSVMModel`](#doc_model) | Existing model (parameters). | `nothing` |
+| `labels` | [`Int vector-like`](#doc_Int_vector_like) | A matrix containing labels (0 or 1) for the points in the training set (y). | `Int[]` |
+| `lambda` | [`Float64`](#doc_Float64) | L2-regularization parameter for training. | `0.0001` |
+| `max_iterations` | [`Int`](#doc_Int) | Maximum iterations for optimizer (0 indicates no limit). | `10000` |
+| `no_intercept` | [`Bool`](#doc_Bool) | Do not add the intercept term to the model. | `false` |
+| `num_classes` | [`Int`](#doc_Int) | Number of classes for classification; if unspecified (or 0), the number of classes found in the labels will be used. | `0` |
+| `optimizer` | [`String`](#doc_String) | Optimizer to use for training ('lbfgs' or 'psgd'). | `"lbfgs"` |
+| `seed` | [`Int`](#doc_Int) | Random seed.  If 0, 'std::time(NULL)' is used. | `0` |
+| `shuffle` | [`Bool`](#doc_Bool) | Don't shuffle the order in which data points are visited for parallel SGD. | `false` |
+| `step_size` | [`Float64`](#doc_Float64) | Step size for parallel SGD optimizer. | `0.01` |
+| `test` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | Matrix containing test dataset. | `zeros(0, 0)` |
+| `test_labels` | [`Int vector-like`](#doc_Int_vector_like) | Matrix containing test labels. | `Int[]` |
+| `tolerance` | [`Float64`](#doc_Float64) | Convergence tolerance for optimizer. | `1e-10` |
+| `training` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | A matrix containing the training set (the matrix of predictors, X). | `zeros(0, 0)` |
+| `verbose` | [`Bool`](#doc_Bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `false` |
+
+### Output options
+
+Results are returned as a tuple, and can be unpacked directly into return values or stored directly as a tuple; undesired results can be ignored with the _ keyword.
+
+| ***name*** | ***type*** | ***description*** |
+|------------|------------|-------------------|
+| `output_model` | [`LinearSVMModel`](#doc_model) | Output for trained linear svm model. | 
+| `predictions` | [`Int vector-like`](#doc_Int_vector_like) | If test data is specified, this matrix is where the predictions for the test set will be saved. | 
+| `probabilities` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | If test data is specified, this matrix is where the class probabilities for the test set will be saved. | 
+
+### Detailed documentation
+{: #linear_svm_detailed-documentation }
+
+An implementation of linear SVMs that uses either L-BFGS or parallel SGD (stochastic gradient descent) to train the model.
+
+This program allows loading a linear SVM model (via the `input_model` parameter) or training a linear SVM model given training data (specified with the `training` parameter), or both those things at once.  In addition, this program allows classification on a test dataset (specified with the `test` parameter) and the classification results may be saved with the `predictions` output parameter. The trained linear SVM model may be saved using the `output_model` output parameter.
+
+The training data, if specified, may have class labels as its last dimension.  Alternately, the `labels` parameter may be used to specify a separate vector of labels.
+
+When a model is being trained, there are many options.  L2 regularization (to prevent overfitting) can be specified with the `lambda` option, and the number of classes can be manually specified with the `num_classes`and if an intercept term is not desired in the model, the `no_intercept` parameter can be specified.
+
+Margin of difference between correct class and other classes can be specified with the `delta` option.The optimizer used to train the model can be specified with the `optimizer` parameter.  Available options are 'psgd' (parallel stochastic gradient descent) and 'lbfgs' (the L-BFGS optimizer).  There are also various parameters for the optimizer; the `max_iterations` parameter specifies the maximum number of allowed iterations, and the `tolerance` parameter specifies the tolerance for convergence.  For the parallel SGD optimizer, the `step_size` parameter controls the step size taken at each iteration by the optimizer and the maximum number of epochs (specified with `epochs`). If the objective function for your data is oscillating between Inf and 0, the step size is probably too large.  There are more parameters for the optimizers, but the C++ interface must be used to access these.
+
+Optionally, the model can be used to predict the labels for another matrix of data points, if `test` is specified.  The `test` parameter can be specified without the `training` parameter, so long as an existing linear SVM model is given with the `input_model` parameter.  The output predictions from the linear SVM model may be saved with the `predictions` parameter.
+
+### Example
+As an example, to train a LinaerSVM on the data '``data``' with labels '``labels``' with L2 regularization of 0.1, saving the model to '``lsvm_model``', the following command may be used:
+
+```julia
+julia> using CSV
+julia> data = CSV.read("data.csv")
+julia> labels = CSV.read("labels.csv"; type=Int)
+julia> lsvm_model, _, _ = linear_svm(delta=1, labels=labels,
+            lambda=0.1, num_classes=0, training=data)
+```
+
+Then, to use that model to predict classes for the dataset '``test``', storing the output predictions in '``predictions``', the following command may be used: 
+
+```julia
+julia> using CSV
+julia> test = CSV.read("test.csv")
+julia> _, predictions, _ = linear_svm(input_model=lsvm_model,
+            test=test)
+```
+
+### See also
+
+ - [random_forest()](#random_forest)
+ - [logistic_regression()](#logistic_regression)
+ - [LinearSVM on Wikipedia](https://en.wikipedia.org/wiki/Support-vector_machine)
+ - [LinearSVM C++ class documentation](../../user/methods/linear_svm.md)
+
 ## adaboost()
 {: #adaboost }
 
@@ -3456,7 +3375,7 @@ julia> _, predictions, class_probs =
 
  - [decision_tree()](#decision_tree)
  - [random_forest()](#random_forest)
- - [Mining High-Speed Data Streams (pdf)](http://dm.cs.washington.edu/papers/vfdt-kdd00.pdf)
+ - [Mining High-Speed Data Streams (pdf)](https://www.cs.rhodes.edu/~welshc/COMP465_S15/Papers/kdd00.pdf)
  - [HoeffdingTree class documentation](../../user/methods/hoeffding_tree.md)
 
 ## nbc()
@@ -3538,6 +3457,89 @@ julia> _, predictions, _ = nbc(input_model=nbc_model,
  - [random_forest()](#random_forest)
  - [Naive Bayes classifier on Wikipedia](https://en.wikipedia.org/wiki/Naive_Bayes_classifier)
  - [NaiveBayesClassifier C++ class documentation](../../user/methods/naive_bayes_classifier.md)
+
+## softmax_regression()
+{: #softmax_regression }
+
+#### Softmax Regression
+{: #softmax_regression_descr }
+
+```julia
+julia> using mlpack: softmax_regression
+julia> output_model, predictions, probabilities = softmax_regression(
+          ; input_model=nothing, labels=Int[], lambda=0.0001,
+          max_iterations=400, no_intercept=false, number_of_classes=0,
+          test=zeros(0, 0), test_labels=Int[], training=zeros(0, 0),
+          verbose=false)
+```
+
+An implementation of softmax regression for classification, which is a multiclass generalization of logistic regression.  Given labeled data, a softmax regression model can be trained and saved for future use, or, a pre-trained softmax regression model can be used for classification of new points. [Detailed documentation](#softmax_regression_detailed-documentation).
+
+
+
+### Input options
+
+| ***name*** | ***type*** | ***description*** | ***default*** |
+|------------|------------|-------------------|---------------|
+| `check_input_matrices` | [`Bool`](#doc_Bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `false` |
+| `input_model` | [`SoftmaxRegression`](#doc_model) | File containing existing model (parameters). | `nothing` |
+| `labels` | [`Int vector-like`](#doc_Int_vector_like) | A matrix containing labels (0 or 1) for the points in the training set (y). The labels must order as a row. | `Int[]` |
+| `lambda` | [`Float64`](#doc_Float64) | L2-regularization constant | `0.0001` |
+| `max_iterations` | [`Int`](#doc_Int) | Maximum number of iterations before termination. | `400` |
+| `no_intercept` | [`Bool`](#doc_Bool) | Do not add the intercept term to the model. | `false` |
+| `number_of_classes` | [`Int`](#doc_Int) | Number of classes for classification; if unspecified (or 0), the number of classes found in the labels will be used. | `0` |
+| `test` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | Matrix containing test dataset. | `zeros(0, 0)` |
+| `test_labels` | [`Int vector-like`](#doc_Int_vector_like) | Matrix containing test labels. | `Int[]` |
+| `training` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | A matrix containing the training set (the matrix of predictors, X). | `zeros(0, 0)` |
+| `verbose` | [`Bool`](#doc_Bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `false` |
+
+### Output options
+
+Results are returned as a tuple, and can be unpacked directly into return values or stored directly as a tuple; undesired results can be ignored with the _ keyword.
+
+| ***name*** | ***type*** | ***description*** |
+|------------|------------|-------------------|
+| `output_model` | [`SoftmaxRegression`](#doc_model) | File to save trained softmax regression model to. | 
+| `predictions` | [`Int vector-like`](#doc_Int_vector_like) | Matrix to save predictions for test dataset into. | 
+| `probabilities` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | Matrix to save class probabilities for test dataset into. | 
+
+### Detailed documentation
+{: #softmax_regression_detailed-documentation }
+
+This program performs softmax regression, a generalization of logistic regression to the multiclass case, and has support for L2 regularization.  The program is able to train a model, load  an existing model, and give predictions (and optionally their accuracy) for test data.
+
+Training a softmax regression model is done by giving a file of training points with the `training` parameter and their corresponding labels with the `labels` parameter. The number of classes can be manually specified with the `number_of_classes` parameter, and the maximum number of iterations of the L-BFGS optimizer can be specified with the `max_iterations` parameter.  The L2 regularization constant can be specified with the `lambda` parameter and if an intercept term is not desired in the model, the `no_intercept` parameter can be specified.
+
+The trained model can be saved with the `output_model` output parameter. If training is not desired, but only testing is, a model can be loaded with the `input_model` parameter.  At the current time, a loaded model cannot be trained further, so specifying both `input_model` and `training` is not allowed.
+
+The program is also able to evaluate a model on test data.  A test dataset can be specified with the `test` parameter. Class predictions can be saved with the `predictions` output parameter.  If labels are specified for the test data with the `test_labels` parameter, then the program will print the accuracy of the predictions on the given test set and its corresponding labels.
+
+### Example
+For example, to train a softmax regression model on the data ``dataset`` with labels ``labels`` with a maximum of 1000 iterations for training, saving the trained model to ``sr_model``, the following command can be used: 
+
+```julia
+julia> using CSV
+julia> dataset = CSV.read("dataset.csv")
+julia> labels = CSV.read("labels.csv"; type=Int)
+julia> sr_model, _, _ = softmax_regression(labels=labels,
+            training=dataset)
+```
+
+Then, to use ``sr_model`` to classify the test points in ``test_points``, saving the output predictions to ``predictions``, the following command can be used:
+
+```julia
+julia> using CSV
+julia> test_points = CSV.read("test_points.csv")
+julia> _, predictions, _ = softmax_regression(input_model=sr_model,
+            test=test_points)
+```
+
+### See also
+
+ - [logistic_regression()](#logistic_regression)
+ - [random_forest()](#random_forest)
+ - [Multinomial logistic regression (softmax regression) on Wikipedia](https://en.wikipedia.org/wiki/Multinomial_logistic_regression)
+ - [SoftmaxRegression C++ class documentation](../../user/methods/softmax_regression.md)
 
 ## linear_regression()
 {: #linear_regression }
