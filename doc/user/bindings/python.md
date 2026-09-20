@@ -329,92 +329,6 @@ An example usage to run DBSCAN on the dataset in `'input'` with a radius of 0.5 
  - [A density-based algorithm for discovering clusters in large spatial databases with noise (pdf)](https://cdn.aaai.org/KDD/1996/KDD96-037.pdf)
  - [DBSCAN class documentation](https://github.com/mlpack/mlpack/blob/master/src/mlpack/methods/dbscan/dbscan.hpp)
 
-## decision_tree()
-{: #decision_tree }
-
-#### Decision tree
-{: #decision_tree_descr }
-
-```python
->>> from mlpack import decision_tree
->>> d = decision_tree(check_input_matrices=False, copy_all_inputs=False,
-        input_model=None, labels=np.empty([0], dtype=np.uint64),
-        maximum_depth=0, minimum_gain_split=1e-07, minimum_leaf_size=20,
-        print_training_accuracy=False, test=np.empty([0, 0]),
-        test_labels=np.empty([0], dtype=np.uint64), training=np.empty([0, 0]),
-        verbose=False, weights=np.empty([0, 0]))
->>> output_model = d['output_model']
->>> predictions = d['predictions']
->>> probabilities = d['probabilities']
-```
-
-An implementation of an ID3-style decision tree for classification, which supports categorical data.  Given labeled data with numeric or categorical features, a decision tree can be trained and saved; or, an existing decision tree can be used for classification on new points. [Detailed documentation](#decision_tree_detailed-documentation).
-
-
-
-### Input options
-
-| ***name*** | ***type*** | ***description*** | ***default*** |
-|------------|------------|-------------------|---------------|
-| `check_input_matrices` | [`bool`](#doc_bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `False` |
-| `copy_all_inputs` | [`bool`](#doc_bool) | If specified, all input parameters will be deep copied before the method is run.  This is useful for debugging problems where the input parameters are being modified by the algorithm, but can slow down the code.  <span class="special">Only exists in Python binding.</span> | `False` |
-| `input_model` | [`DecisionTreeModelType`](#doc_model) | Pre-trained decision tree, to be used with test points. | `None` |
-| `labels` | [`int vector`](#doc_int_vector) | Training labels. | `np.empty([0], dtype=np.uint64)` |
-| `maximum_depth` | [`int`](#doc_int) | Maximum depth of the tree (0 means no limit). | `0` |
-| `minimum_gain_split` | [`float`](#doc_float) | Minimum gain for node splitting. | `1e-07` |
-| `minimum_leaf_size` | [`int`](#doc_int) | Minimum number of points in a leaf. | `20` |
-| `print_training_accuracy` | [`bool`](#doc_bool) | Print the training accuracy. | `False` |
-| `test` | [`categorical matrix`](#doc_categorical_matrix) | Testing dataset (may be categorical). | `np.empty([0, 0])` |
-| `test_labels` | [`int vector`](#doc_int_vector) | Test point labels, if accuracy calculation is desired. | `np.empty([0], dtype=np.uint64)` |
-| `training` | [`categorical matrix`](#doc_categorical_matrix) | Training dataset (may be categorical). | `np.empty([0, 0])` |
-| `verbose` | [`bool`](#doc_bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `False` |
-| `weights` | [`matrix`](#doc_matrix) | The weight of labels | `np.empty([0, 0])` |
-
-### Output options
-
-Results are returned in a Python dictionary.  The keys of the dictionary are the names of the output parameters.
-
-| ***name*** | ***type*** | ***description*** |
-|------------|------------|-------------------|
-| `output_model` | [`DecisionTreeModelType`](#doc_model) | Output for trained decision tree. | 
-| `predictions` | [`int vector`](#doc_int_vector) | Class predictions for each test point. | 
-| `probabilities` | [`matrix`](#doc_matrix) | Class probabilities for each test point. | 
-
-### Detailed documentation
-{: #decision_tree_detailed-documentation }
-
-Train and evaluate using a decision tree.  Given a dataset containing numeric or categorical features, and associated labels for each point in the dataset, this program can train a decision tree on that data.
-
-The training set and associated labels are specified with the `training` and `labels` parameters, respectively.  The labels should be in the range `[0, num_classes - 1]`. Optionally, if `labels` is not specified, the labels are assumed to be the last dimension of the training dataset.
-
-When a model is trained, the `output_model` output parameter may be used to save the trained model.  A model may be loaded for predictions with the `input_model` parameter.  The `input_model` parameter may not be specified when the `training` parameter is specified.  The `minimum_leaf_size` parameter specifies the minimum number of training points that must fall into each leaf for it to be split.  The `minimum_gain_split` parameter specifies the minimum gain that is needed for the node to split.  The `maximum_depth` parameter specifies the maximum depth of the tree.  If `print_training_accuracy` is specified, the training accuracy will be printed.
-
-Test data may be specified with the `test` parameter, and if performance numbers are desired for that test set, labels may be specified with the `test_labels` parameter.  Predictions for each test point may be saved via the `predictions` output parameter.  Class probabilities for each prediction may be saved with the `probabilities` output parameter.
-
-### Example
-For example, to train a decision tree with a minimum leaf size of 20 on the dataset contained in `'data'` with labels `'labels'`, saving the output model to `'tree'` and printing the training error, one could call
-
-```python
->>> output = decision_tree(training=data, labels=labels, minimum_leaf_size=20,
-  minimum_gain_split=0.001, print_training_accuracy=True)
->>> tree = output['output_model']
-```
-
-Then, to use that model to classify points in `'test_set'` and print the test error given the labels `'test_labels'` using that model, while saving the predictions for each point to `'predictions'`, one could call 
-
-```python
->>> output = decision_tree(input_model=tree, test=test_set,
-  test_labels=test_labels)
->>> predictions = output['predictions']
-```
-
-### See also
-
- - [Random forest](#random_forest)
- - [Decision trees on Wikipedia](https://en.wikipedia.org/wiki/Decision_tree_learning)
- - [Induction of Decision Trees (pdf)](https://www.hunch.net/~coms-4771/quinlan.pdf)
- - [DecisionTree C++ class documentation](../../user/methods/decision_tree.md)
-
 ## det()
 {: #det }
 
@@ -1056,98 +970,6 @@ For example, to predict the state sequence of the observations `'obs'` using the
  - [hmm_loglik()](#hmm_loglik)
  - [Hidden Mixture Models on Wikipedia](https://en.wikipedia.org/wiki/Hidden_Markov_model)
  - [HMM class documentation](https://github.com/mlpack/mlpack/blob/master/src/mlpack/methods/hmm/hmm.hpp)
-
-## hoeffding_tree()
-{: #hoeffding_tree }
-
-#### Hoeffding trees
-{: #hoeffding_tree_descr }
-
-```python
->>> from mlpack import hoeffding_tree
->>> d = hoeffding_tree(batch_mode=False, bins=10,
-        check_input_matrices=False, confidence=0.95, copy_all_inputs=False,
-        info_gain=False, input_model=None, labels=np.empty([0],
-        dtype=np.uint64), max_samples=5000, min_samples=100,
-        numeric_split_strategy='binary', observations_before_binning=100,
-        passes=1, test=np.empty([0, 0]), test_labels=np.empty([0],
-        dtype=np.uint64), training=np.empty([0, 0]), verbose=False)
->>> output_model = d['output_model']
->>> predictions = d['predictions']
->>> probabilities = d['probabilities']
-```
-
-An implementation of Hoeffding trees, a form of streaming decision tree for classification.  Given labeled data, a Hoeffding tree can be trained and saved for later use, or a pre-trained Hoeffding tree can be used for predicting the classifications of new points. [Detailed documentation](#hoeffding_tree_detailed-documentation).
-
-
-
-### Input options
-
-| ***name*** | ***type*** | ***description*** | ***default*** |
-|------------|------------|-------------------|---------------|
-| `batch_mode` | [`bool`](#doc_bool) | If true, samples will be considered in batch instead of as a stream.  This generally results in better trees but at the cost of memory usage and runtime. | `False` |
-| `bins` | [`int`](#doc_int) | If the 'domingos' split strategy is used, this specifies the number of bins for each numeric split. | `10` |
-| `check_input_matrices` | [`bool`](#doc_bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `False` |
-| `confidence` | [`float`](#doc_float) | Confidence before splitting (between 0 and 1). | `0.95` |
-| `copy_all_inputs` | [`bool`](#doc_bool) | If specified, all input parameters will be deep copied before the method is run.  This is useful for debugging problems where the input parameters are being modified by the algorithm, but can slow down the code.  <span class="special">Only exists in Python binding.</span> | `False` |
-| `info_gain` | [`bool`](#doc_bool) | If set, information gain is used instead of Gini impurity for calculating Hoeffding bounds. | `False` |
-| `input_model` | [`HoeffdingTreeModelType`](#doc_model) | Input trained Hoeffding tree model. | `None` |
-| `labels` | [`int vector`](#doc_int_vector) | Labels for training dataset. | `np.empty([0], dtype=np.uint64)` |
-| `max_samples` | [`int`](#doc_int) | Maximum number of samples before splitting. | `5000` |
-| `min_samples` | [`int`](#doc_int) | Minimum number of samples before splitting. | `100` |
-| `numeric_split_strategy` | [`str`](#doc_str) | The splitting strategy to use for numeric features: 'domingos' or 'binary'. | `'binary'` |
-| `observations_before_binning` | [`int`](#doc_int) | If the 'domingos' split strategy is used, this specifies the number of samples observed before binning is performed. | `100` |
-| `passes` | [`int`](#doc_int) | Number of passes to take over the dataset. | `1` |
-| `test` | [`categorical matrix`](#doc_categorical_matrix) | Testing dataset (may be categorical). | `np.empty([0, 0])` |
-| `test_labels` | [`int vector`](#doc_int_vector) | Labels of test data. | `np.empty([0], dtype=np.uint64)` |
-| `training` | [`categorical matrix`](#doc_categorical_matrix) | Training dataset (may be categorical). | `np.empty([0, 0])` |
-| `verbose` | [`bool`](#doc_bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `False` |
-
-### Output options
-
-Results are returned in a Python dictionary.  The keys of the dictionary are the names of the output parameters.
-
-| ***name*** | ***type*** | ***description*** |
-|------------|------------|-------------------|
-| `output_model` | [`HoeffdingTreeModelType`](#doc_model) | Output for trained Hoeffding tree model. | 
-| `predictions` | [`int vector`](#doc_int_vector) | Matrix to output label predictions for test data into. | 
-| `probabilities` | [`matrix`](#doc_matrix) | In addition to predicting labels, provide rediction probabilities in this matrix. | 
-
-### Detailed documentation
-{: #hoeffding_tree_detailed-documentation }
-
-This program implements Hoeffding trees, a form of streaming decision tree suited best for large (or streaming) datasets.  This program supports both categorical and numeric data.  Given an input dataset, this program is able to train the tree with numerous training options, and save the model to a file.  The program is also able to use a trained model or a model from file in order to predict classes for a given test set.
-
-The training file and associated labels are specified with the `training` and `labels` parameters, respectively. Optionally, if `labels` is not specified, the labels are assumed to be the last dimension of the training dataset.
-
-The training may be performed in batch mode (like a typical decision tree algorithm) by specifying the `batch_mode` option, but this may not be the best option for large datasets.
-
-When a model is trained, it may be saved via the `output_model` output parameter.  A model may be loaded from file for further training or testing with the `input_model` parameter.
-
-Test data may be specified with the `test` parameter, and if performance statistics are desired for that test set, labels may be specified with the `test_labels` parameter.  Predictions for each test point may be saved with the `predictions` output parameter, and class probabilities for each prediction may be saved with the `probabilities` output parameter.
-
-### Example
-For example, to train a Hoeffding tree with confidence 0.99 with data `'dataset'`, saving the trained tree to `'tree'`, the following command may be used:
-
-```python
->>> output = hoeffding_tree(training=dataset, confidence=0.99)
->>> tree = output['output_model']
-```
-
-Then, this tree may be used to make predictions on the test set `'test_set'`, saving the predictions into `'predictions'` and the class probabilities into `'class_probs'` with the following command: 
-
-```python
->>> output = hoeffding_tree(input_model=tree, test=test_set)
->>> predictions = output['predictions']
->>> class_probs = output['probabilities']
-```
-
-### See also
-
- - [decision_tree()](#decision_tree)
- - [random_forest()](#random_forest)
- - [Mining High-Speed Data Streams (pdf)](http://dm.cs.washington.edu/papers/vfdt-kdd00.pdf)
- - [HoeffdingTree class documentation](../../user/methods/hoeffding_tree.md)
 
 ## image_converter()
 {: #image_converter }
@@ -2230,87 +2052,6 @@ For example, to run mean shift clustering on the dataset `'data'` and store the 
  - [Mean shift on Wikipedia](https://en.wikipedia.org/wiki/Mean_shift)
  - [Mean Shift, Mode Seeking, and Clustering (pdf)](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=1c168275c59ba382588350ee1443537f59978183)
  - [mlpack::mean_shift::MeanShift C++ class documentation](../../user/methods/mean_shift.md)
-
-## nbc()
-{: #nbc }
-
-#### Parametric Naive Bayes Classifier
-{: #nbc_descr }
-
-```python
->>> from mlpack import nbc
->>> d = nbc(check_input_matrices=False, copy_all_inputs=False,
-        incremental_variance=False, input_model=None, labels=np.empty([0],
-        dtype=np.uint64), test=np.empty([0, 0]), training=np.empty([0, 0]),
-        verbose=False)
->>> output_model = d['output_model']
->>> predictions = d['predictions']
->>> probabilities = d['probabilities']
-```
-
-An implementation of the Naive Bayes Classifier, used for classification. Given labeled data, an NBC model can be trained and saved, or, a pre-trained model can be used for classification. [Detailed documentation](#nbc_detailed-documentation).
-
-
-
-### Input options
-
-| ***name*** | ***type*** | ***description*** | ***default*** |
-|------------|------------|-------------------|---------------|
-| `check_input_matrices` | [`bool`](#doc_bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `False` |
-| `copy_all_inputs` | [`bool`](#doc_bool) | If specified, all input parameters will be deep copied before the method is run.  This is useful for debugging problems where the input parameters are being modified by the algorithm, but can slow down the code.  <span class="special">Only exists in Python binding.</span> | `False` |
-| `incremental_variance` | [`bool`](#doc_bool) | The variance of each class will be calculated incrementally. | `False` |
-| `input_model` | [`NBCModelType`](#doc_model) | Input Naive Bayes model. | `None` |
-| `labels` | [`int vector`](#doc_int_vector) | A file containing labels for the training set. | `np.empty([0], dtype=np.uint64)` |
-| `test` | [`matrix`](#doc_matrix) | A matrix containing the test set. | `np.empty([0, 0])` |
-| `training` | [`matrix`](#doc_matrix) | A matrix containing the training set. | `np.empty([0, 0])` |
-| `verbose` | [`bool`](#doc_bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `False` |
-
-### Output options
-
-Results are returned in a Python dictionary.  The keys of the dictionary are the names of the output parameters.
-
-| ***name*** | ***type*** | ***description*** |
-|------------|------------|-------------------|
-| `output_model` | [`NBCModelType`](#doc_model) | File to save trained Naive Bayes model to. | 
-| `predictions` | [`int vector`](#doc_int_vector) | The matrix in which the predicted labels for the test set will be written. | 
-| `probabilities` | [`matrix`](#doc_matrix) | The matrix in which the predicted probability of labels for the test set will be written. | 
-
-### Detailed documentation
-{: #nbc_detailed-documentation }
-
-This program trains the Naive Bayes classifier on the given labeled training set, or loads a model from the given model file, and then may use that trained model to classify the points in a given test set.
-
-The training set is specified with the `training` parameter.  Labels may be either the last row of the training set, or alternately the `labels` parameter may be specified to pass a separate matrix of labels.
-
-If training is not desired, a pre-existing model may be loaded with the `input_model` parameter.
-
-
-
-The `incremental_variance` parameter can be used to force the training to use an incremental algorithm for calculating variance.  This is slower, but can help avoid loss of precision in some cases.
-
-If classifying a test set is desired, the test set may be specified with the `test` parameter, and the classifications may be saved with the `predictions`predictions  parameter.  If saving the trained model is desired, this may be done with the `output_model` output parameter.
-
-### Example
-For example, to train a Naive Bayes classifier on the dataset `'data'` with labels `'labels'` and save the model to `'nbc_model'`, the following command may be used:
-
-```python
->>> output = nbc(training=data, labels=labels)
->>> nbc_model = output['output_model']
-```
-
-Then, to use `'nbc_model'` to predict the classes of the dataset `'test_set'` and save the predicted classes to `'predictions'`, the following command may be used:
-
-```python
->>> output = nbc(input_model=nbc_model, test=test_set)
->>> predictions = output['predictions']
-```
-
-### See also
-
- - [softmax_regression()](#softmax_regression)
- - [random_forest()](#random_forest)
- - [Naive Bayes classifier on Wikipedia](https://en.wikipedia.org/wiki/Naive_Bayes_classifier)
- - [NaiveBayesClassifier C++ class documentation](../../user/methods/naive_bayes_classifier.md)
 
 ## nca()
 {: #nca }
@@ -3549,6 +3290,111 @@ Class probabilities from random forest model.
 |----------|-----------------|
 | [`matrix`](#doc_matrix) | Predicted class probabilities for each point in the test set. | 
 
+## class DecisionTree
+{: #decision_tree }
+
+#### Decision tree training
+{: #decision_tree_descr }
+
+
+Train using a decision tree.  Given a dataset containing numeric or categorical features, and associated labels for each point in the dataset, this program can train a decision tree on that data.
+
+The training set and associated labels are specified with the `training` and `labels` parameters, respectively.  The labels should be in the range `[0, num_classes - 1]`. Optionally, if `labels` is not specified, the labels are assumed to be the last dimension of the training dataset.
+
+The trained model is returned, and can then be used for prediction. The `minimum_leaf_size` parameter specifies the minimum number of training points that must fall into each leaf for it to be split.  The `minimum_gain_split` parameter specifies the minimum gain that is needed for the node to split.  The `maximum_depth` parameter specifies the maximum depth of the tree.  If `print_training_accuracy` is specified, the training accuracy will be printed.
+### Parameters
+
+| ***name*** | ***type*** | ***description*** | ***default*** |
+|------------|------------|-------------------|---------------|
+| `check_input_matrices` | [`bool`](#doc_bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `False` |
+| `copy_all_inputs` | [`bool`](#doc_bool) | If specified, all input parameters will be deep copied before the method is run.  This is useful for debugging problems where the input parameters are being modified by the algorithm, but can slow down the code.  <span class="special">Only exists in Python binding.</span> | `False` |
+| `maximum_depth` | [`int`](#doc_int) | Maximum depth of the tree (0 means no limit). | `0` |
+| `minimum_gain_split` | [`float`](#doc_float) | Minimum gain for node splitting. | `1e-07` |
+| `minimum_leaf_size` | [`int`](#doc_int) | Minimum number of points in a leaf. | `20` |
+| `print_training_accuracy` | [`bool`](#doc_bool) | Print the training accuracy. | `False` |
+| `verbose` | [`bool`](#doc_bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `False` |
+
+### Example
+
+```python
+>>> import pandas as pd
+>>> from mlpack import preprocess_split
+>>> from mlpack import DecisionTree
+>>> X = pd.read_csv('http://datasets.mlpack.org/iris.csv')
+>>> y = pd.read_csv('http://datasets.mlpack.org/iris_labels.csv')
+>>> d = preprocess_split(input_=X, input_labels=y, test_ratio=0.2)
+>>> X_train = d['training']
+>>> y_train = d['training_labels']
+>>> X_test = d['test']
+>>> y_test = d['test_labels']
+>>> model = DecisionTree(check_input_matrices=False, copy_all_inputs=False,
+  maximum_depth=0, minimum_gain_split=1e-07, minimum_leaf_size=20,
+  print_training_accuracy=False, verbose=False)
+>>> output_model = model.fit(training=X_train, labels=y_train)
+>>> predictions = model.predict(test=X_test)
+>>> probabilities = model.predict_proba(test=X_test)
+```
+
+### Methods
+
+| **name** | **description** |
+|----------|-----------------|
+| fit | Training ID3-style decision tree model. |
+| predict | Class predictions from train decision tree model. |
+| predict_proba | Class predictions from train decision tree model. |
+
+### 1. fit
+
+Training ID3-style decision tree model.
+
+#### Input Parameters:
+
+| **name** | **type** | **description** |
+|----------|----------|-----------------|
+| `labels` | [`int vector`](#doc_int_vector) | Training labels. | 
+| `training` | [`categorical matrix`](#doc_categorical_matrix) | Training dataset (may contain categorical variables). | 
+| `weights` | [`matrix`](#doc_matrix) | The weight of labels | 
+
+#### Returns: 
+
+| **type** | **description** |
+|----------|-----------------|
+| [`DecisionTreeModelType`](#doc_model) | Output for trained decision tree. | 
+
+### 2. predict
+
+Class predictions from train decision tree model.
+
+#### Input Parameters:
+
+| **name** | **type** | **description** |
+|----------|----------|-----------------|
+| `test` | [`categorical matrix`](#doc_categorical_matrix) | Testing dataset (may contain categorical variables). | 
+| `test_labels` | [`int vector`](#doc_int_vector) | Test point labels, if accuracy calculation is desired. | 
+
+#### Returns: 
+
+| **type** | **description** |
+|----------|-----------------|
+| [`int vector`](#doc_int_vector) | Class predictions for each test point. | 
+
+### 3. predict_proba
+
+Class predictions from train decision tree model.
+
+#### Input Parameters:
+
+| **name** | **type** | **description** |
+|----------|----------|-----------------|
+| `test` | [`categorical matrix`](#doc_categorical_matrix) | Testing dataset (may contain categorical variables). | 
+| `test_labels` | [`int vector`](#doc_int_vector) | Test point labels, if accuracy calculation is desired. | 
+
+#### Returns: 
+
+| **type** | **description** |
+|----------|-----------------|
+| [`matrix`](#doc_matrix) | Class probabilities for each test point if probabilities has been selected. | 
+
 ## class Adaboost
 {: #adaboost }
 
@@ -3647,6 +3493,217 @@ Class probabilities from model.
 | **type** | **description** |
 |----------|-----------------|
 | [`matrix`](#doc_matrix) | Predicted class probabilities for each point in the test set. | 
+
+## class HoeffdingTree
+{: #hoeffding_tree }
+
+#### Hoeffding trees training
+{: #hoeffding_tree_descr }
+
+
+Implements Hoeffding trees, a form of streaming decision tree suited best for large (or streaming) datasets, supporting both categorical and numeric data.  Given an input dataset, it is able to train the tree with numerous training options, and return the model.
+
+The training file and associated labels are specified with the `training` and `labels` parameters, respectively. Optionally, if `labels` is not specified, the labels are assumed to be the last dimension of the training dataset.
+
+The training may be performed in batch mode (like a typical decision tree algorithm) by specifying the `batch_mode` option, but this may not be the best option for large datasets.
+### Parameters
+
+| ***name*** | ***type*** | ***description*** | ***default*** |
+|------------|------------|-------------------|---------------|
+| `batch_mode` | [`bool`](#doc_bool) | If true, samples will be considered in batch instead of as a stream.  This generally results in better trees but at the cost of memory usage and runtime. | `False` |
+| `bins` | [`int`](#doc_int) | If the 'domingos' split strategy is used, this specifies the number of bins for each numeric split. | `10` |
+| `check_input_matrices` | [`bool`](#doc_bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `False` |
+| `confidence` | [`float`](#doc_float) | Confidence before splitting (between 0 and 1). | `0.95` |
+| `copy_all_inputs` | [`bool`](#doc_bool) | If specified, all input parameters will be deep copied before the method is run.  This is useful for debugging problems where the input parameters are being modified by the algorithm, but can slow down the code.  <span class="special">Only exists in Python binding.</span> | `False` |
+| `info_gain` | [`bool`](#doc_bool) | If set, information gain is used instead of Gini impurity for calculating Hoeffding bounds. | `False` |
+| `max_samples` | [`int`](#doc_int) | Maximum number of samples before splitting. | `5000` |
+| `min_samples` | [`int`](#doc_int) | Minimum number of samples before splitting. | `100` |
+| `numeric_split_strategy` | [`str`](#doc_str) | The splitting strategy to use for numeric features: 'domingos' or 'binary'. | `'binary'` |
+| `observations_before_binning` | [`int`](#doc_int) | If the 'domingos' split strategy is used, this specifies the number of samples observed before binning is performed. | `100` |
+| `passes` | [`int`](#doc_int) | Number of passes to take over the dataset. | `1` |
+| `verbose` | [`bool`](#doc_bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `False` |
+
+### Example
+
+```python
+>>> import pandas as pd
+>>> from mlpack import preprocess_split
+>>> from mlpack import HoeffdingTrees
+>>> X = pd.read_csv('http://datasets.mlpack.org/iris.csv')
+>>> y = pd.read_csv('http://datasets.mlpack.org/iris_labels.csv')
+>>> d = preprocess_split(input_=X, input_labels=y, test_ratio=0.2)
+>>> X_train = d['training']
+>>> y_train = d['training_labels']
+>>> X_test = d['test']
+>>> y_test = d['test_labels']
+>>> model = HoeffdingTrees(batch_mode=False, bins=10,
+  check_input_matrices=False, confidence=0.95, copy_all_inputs=False,
+  info_gain=False, max_samples=5000, min_samples=100,
+  numeric_split_strategy='binary', observations_before_binning=100, passes=1,
+  verbose=False)
+>>> output_model = model.fit(training=X_train, labels=y_train)
+>>> predictions = model.predict(test=X_test)
+>>> probabilities = model.predict_proba(test=X_test)
+```
+
+### Methods
+
+| **name** | **description** |
+|----------|-----------------|
+| fit | An implementation of Hoeffding trees, a form of streaming decision tree for classification.  Given labeled data a Hoeffding tree can be trained for later use of predicting the classifications of new points. |
+| predict | Class predictions from Hoeffding trees model. |
+| predict_proba | Class probabilities from Hoeffding trees model. |
+
+### 1. fit
+
+An implementation of Hoeffding trees, a form of streaming decision tree for classification.  Given labeled data a Hoeffding tree can be trained for later use of predicting the classifications of new points.
+
+#### Input Parameters:
+
+| **name** | **type** | **description** |
+|----------|----------|-----------------|
+| `labels` | [`int vector`](#doc_int_vector) | Labels for training dataset. | 
+| `test` | [`categorical matrix`](#doc_categorical_matrix) | Testing dataset (may be categorical). | 
+| `test_labels` | [`int vector`](#doc_int_vector) | Labels of test data. | 
+| `training` | [`categorical matrix`](#doc_categorical_matrix) | Training dataset (may be categorical). | 
+
+#### Returns: 
+
+| **type** | **description** |
+|----------|-----------------|
+| [`HoeffdingTreeModelType`](#doc_model) | Output for trained Hoeffding tree model. | 
+
+### 2. predict
+
+Class predictions from Hoeffding trees model.
+
+#### Input Parameters:
+
+| **name** | **type** | **description** |
+|----------|----------|-----------------|
+| `test` | [`categorical matrix`](#doc_categorical_matrix) | Testing dataset (may be categorical). | 
+| `test_labels` | [`int vector`](#doc_int_vector) | Labels of test data. | 
+
+#### Returns: 
+
+| **type** | **description** |
+|----------|-----------------|
+| [`int vector`](#doc_int_vector) | Matrix to output label predictions for test data into. | 
+
+### 3. predict_proba
+
+Class probabilities from Hoeffding trees model.
+
+#### Input Parameters:
+
+| **name** | **type** | **description** |
+|----------|----------|-----------------|
+| `test` | [`categorical matrix`](#doc_categorical_matrix) | Testing dataset (may be categorical). | 
+| `test_labels` | [`int vector`](#doc_int_vector) | Labels of test data. | 
+
+#### Returns: 
+
+| **type** | **description** |
+|----------|-----------------|
+| [`matrix`](#doc_matrix) | In addition to predicting labels, provide rediction probabilities in this matrix. | 
+
+## class Nbc
+{: #nbc }
+
+#### Parametric Naive Bayes Classifier training
+{: #nbc_descr }
+
+
+Implements the Naive Bayes classifier on the given labeled training set for us of that trained model to classify the points in a given test set.
+
+The training set is specified with the `training` parameter.  Labels may be either the last row of the training set, or alternately the `labels` parameter may be specified to pass a separate matrix of labels.
+
+The `incremental_variance` parameter can be used to force the training to use an incremental algorithm for calculating variance.  This is slower, but can help avoid loss of precision in some cases.
+### Parameters
+
+| ***name*** | ***type*** | ***description*** | ***default*** |
+|------------|------------|-------------------|---------------|
+| `check_input_matrices` | [`bool`](#doc_bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `False` |
+| `copy_all_inputs` | [`bool`](#doc_bool) | If specified, all input parameters will be deep copied before the method is run.  This is useful for debugging problems where the input parameters are being modified by the algorithm, but can slow down the code.  <span class="special">Only exists in Python binding.</span> | `False` |
+| `incremental_variance` | [`bool`](#doc_bool) | The variance of each class will be calculated incrementally. | `False` |
+| `verbose` | [`bool`](#doc_bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `False` |
+
+### Example
+
+```python
+>>> import pandas as pd
+>>> from mlpack import preprocess_split
+>>> from mlpack import NaiveBayes
+>>> X = pd.read_csv('http://datasets.mlpack.org/iris.csv')
+>>> y = pd.read_csv('http://datasets.mlpack.org/iris_labels.csv')
+>>> d = preprocess_split(input_=X, input_labels=y, test_ratio=0.2)
+>>> X_train = d['training']
+>>> y_train = d['training_labels']
+>>> X_test = d['test']
+>>> y_test = d['test_labels']
+>>> model = NaiveBayesTrees(check_input_matrices=False, copy_all_inputs=False,
+  incremental_variance=False, verbose=False)
+>>> output_model = model.fit(training=X_train, labels=y_train)
+>>> predictions = model.predict(test=X_test)
+>>> probabilities = model.predict_proba(test=X_test)
+```
+
+### Methods
+
+| **name** | **description** |
+|----------|-----------------|
+| fit | An implementation of the Naive Bayes Classifier, used for classification. Given labeled data, an NBC model is be trained for later use for classification on new data. |
+| predict | Class predictions from a Naive Bayes Classifier model. |
+| predict_proba | Class probabilities from a Naive Bayes Classifier model. |
+
+### 1. fit
+
+An implementation of the Naive Bayes Classifier, used for classification. Given labeled data, an NBC model is be trained for later use for classification on new data.
+
+#### Input Parameters:
+
+| **name** | **type** | **description** |
+|----------|----------|-----------------|
+| `labels` | [`int vector`](#doc_int_vector) | A vector containing labels for the training set. | 
+| `training` | [`matrix`](#doc_matrix) | A matrix containing the training set. | 
+
+#### Returns: 
+
+| **type** | **description** |
+|----------|-----------------|
+| [`NBCModelType`](#doc_model) | File to save trained Naive Bayes model to. | 
+
+### 2. predict
+
+Class predictions from a Naive Bayes Classifier model.
+
+#### Input Parameters:
+
+| **name** | **type** | **description** |
+|----------|----------|-----------------|
+| `test` | [`matrix`](#doc_matrix) | A matrix containing the test set. | 
+
+#### Returns: 
+
+| **type** | **description** |
+|----------|-----------------|
+| [`int vector`](#doc_int_vector) | The matrix in which the predicted labels for the test set will be written. | 
+
+### 3. predict_proba
+
+Class probabilities from a Naive Bayes Classifier model.
+
+#### Input Parameters:
+
+| **name** | **type** | **description** |
+|----------|----------|-----------------|
+| `test` | [`matrix`](#doc_matrix) | A matrix containing the test set. | 
+
+#### Returns: 
+
+| **type** | **description** |
+|----------|-----------------|
+| [`matrix`](#doc_matrix) | The matrix in which the predicted probability of labels for the test set will be written. | 
 
 ## class LinearRegression
 {: #linear_regression }

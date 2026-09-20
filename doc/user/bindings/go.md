@@ -389,112 +389,6 @@ _, _ := mlpack.Dbscan(input, param)
  - [A density-based algorithm for discovering clusters in large spatial databases with noise (pdf)](https://cdn.aaai.org/KDD/1996/KDD96-037.pdf)
  - [DBSCAN class documentation](https://github.com/mlpack/mlpack/blob/master/src/mlpack/methods/dbscan/dbscan.hpp)
 
-## DecisionTree()
-{: #decision_tree }
-
-#### Decision tree
-{: #decision_tree_descr }
-
-```go
-import (
-  "mlpack.org/v1/mlpack"
-  "gonum.org/v1/gonum/mat"
-)
-
-// Initialize optional parameters for DecisionTree().
-param := mlpack.DecisionTreeOptions()
-param.InputModel = nil
-param.Labels = mat.NewDense(1, 1, nil)
-param.MaximumDepth = 0
-param.MinimumGainSplit = 1e-07
-param.MinimumLeafSize = 20
-param.PrintTrainingAccuracy = false
-param.Test = mat.NewDense(1, 1, nil)
-param.TestLabels = mat.NewDense(1, 1, nil)
-param.Training = mat.NewDense(1, 1, nil)
-param.Verbose = false
-param.Weights = mat.NewDense(1, 1, nil)
-
-output_model, predictions, probabilities := mlpack.DecisionTree(param)
-```
-
-An implementation of an ID3-style decision tree for classification, which supports categorical data.  Given labeled data with numeric or categorical features, a decision tree can be trained and saved; or, an existing decision tree can be used for classification on new points. [Detailed documentation](#decision_tree_detailed-documentation).
-
-
-
-### Input options
-There are two types of input options: required options, which are passed directly to the function call, and optional options, which are passed via an initialized struct, which allows keyword access to each of the options.
-
-| ***name*** | ***type*** | ***description*** | ***default*** |
-|------------|------------|-------------------|---------------|
-| `CheckInputMatrices` | [`bool`](#doc_bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `false` |
-| `InputModel` | [`decisionTreeModel`](#doc_model) | Pre-trained decision tree, to be used with test points. | `nil` |
-| `Labels` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | Training labels. | `mat.NewDense(1, 1, nil)` |
-| `MaximumDepth` | [`int`](#doc_int) | Maximum depth of the tree (0 means no limit). | `0` |
-| `MinimumGainSplit` | [`float64`](#doc_float64) | Minimum gain for node splitting. | `1e-07` |
-| `MinimumLeafSize` | [`int`](#doc_int) | Minimum number of points in a leaf. | `20` |
-| `PrintTrainingAccuracy` | [`bool`](#doc_bool) | Print the training accuracy. | `false` |
-| `Test` | [`matrixWithInfo`](#doc_matrixWithInfo) | Testing dataset (may be categorical). | `mat.NewDense(1, 1, nil)` |
-| `TestLabels` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | Test point labels, if accuracy calculation is desired. | `mat.NewDense(1, 1, nil)` |
-| `Training` | [`matrixWithInfo`](#doc_matrixWithInfo) | Training dataset (may be categorical). | `mat.NewDense(1, 1, nil)` |
-| `Verbose` | [`bool`](#doc_bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `false` |
-| `Weights` | [`*mat.Dense`](#doc_a__mat_Dense) | The weight of labels | `mat.NewDense(1, 1, nil)` |
-
-### Output options
-
-Output options are returned via Go's support for multiple return values, in the order listed below.
-
-| ***name*** | ***type*** | ***description*** |
-|------------|------------|-------------------|
-| `OutputModel` | [`decisionTreeModel`](#doc_model) | Output for trained decision tree. | 
-| `Predictions` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | Class predictions for each test point. | 
-| `Probabilities` | [`*mat.Dense`](#doc_a__mat_Dense) | Class probabilities for each test point. | 
-
-### Detailed documentation
-{: #decision_tree_detailed-documentation }
-
-Train and evaluate using a decision tree.  Given a dataset containing numeric or categorical features, and associated labels for each point in the dataset, this program can train a decision tree on that data.
-
-The training set and associated labels are specified with the `Training` and `Labels` parameters, respectively.  The labels should be in the range `[0, num_classes - 1]`. Optionally, if `Labels` is not specified, the labels are assumed to be the last dimension of the training dataset.
-
-When a model is trained, the `OutputModel` output parameter may be used to save the trained model.  A model may be loaded for predictions with the `InputModel` parameter.  The `InputModel` parameter may not be specified when the `Training` parameter is specified.  The `MinimumLeafSize` parameter specifies the minimum number of training points that must fall into each leaf for it to be split.  The `MinimumGainSplit` parameter specifies the minimum gain that is needed for the node to split.  The `MaximumDepth` parameter specifies the maximum depth of the tree.  If `PrintTrainingAccuracy` is specified, the training accuracy will be printed.
-
-Test data may be specified with the `Test` parameter, and if performance numbers are desired for that test set, labels may be specified with the `TestLabels` parameter.  Predictions for each test point may be saved via the `Predictions` output parameter.  Class probabilities for each prediction may be saved with the `Probabilities` output parameter.
-
-### Example
-For example, to train a decision tree with a minimum leaf size of 20 on the dataset contained in `data` with labels `labels`, saving the output model to `tree` and printing the training error, one could call
-
-```go
-// Initialize optional parameters for DecisionTree().
-param := mlpack.DecisionTreeOptions()
-param.Training = data
-param.Labels = labels
-param.MinimumLeafSize = 20
-param.MinimumGainSplit = 0.001
-param.PrintTrainingAccuracy = true
-
-tree, _, _ := mlpack.DecisionTree(param)
-```
-
-Then, to use that model to classify points in `test_set` and print the test error given the labels `test_labels` using that model, while saving the predictions for each point to `predictions`, one could call 
-
-```go
-// Initialize optional parameters for DecisionTree().
-param := mlpack.DecisionTreeOptions()
-param.InputModel = &tree
-param.Test = test_set
-param.TestLabels = test_labels
-
-_, predictions, _ := mlpack.DecisionTree(param)
-```
-
-### See also
-
- - [Random forest](#random_forest)
- - [Decision trees on Wikipedia](https://en.wikipedia.org/wiki/Decision_tree_learning)
- - [Induction of Decision Trees (pdf)](https://www.hunch.net/~coms-4771/quinlan.pdf)
- - [DecisionTree C++ class documentation](../../user/methods/decision_tree.md)
-
 ## Det()
 {: #det }
 
@@ -1248,118 +1142,6 @@ states := mlpack.HmmViterbi(obs, &hmm, param)
  - [HmmLoglik()](#hmm_loglik)
  - [Hidden Mixture Models on Wikipedia](https://en.wikipedia.org/wiki/Hidden_Markov_model)
  - [HMM class documentation](https://github.com/mlpack/mlpack/blob/master/src/mlpack/methods/hmm/hmm.hpp)
-
-## HoeffdingTree()
-{: #hoeffding_tree }
-
-#### Hoeffding trees
-{: #hoeffding_tree_descr }
-
-```go
-import (
-  "mlpack.org/v1/mlpack"
-  "gonum.org/v1/gonum/mat"
-)
-
-// Initialize optional parameters for HoeffdingTree().
-param := mlpack.HoeffdingTreeOptions()
-param.BatchMode = false
-param.Bins = 10
-param.Confidence = 0.95
-param.InfoGain = false
-param.InputModel = nil
-param.Labels = mat.NewDense(1, 1, nil)
-param.MaxSamples = 5000
-param.MinSamples = 100
-param.NumericSplitStrategy = "binary"
-param.ObservationsBeforeBinning = 100
-param.Passes = 1
-param.Test = mat.NewDense(1, 1, nil)
-param.TestLabels = mat.NewDense(1, 1, nil)
-param.Training = mat.NewDense(1, 1, nil)
-param.Verbose = false
-
-output_model, predictions, probabilities := mlpack.HoeffdingTree(param)
-```
-
-An implementation of Hoeffding trees, a form of streaming decision tree for classification.  Given labeled data, a Hoeffding tree can be trained and saved for later use, or a pre-trained Hoeffding tree can be used for predicting the classifications of new points. [Detailed documentation](#hoeffding_tree_detailed-documentation).
-
-
-
-### Input options
-There are two types of input options: required options, which are passed directly to the function call, and optional options, which are passed via an initialized struct, which allows keyword access to each of the options.
-
-| ***name*** | ***type*** | ***description*** | ***default*** |
-|------------|------------|-------------------|---------------|
-| `BatchMode` | [`bool`](#doc_bool) | If true, samples will be considered in batch instead of as a stream.  This generally results in better trees but at the cost of memory usage and runtime. | `false` |
-| `Bins` | [`int`](#doc_int) | If the 'domingos' split strategy is used, this specifies the number of bins for each numeric split. | `10` |
-| `CheckInputMatrices` | [`bool`](#doc_bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `false` |
-| `Confidence` | [`float64`](#doc_float64) | Confidence before splitting (between 0 and 1). | `0.95` |
-| `InfoGain` | [`bool`](#doc_bool) | If set, information gain is used instead of Gini impurity for calculating Hoeffding bounds. | `false` |
-| `InputModel` | [`hoeffdingTreeModel`](#doc_model) | Input trained Hoeffding tree model. | `nil` |
-| `Labels` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | Labels for training dataset. | `mat.NewDense(1, 1, nil)` |
-| `MaxSamples` | [`int`](#doc_int) | Maximum number of samples before splitting. | `5000` |
-| `MinSamples` | [`int`](#doc_int) | Minimum number of samples before splitting. | `100` |
-| `NumericSplitStrategy` | [`string`](#doc_string) | The splitting strategy to use for numeric features: 'domingos' or 'binary'. | `"binary"` |
-| `ObservationsBeforeBinning` | [`int`](#doc_int) | If the 'domingos' split strategy is used, this specifies the number of samples observed before binning is performed. | `100` |
-| `Passes` | [`int`](#doc_int) | Number of passes to take over the dataset. | `1` |
-| `Test` | [`matrixWithInfo`](#doc_matrixWithInfo) | Testing dataset (may be categorical). | `mat.NewDense(1, 1, nil)` |
-| `TestLabels` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | Labels of test data. | `mat.NewDense(1, 1, nil)` |
-| `Training` | [`matrixWithInfo`](#doc_matrixWithInfo) | Training dataset (may be categorical). | `mat.NewDense(1, 1, nil)` |
-| `Verbose` | [`bool`](#doc_bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `false` |
-
-### Output options
-
-Output options are returned via Go's support for multiple return values, in the order listed below.
-
-| ***name*** | ***type*** | ***description*** |
-|------------|------------|-------------------|
-| `OutputModel` | [`hoeffdingTreeModel`](#doc_model) | Output for trained Hoeffding tree model. | 
-| `Predictions` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | Matrix to output label predictions for test data into. | 
-| `Probabilities` | [`*mat.Dense`](#doc_a__mat_Dense) | In addition to predicting labels, provide rediction probabilities in this matrix. | 
-
-### Detailed documentation
-{: #hoeffding_tree_detailed-documentation }
-
-This program implements Hoeffding trees, a form of streaming decision tree suited best for large (or streaming) datasets.  This program supports both categorical and numeric data.  Given an input dataset, this program is able to train the tree with numerous training options, and save the model to a file.  The program is also able to use a trained model or a model from file in order to predict classes for a given test set.
-
-The training file and associated labels are specified with the `Training` and `Labels` parameters, respectively. Optionally, if `Labels` is not specified, the labels are assumed to be the last dimension of the training dataset.
-
-The training may be performed in batch mode (like a typical decision tree algorithm) by specifying the `BatchMode` option, but this may not be the best option for large datasets.
-
-When a model is trained, it may be saved via the `OutputModel` output parameter.  A model may be loaded from file for further training or testing with the `InputModel` parameter.
-
-Test data may be specified with the `Test` parameter, and if performance statistics are desired for that test set, labels may be specified with the `TestLabels` parameter.  Predictions for each test point may be saved with the `Predictions` output parameter, and class probabilities for each prediction may be saved with the `Probabilities` output parameter.
-
-### Example
-For example, to train a Hoeffding tree with confidence 0.99 with data `dataset`, saving the trained tree to `tree`, the following command may be used:
-
-```go
-// Initialize optional parameters for HoeffdingTree().
-param := mlpack.HoeffdingTreeOptions()
-param.Training = dataset
-param.Confidence = 0.99
-
-tree, _, _ := mlpack.HoeffdingTree(param)
-```
-
-Then, this tree may be used to make predictions on the test set `test_set`, saving the predictions into `predictions` and the class probabilities into `class_probs` with the following command: 
-
-```go
-// Initialize optional parameters for HoeffdingTree().
-param := mlpack.HoeffdingTreeOptions()
-param.InputModel = &tree
-param.Test = test_set
-
-_, predictions, class_probs := mlpack.HoeffdingTree(param)
-```
-
-### See also
-
- - [DecisionTree()](#decision_tree)
- - [RandomForest()](#random_forest)
- - [Mining High-Speed Data Streams (pdf)](http://dm.cs.washington.edu/papers/vfdt-kdd00.pdf)
- - [HoeffdingTree class documentation](../../user/methods/hoeffding_tree.md)
 
 ## ImageConverter()
 {: #image_converter }
@@ -2663,102 +2445,6 @@ centroids, _ := mlpack.MeanShift(data, param)
  - [Mean shift on Wikipedia](https://en.wikipedia.org/wiki/Mean_shift)
  - [Mean Shift, Mode Seeking, and Clustering (pdf)](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=1c168275c59ba382588350ee1443537f59978183)
  - [mlpack::mean_shift::MeanShift C++ class documentation](../../user/methods/mean_shift.md)
-
-## Nbc()
-{: #nbc }
-
-#### Parametric Naive Bayes Classifier
-{: #nbc_descr }
-
-```go
-import (
-  "mlpack.org/v1/mlpack"
-  "gonum.org/v1/gonum/mat"
-)
-
-// Initialize optional parameters for Nbc().
-param := mlpack.NbcOptions()
-param.IncrementalVariance = false
-param.InputModel = nil
-param.Labels = mat.NewDense(1, 1, nil)
-param.Test = mat.NewDense(1, 1, nil)
-param.Training = mat.NewDense(1, 1, nil)
-param.Verbose = false
-
-output_model, predictions, probabilities := mlpack.Nbc(param)
-```
-
-An implementation of the Naive Bayes Classifier, used for classification. Given labeled data, an NBC model can be trained and saved, or, a pre-trained model can be used for classification. [Detailed documentation](#nbc_detailed-documentation).
-
-
-
-### Input options
-There are two types of input options: required options, which are passed directly to the function call, and optional options, which are passed via an initialized struct, which allows keyword access to each of the options.
-
-| ***name*** | ***type*** | ***description*** | ***default*** |
-|------------|------------|-------------------|---------------|
-| `CheckInputMatrices` | [`bool`](#doc_bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `false` |
-| `IncrementalVariance` | [`bool`](#doc_bool) | The variance of each class will be calculated incrementally. | `false` |
-| `InputModel` | [`nbcModel`](#doc_model) | Input Naive Bayes model. | `nil` |
-| `Labels` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | A file containing labels for the training set. | `mat.NewDense(1, 1, nil)` |
-| `Test` | [`*mat.Dense`](#doc_a__mat_Dense) | A matrix containing the test set. | `mat.NewDense(1, 1, nil)` |
-| `Training` | [`*mat.Dense`](#doc_a__mat_Dense) | A matrix containing the training set. | `mat.NewDense(1, 1, nil)` |
-| `Verbose` | [`bool`](#doc_bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `false` |
-
-### Output options
-
-Output options are returned via Go's support for multiple return values, in the order listed below.
-
-| ***name*** | ***type*** | ***description*** |
-|------------|------------|-------------------|
-| `OutputModel` | [`nbcModel`](#doc_model) | File to save trained Naive Bayes model to. | 
-| `Predictions` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | The matrix in which the predicted labels for the test set will be written. | 
-| `Probabilities` | [`*mat.Dense`](#doc_a__mat_Dense) | The matrix in which the predicted probability of labels for the test set will be written. | 
-
-### Detailed documentation
-{: #nbc_detailed-documentation }
-
-This program trains the Naive Bayes classifier on the given labeled training set, or loads a model from the given model file, and then may use that trained model to classify the points in a given test set.
-
-The training set is specified with the `Training` parameter.  Labels may be either the last row of the training set, or alternately the `Labels` parameter may be specified to pass a separate matrix of labels.
-
-If training is not desired, a pre-existing model may be loaded with the `InputModel` parameter.
-
-
-
-The `IncrementalVariance` parameter can be used to force the training to use an incremental algorithm for calculating variance.  This is slower, but can help avoid loss of precision in some cases.
-
-If classifying a test set is desired, the test set may be specified with the `Test` parameter, and the classifications may be saved with the `Predictions`predictions  parameter.  If saving the trained model is desired, this may be done with the `OutputModel` output parameter.
-
-### Example
-For example, to train a Naive Bayes classifier on the dataset `data` with labels `labels` and save the model to `nbc_model`, the following command may be used:
-
-```go
-// Initialize optional parameters for Nbc().
-param := mlpack.NbcOptions()
-param.Training = data
-param.Labels = labels
-
-nbc_model, _, _ := mlpack.Nbc(param)
-```
-
-Then, to use `nbc_model` to predict the classes of the dataset `test_set` and save the predicted classes to `predictions`, the following command may be used:
-
-```go
-// Initialize optional parameters for Nbc().
-param := mlpack.NbcOptions()
-param.InputModel = &nbc_model
-param.Test = test_set
-
-_, predictions, _ := mlpack.Nbc(param)
-```
-
-### See also
-
- - [SoftmaxRegression()](#softmax_regression)
- - [RandomForest()](#random_forest)
- - [Naive Bayes classifier on Wikipedia](https://en.wikipedia.org/wiki/Naive_Bayes_classifier)
- - [NaiveBayesClassifier C++ class documentation](../../user/methods/naive_bayes_classifier.md)
 
 ## Nca()
 {: #nca }
@@ -4247,6 +3933,112 @@ _, predictions, _ := mlpack.RandomForest(param)
  - [Random forests (pdf)](https://www.eecis.udel.edu/~shatkay/Course/papers/BreimanRandomForests2001.pdf)
  - [RandomForest C++ class documentation](../../user/methods/random_forest.md)
 
+## DecisionTree()
+{: #decision_tree }
+
+#### Decision tree
+{: #decision_tree_descr }
+
+```go
+import (
+  "mlpack.org/v1/mlpack"
+  "gonum.org/v1/gonum/mat"
+)
+
+// Initialize optional parameters for DecisionTree().
+param := mlpack.DecisionTreeOptions()
+param.InputModel = nil
+param.Labels = mat.NewDense(1, 1, nil)
+param.MaximumDepth = 0
+param.MinimumGainSplit = 1e-07
+param.MinimumLeafSize = 20
+param.PrintTrainingAccuracy = false
+param.Test = mat.NewDense(1, 1, nil)
+param.TestLabels = mat.NewDense(1, 1, nil)
+param.Training = mat.NewDense(1, 1, nil)
+param.Verbose = false
+param.Weights = mat.NewDense(1, 1, nil)
+
+output_model, predictions, probabilities := mlpack.DecisionTree(param)
+```
+
+An implementation of an ID3-style decision tree for classification, which supports categorical data.  Given labeled data with numeric or categorical features, a decision tree can be trained and saved; or, an existing decision tree can be used for classification on new points. [Detailed documentation](#decision_tree_detailed-documentation).
+
+
+
+### Input options
+There are two types of input options: required options, which are passed directly to the function call, and optional options, which are passed via an initialized struct, which allows keyword access to each of the options.
+
+| ***name*** | ***type*** | ***description*** | ***default*** |
+|------------|------------|-------------------|---------------|
+| `CheckInputMatrices` | [`bool`](#doc_bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `false` |
+| `InputModel` | [`decisionTreeModel`](#doc_model) | Pre-trained decision tree, to be used with test points. | `nil` |
+| `Labels` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | Training labels. | `mat.NewDense(1, 1, nil)` |
+| `MaximumDepth` | [`int`](#doc_int) | Maximum depth of the tree (0 means no limit). | `0` |
+| `MinimumGainSplit` | [`float64`](#doc_float64) | Minimum gain for node splitting. | `1e-07` |
+| `MinimumLeafSize` | [`int`](#doc_int) | Minimum number of points in a leaf. | `20` |
+| `PrintTrainingAccuracy` | [`bool`](#doc_bool) | Print the training accuracy. | `false` |
+| `Test` | [`matrixWithInfo`](#doc_matrixWithInfo) | Testing dataset (may be categorical). | `mat.NewDense(1, 1, nil)` |
+| `TestLabels` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | Test point labels, if accuracy calculation is desired. | `mat.NewDense(1, 1, nil)` |
+| `Training` | [`matrixWithInfo`](#doc_matrixWithInfo) | Training dataset (may be categorical). | `mat.NewDense(1, 1, nil)` |
+| `Verbose` | [`bool`](#doc_bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `false` |
+| `Weights` | [`*mat.Dense`](#doc_a__mat_Dense) | The weight of labels | `mat.NewDense(1, 1, nil)` |
+
+### Output options
+
+Output options are returned via Go's support for multiple return values, in the order listed below.
+
+| ***name*** | ***type*** | ***description*** |
+|------------|------------|-------------------|
+| `OutputModel` | [`decisionTreeModel`](#doc_model) | Output for trained decision tree. | 
+| `Predictions` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | Class predictions for each test point. | 
+| `Probabilities` | [`*mat.Dense`](#doc_a__mat_Dense) | Class probabilities for each test point. | 
+
+### Detailed documentation
+{: #decision_tree_detailed-documentation }
+
+Train and evaluate using a decision tree.  Given a dataset containing numeric or categorical features, and associated labels for each point in the dataset, this program can train a decision tree on that data.
+
+The training set and associated labels are specified with the `Training` and `Labels` parameters, respectively.  The labels should be in the range `[0, num_classes - 1]`. Optionally, if `Labels` is not specified, the labels are assumed to be the last dimension of the training dataset.
+
+When a model is trained, the `OutputModel` output parameter may be used to save the trained model.  A model may be loaded for predictions with the `InputModel` parameter.  The `InputModel` parameter may not be specified when the `Training` parameter is specified.  The `MinimumLeafSize` parameter specifies the minimum number of training points that must fall into each leaf for it to be split.  The `MinimumGainSplit` parameter specifies the minimum gain that is needed for the node to split.  The `MaximumDepth` parameter specifies the maximum depth of the tree.  If `PrintTrainingAccuracy` is specified, the training accuracy will be printed.
+
+Test data may be specified with the `Test` parameter, and if performance numbers are desired for that test set, labels may be specified with the `TestLabels` parameter.  Predictions for each test point may be saved via the `Predictions` output parameter.  Class probabilities for each prediction may be saved with the `Probabilities` output parameter.
+
+### Example
+For example, to train a decision tree with a minimum leaf size of 20 on the dataset contained in `data` with labels `labels`, saving the output model to `tree` and printing the training error, one could call
+
+```go
+// Initialize optional parameters for DecisionTree().
+param := mlpack.DecisionTreeOptions()
+param.Training = data
+param.Labels = labels
+param.MinimumLeafSize = 20
+param.MinimumGainSplit = 0.001
+param.PrintTrainingAccuracy = true
+
+tree, _, _ := mlpack.DecisionTree(param)
+```
+
+Then, to use that model to classify points in `test_set` and print the test error given the labels `test_labels` using that model, while saving the predictions for each point to `predictions`, one could call 
+
+```go
+// Initialize optional parameters for DecisionTree().
+param := mlpack.DecisionTreeOptions()
+param.InputModel = &tree
+param.Test = test_set
+param.TestLabels = test_labels
+
+_, predictions, _ := mlpack.DecisionTree(param)
+```
+
+### See also
+
+ - [Random forest](#random_forest)
+ - [Decision trees on Wikipedia](https://en.wikipedia.org/wiki/Decision_tree_learning)
+ - [Induction of Decision Trees (pdf)](https://www.hunch.net/~coms-4771/quinlan.pdf)
+ - [DecisionTree C++ class documentation](../../user/methods/decision_tree.md)
+
 ## Adaboost()
 {: #adaboost }
 
@@ -4344,6 +4136,214 @@ _, predictions, _ := mlpack.Adaboost(param)
  - [Perceptron](#perceptron)
  - [Decision Trees](#decision_tree)
  - [AdaBoost C++ class documentation](../../user/methods/adaboost.md)
+
+## HoeffdingTree()
+{: #hoeffding_tree }
+
+#### Hoeffding trees
+{: #hoeffding_tree_descr }
+
+```go
+import (
+  "mlpack.org/v1/mlpack"
+  "gonum.org/v1/gonum/mat"
+)
+
+// Initialize optional parameters for HoeffdingTree().
+param := mlpack.HoeffdingTreeOptions()
+param.BatchMode = false
+param.Bins = 10
+param.Confidence = 0.95
+param.InfoGain = false
+param.InputModel = nil
+param.Labels = mat.NewDense(1, 1, nil)
+param.MaxSamples = 5000
+param.MinSamples = 100
+param.NumericSplitStrategy = "binary"
+param.ObservationsBeforeBinning = 100
+param.Passes = 1
+param.Test = mat.NewDense(1, 1, nil)
+param.TestLabels = mat.NewDense(1, 1, nil)
+param.Training = mat.NewDense(1, 1, nil)
+param.Verbose = false
+
+output_model, predictions, probabilities := mlpack.HoeffdingTree(param)
+```
+
+An implementation of Hoeffding trees, a form of streaming decision tree for classification.  Given labeled data, a Hoeffding tree can be trained and saved for later use, or a pre-trained Hoeffding tree can be used for predicting the classifications of new points. [Detailed documentation](#hoeffding_tree_detailed-documentation).
+
+
+
+### Input options
+There are two types of input options: required options, which are passed directly to the function call, and optional options, which are passed via an initialized struct, which allows keyword access to each of the options.
+
+| ***name*** | ***type*** | ***description*** | ***default*** |
+|------------|------------|-------------------|---------------|
+| `BatchMode` | [`bool`](#doc_bool) | If true, samples will be considered in batch instead of as a stream.  This generally results in better trees but at the cost of memory usage and runtime. | `false` |
+| `Bins` | [`int`](#doc_int) | If the 'domingos' split strategy is used, this specifies the number of bins for each numeric split. | `10` |
+| `CheckInputMatrices` | [`bool`](#doc_bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `false` |
+| `Confidence` | [`float64`](#doc_float64) | Confidence before splitting (between 0 and 1). | `0.95` |
+| `InfoGain` | [`bool`](#doc_bool) | If set, information gain is used instead of Gini impurity for calculating Hoeffding bounds. | `false` |
+| `InputModel` | [`hoeffdingTreeModel`](#doc_model) | Input trained Hoeffding tree model. | `nil` |
+| `Labels` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | Labels for training dataset. | `mat.NewDense(1, 1, nil)` |
+| `MaxSamples` | [`int`](#doc_int) | Maximum number of samples before splitting. | `5000` |
+| `MinSamples` | [`int`](#doc_int) | Minimum number of samples before splitting. | `100` |
+| `NumericSplitStrategy` | [`string`](#doc_string) | The splitting strategy to use for numeric features: 'domingos' or 'binary'. | `"binary"` |
+| `ObservationsBeforeBinning` | [`int`](#doc_int) | If the 'domingos' split strategy is used, this specifies the number of samples observed before binning is performed. | `100` |
+| `Passes` | [`int`](#doc_int) | Number of passes to take over the dataset. | `1` |
+| `Test` | [`matrixWithInfo`](#doc_matrixWithInfo) | Testing dataset (may be categorical). | `mat.NewDense(1, 1, nil)` |
+| `TestLabels` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | Labels of test data. | `mat.NewDense(1, 1, nil)` |
+| `Training` | [`matrixWithInfo`](#doc_matrixWithInfo) | Training dataset (may be categorical). | `mat.NewDense(1, 1, nil)` |
+| `Verbose` | [`bool`](#doc_bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `false` |
+
+### Output options
+
+Output options are returned via Go's support for multiple return values, in the order listed below.
+
+| ***name*** | ***type*** | ***description*** |
+|------------|------------|-------------------|
+| `OutputModel` | [`hoeffdingTreeModel`](#doc_model) | Output for trained Hoeffding tree model. | 
+| `Predictions` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | Matrix to output label predictions for test data into. | 
+| `Probabilities` | [`*mat.Dense`](#doc_a__mat_Dense) | In addition to predicting labels, provide rediction probabilities in this matrix. | 
+
+### Detailed documentation
+{: #hoeffding_tree_detailed-documentation }
+
+This program implements Hoeffding trees, a form of streaming decision tree suited best for large (or streaming) datasets.  This program supports both categorical and numeric data.  Given an input dataset, this program is able to train the tree with numerous training options, and save the model to a file.  The program is also able to use a trained model or a model from file in order to predict classes for a given test set.
+
+The training file and associated labels are specified with the `Training` and `Labels` parameters, respectively. Optionally, if `Labels` is not specified, the labels are assumed to be the last dimension of the training dataset.
+
+The training may be performed in batch mode (like a typical decision tree algorithm) by specifying the `BatchMode` option, but this may not be the best option for large datasets.
+
+When a model is trained, it may be saved via the `OutputModel` output parameter.  A model may be loaded from file for further training or testing with the `InputModel` parameter.
+
+Test data may be specified with the `Test` parameter, and if performance statistics are desired for that test set, labels may be specified with the `TestLabels` parameter.  Predictions for each test point may be saved with the `Predictions` output parameter, and class probabilities for each prediction may be saved with the `Probabilities` output parameter.
+
+### Example
+For example, to train a Hoeffding tree with confidence 0.99 with data `dataset`, saving the trained tree to `tree`, the following command may be used:
+
+```go
+// Initialize optional parameters for HoeffdingTree().
+param := mlpack.HoeffdingTreeOptions()
+param.Training = dataset
+param.Confidence = 0.99
+
+tree, _, _ := mlpack.HoeffdingTree(param)
+```
+
+Then, this tree may be used to make predictions on the test set `test_set`, saving the predictions into `predictions` and the class probabilities into `class_probs` with the following command: 
+
+```go
+// Initialize optional parameters for HoeffdingTree().
+param := mlpack.HoeffdingTreeOptions()
+param.InputModel = &tree
+param.Test = test_set
+
+_, predictions, class_probs := mlpack.HoeffdingTree(param)
+```
+
+### See also
+
+ - [DecisionTree()](#decision_tree)
+ - [RandomForest()](#random_forest)
+ - [Mining High-Speed Data Streams (pdf)](http://dm.cs.washington.edu/papers/vfdt-kdd00.pdf)
+ - [HoeffdingTree class documentation](../../user/methods/hoeffding_tree.md)
+
+## Nbc()
+{: #nbc }
+
+#### Parametric Naive Bayes Classifier
+{: #nbc_descr }
+
+```go
+import (
+  "mlpack.org/v1/mlpack"
+  "gonum.org/v1/gonum/mat"
+)
+
+// Initialize optional parameters for Nbc().
+param := mlpack.NbcOptions()
+param.IncrementalVariance = false
+param.InputModel = nil
+param.Labels = mat.NewDense(1, 1, nil)
+param.Test = mat.NewDense(1, 1, nil)
+param.Training = mat.NewDense(1, 1, nil)
+param.Verbose = false
+
+output_model, predictions, probabilities := mlpack.Nbc(param)
+```
+
+An implementation of the Naive Bayes Classifier, used for classification. Given labeled data, an NBC model can be trained and saved, or, a pre-trained model can be used for classification. [Detailed documentation](#nbc_detailed-documentation).
+
+
+
+### Input options
+There are two types of input options: required options, which are passed directly to the function call, and optional options, which are passed via an initialized struct, which allows keyword access to each of the options.
+
+| ***name*** | ***type*** | ***description*** | ***default*** |
+|------------|------------|-------------------|---------------|
+| `CheckInputMatrices` | [`bool`](#doc_bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `false` |
+| `IncrementalVariance` | [`bool`](#doc_bool) | The variance of each class will be calculated incrementally. | `false` |
+| `InputModel` | [`nbcModel`](#doc_model) | Input Naive Bayes model. | `nil` |
+| `Labels` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | A file containing labels for the training set. | `mat.NewDense(1, 1, nil)` |
+| `Test` | [`*mat.Dense`](#doc_a__mat_Dense) | A matrix containing the test set. | `mat.NewDense(1, 1, nil)` |
+| `Training` | [`*mat.Dense`](#doc_a__mat_Dense) | A matrix containing the training set. | `mat.NewDense(1, 1, nil)` |
+| `Verbose` | [`bool`](#doc_bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `false` |
+
+### Output options
+
+Output options are returned via Go's support for multiple return values, in the order listed below.
+
+| ***name*** | ***type*** | ***description*** |
+|------------|------------|-------------------|
+| `OutputModel` | [`nbcModel`](#doc_model) | File to save trained Naive Bayes model to. | 
+| `Predictions` | [`*mat.Dense (1d)`](#doc_a__mat_Dense__1d_) | The matrix in which the predicted labels for the test set will be written. | 
+| `Probabilities` | [`*mat.Dense`](#doc_a__mat_Dense) | The matrix in which the predicted probability of labels for the test set will be written. | 
+
+### Detailed documentation
+{: #nbc_detailed-documentation }
+
+This program trains the Naive Bayes classifier on the given labeled training set, or loads a model from the given model file, and then may use that trained model to classify the points in a given test set.
+
+The training set is specified with the `Training` parameter.  Labels may be either the last row of the training set, or alternately the `Labels` parameter may be specified to pass a separate matrix of labels.
+
+If training is not desired, a pre-existing model may be loaded with the `InputModel` parameter.
+
+
+
+The `IncrementalVariance` parameter can be used to force the training to use an incremental algorithm for calculating variance.  This is slower, but can help avoid loss of precision in some cases.
+
+If classifying a test set is desired, the test set may be specified with the `Test` parameter, and the classifications may be saved with the `Predictions`predictions  parameter.  If saving the trained model is desired, this may be done with the `OutputModel` output parameter.
+
+### Example
+For example, to train a Naive Bayes classifier on the dataset `data` with labels `labels` and save the model to `nbc_model`, the following command may be used:
+
+```go
+// Initialize optional parameters for Nbc().
+param := mlpack.NbcOptions()
+param.Training = data
+param.Labels = labels
+
+nbc_model, _, _ := mlpack.Nbc(param)
+```
+
+Then, to use `nbc_model` to predict the classes of the dataset `test_set` and save the predicted classes to `predictions`, the following command may be used:
+
+```go
+// Initialize optional parameters for Nbc().
+param := mlpack.NbcOptions()
+param.InputModel = &nbc_model
+param.Test = test_set
+
+_, predictions, _ := mlpack.Nbc(param)
+```
+
+### See also
+
+ - [SoftmaxRegression()](#softmax_regression)
+ - [RandomForest()](#random_forest)
+ - [Naive Bayes classifier on Wikipedia](https://en.wikipedia.org/wiki/Naive_Bayes_classifier)
+ - [NaiveBayesClassifier C++ class documentation](../../user/methods/naive_bayes_classifier.md)
 
 ## LinearRegression()
 {: #linear_regression }

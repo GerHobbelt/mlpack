@@ -4,6 +4,12 @@
 
 _????-??-??_
 
+ * Accelerated `LeakyReLU` ANN Layer (#4174)
+
+## mlpack 4.8.0
+
+_2026-06-07_
+
  * Add Mel Filterbanks Energies (MFE) and Mel-frequency cepstral coefficients
    (MFCC) as part of our signal processing utilities (#4144).
 
