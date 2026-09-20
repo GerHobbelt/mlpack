@@ -16,8 +16,6 @@ endmacro()
 
 # First, define all the "regular" bindings that exist for all languages.
 add_all_bindings(approx_kfn approx_kfn "Geometry")
-add_all_bindings(bayesian_linear_regression bayesian_linear_regression
-    "Regression")
 add_all_bindings(cf cf "Misc. / Other")
 add_all_bindings(dbscan dbscan "Clustering")
 add_all_bindings(decision_tree decision_tree "Classification")
@@ -36,6 +34,21 @@ add_all_bindings(preprocess image_converter "Preprocessing")
 add_all_bindings(kde kde "Misc. / Other")
 add_all_bindings(kernel_pca kernel_pca "Transformations")
 add_all_bindings(kmeans kmeans "Clustering")
+
+add_category(bayesian_linear_regression "Regression")
+group_bindings(bayesian_linear_regression bayesian_linear_regression
+  "train;predict")
+add_python_wrapper(bayesian_linear_regression bayesian_linear_regression)
+add_julia_class(bayesian_linear_regression bayesian_linear_regression)
+add_cli_executable(bayesian_linear_regression bayesian_linear_regression)
+add_go_binding(bayesian_linear_regression bayesian_linear_regression)
+add_r_binding(bayesian_linear_regression bayesian_linear_regression "include")
+add_r_binding(bayesian_linear_regression bayesian_linear_regression_train
+  "skip")
+add_r_binding(bayesian_linear_regression bayesian_linear_regression_predict
+  "skip")
+add_markdown_docs(bayesian_linear_regression bayesian_linear_regression
+  "cli;python;julia;go;r" "python;r")
 
 #add_all_bindings(lars lars "Regression")
 add_category(lars "Regression")
@@ -83,12 +96,26 @@ add_all_bindings(preprocess preprocess_describe "Preprocessing")
 add_all_bindings(preprocess preprocess_scale "Preprocessing")
 add_all_bindings(preprocess preprocess_one_hot_encoding "Preprocessing")
 add_all_bindings(radical radical "Transformations")
-add_all_bindings(random_forest random_forest "Classification")
+#add_all_bindings(random_forest random_forest "Classification")
 add_all_bindings(rann krann "Geometry")
 add_all_bindings(softmax_regression softmax_regression "Classification")
 add_all_bindings(sparse_coding sparse_coding "Transformations")
 
 # Now, define the "special" bindings that are different somehow.
+
+# random forest
+add_category(random_forest "Classification")
+group_bindings(random_forest random_forest "train;classify;probabilities")
+add_python_wrapper(random_forest random_forest)
+add_julia_class(random_forest random_forest)
+add_cli_executable(random_forest random_forest)
+add_go_binding(random_forest random_forest)
+add_r_binding(random_forest random_forest "include")
+add_r_binding(random_forest random_forest_train "skip")
+add_r_binding(random_forest random_forest_classify "skip")
+add_r_binding(random_forest random_forest_probabilities "skip")
+add_markdown_docs(random_forest random_forest "cli;python;julia;go;r" "python;r")
+
 
 # Adaboost has a Python wrapper class that encapsulates its functionality in a
 # few methods.

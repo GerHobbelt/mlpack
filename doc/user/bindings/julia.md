@@ -135,94 +135,6 @@ julia> _, neighbors, _ = approx_kfn(input_model=model, k=3,
  - [QDAFN class documentation](https://github.com/mlpack/mlpack/blob/master/src/mlpack/methods/approx_kfn/qdafn.hpp)
  - [DrusillaSelect class documentation](https://github.com/mlpack/mlpack/blob/master/src/mlpack/methods/approx_kfn/drusilla_select.hpp)
 
-## bayesian_linear_regression()
-{: #bayesian_linear_regression }
-
-#### BayesianLinearRegression
-{: #bayesian_linear_regression_descr }
-
-```julia
-julia> using mlpack: bayesian_linear_regression
-julia> output_model, predictions, stds = bayesian_linear_regression( ;
-          center=false, input=zeros(0, 0), input_model=nothing,
-          responses=Float64[], scale=false, test=zeros(0, 0), verbose=false)
-```
-
-An implementation of the bayesian linear regression. [Detailed documentation](#bayesian_linear_regression_detailed-documentation).
-
-
-
-### Input options
-
-| ***name*** | ***type*** | ***description*** | ***default*** |
-|------------|------------|-------------------|---------------|
-| `center` | [`Bool`](#doc_Bool) | Center the data and fit the intercept if enabled. | `false` |
-| `check_input_matrices` | [`Bool`](#doc_Bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `false` |
-| `input` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | Matrix of covariates (X). | `zeros(0, 0)` |
-| `input_model` | [`BayesianLinearRegression`](#doc_model) | Trained BayesianLinearRegression model to use. | `nothing` |
-| `responses` | [`Float64 vector-like`](#doc_Float64_vector_like) | Matrix of responses/observations (y). | `Float64[]` |
-| `scale` | [`Bool`](#doc_Bool) | Scale each feature by their standard deviations if enabled. | `false` |
-| `test` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | Matrix containing points to regress on (test points). | `zeros(0, 0)` |
-| `verbose` | [`Bool`](#doc_Bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `false` |
-
-### Output options
-
-Results are returned as a tuple, and can be unpacked directly into return values or stored directly as a tuple; undesired results can be ignored with the _ keyword.
-
-| ***name*** | ***type*** | ***description*** |
-|------------|------------|-------------------|
-| `output_model` | [`BayesianLinearRegression`](#doc_model) | Output BayesianLinearRegression model. | 
-| `predictions` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | If --test_file is specified, this file is where the predicted responses will be saved. | 
-| `stds` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | If specified, this is where the standard deviations of the predictive distribution will be saved. | 
-
-### Detailed documentation
-{: #bayesian_linear_regression_detailed-documentation }
-
-An implementation of the bayesian linear regression.
-This model is a probabilistic view and implementation of the linear regression. The final solution is obtained by computing a posterior distribution from gaussian likelihood and a zero mean gaussian isotropic  prior distribution on the solution. 
-Optimization is AUTOMATIC and does not require cross validation. The optimization is performed by maximization of the evidence function. Parameters are tuned during the maximization of the marginal likelihood. This procedure includes the Ockham's razor that penalizes over complex solutions. 
-
-This program is able to train a Bayesian linear regression model or load a model from file, output regression predictions for a test set, and save the trained model to a file.
-
-To train a BayesianLinearRegression model, the `input` and `responses`parameters must be given. The `center`and `scale` parameters control the centering and the normalizing options. A trained model can be saved with the `output_model`. If no training is desired at all, a model can be passed via the `input_model` parameter.
-
-The program can also provide predictions for test data using either the trained model or the given input model.  Test points can be specified with the `test` parameter.  Predicted responses to the test points can be saved with the `predictions` output parameter. The corresponding standard deviation can be save by precising the `stds` parameter.
-
-### Example
-For example, the following command trains a model on the data ``data`` and responses ``responses``with center set to true and scale set to false (so, Bayesian linear regression is being solved, and then the model is saved to ``blr_model``:
-
-```julia
-julia> using CSV
-julia> data = CSV.read("data.csv")
-julia> responses = CSV.read("responses.csv")
-julia> blr_model, _, _ = bayesian_linear_regression(center=1,
-            input=data, responses=responses, scale=0)
-```
-
-The following command uses the ``blr_model`` to provide predicted  responses for the data ``test`` and save those  responses to ``test_predictions``: 
-
-```julia
-julia> using CSV
-julia> test = CSV.read("test.csv")
-julia> _, test_predictions, _ =
-            bayesian_linear_regression(input_model=blr_model, test=test)
-```
-
-Because the estimator computes a predictive distribution instead of a simple point estimate, the `stds` parameter allows one to save the prediction uncertainties: 
-
-```julia
-julia> using CSV
-julia> test = CSV.read("test.csv")
-julia> _, test_predictions, stds =
-            bayesian_linear_regression(input_model=blr_model, test=test)
-```
-
-### See also
-
- - [Bayesian Interpolation](https://cs.uwaterloo.ca/~mannr/cs886-w10/mackay-bayesian.pdf)
- - [Bayesian Linear Regression, Section 3.3](https://www.microsoft.com/en-us/research/wp-content/uploads/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf)
- - [BayesianLinearRegression C++ class documentation](../../user/methods/bayesian_linear_regression.md)
-
 ## cf()
 {: #cf }
 
@@ -1566,6 +1478,94 @@ julia> final, _ = kmeans(10, data; initial_centroids=initial,
  - [Accelerating exact k-means algorithms with geometric reasoning (pdf)](http://reports-archive.adm.cs.cmu.edu/anon/anon/usr/ftp/usr0/ftp/2000/CMU-CS-00-105.pdf)
  - [A dual-tree algorithm for fast k-means clustering with large k (pdf)](http://www.ratml.org/pub/pdf/2017dual.pdf)
  - [KMeans class documentation](https://github.com/mlpack/mlpack/blob/master/src/mlpack/methods/kmeans/kmeans.hpp)
+
+## bayesian_linear_regression()
+{: #bayesian_linear_regression }
+
+#### BayesianLinearRegression
+{: #bayesian_linear_regression_descr }
+
+```julia
+julia> using mlpack: bayesian_linear_regression
+julia> output_model, predictions, stds = bayesian_linear_regression( ;
+          center=false, input=zeros(0, 0), input_model=nothing,
+          responses=Float64[], scale=false, test=zeros(0, 0), verbose=false)
+```
+
+An implementation of the Bayesian linear regression. [Detailed documentation](#bayesian_linear_regression_detailed-documentation).
+
+
+
+### Input options
+
+| ***name*** | ***type*** | ***description*** | ***default*** |
+|------------|------------|-------------------|---------------|
+| `center` | [`Bool`](#doc_Bool) | Center the data and fit the intercept if enabled. | `false` |
+| `check_input_matrices` | [`Bool`](#doc_Bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `false` |
+| `input` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | Matrix of covariates (X). | `zeros(0, 0)` |
+| `input_model` | [`BayesianLinearRegression`](#doc_model) | Trained BayesianLinearRegression model to use. | `nothing` |
+| `responses` | [`Float64 vector-like`](#doc_Float64_vector_like) | Matrix of responses/observations (y). | `Float64[]` |
+| `scale` | [`Bool`](#doc_Bool) | Scale each feature by their standard deviations if enabled. | `false` |
+| `test` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | Matrix containing points to regress on (test points). | `zeros(0, 0)` |
+| `verbose` | [`Bool`](#doc_Bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `false` |
+
+### Output options
+
+Results are returned as a tuple, and can be unpacked directly into return values or stored directly as a tuple; undesired results can be ignored with the _ keyword.
+
+| ***name*** | ***type*** | ***description*** |
+|------------|------------|-------------------|
+| `output_model` | [`BayesianLinearRegression`](#doc_model) | Output BayesianLinearRegression model. | 
+| `predictions` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | If --test_file is specified, this file is where the predicted responses will be saved. | 
+| `stds` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | If specified, this is where the standard deviations of the predictive distribution will be saved. | 
+
+### Detailed documentation
+{: #bayesian_linear_regression_detailed-documentation }
+
+An implementation of the Bayesian linear regression.
+This model is a probabilistic view and implementation of the linear regression. The final solution is obtained by computing a posterior distribution from gaussian likelihood and a zero mean gaussian isotropic  prior distribution on the solution. 
+Optimization is AUTOMATIC and does not require cross validation. The optimization is performed by maximization of the evidence function. Parameters are tuned during the maximization of the marginal likelihood. This procedure includes the Ockham's razor that penalizes over complex solutions. 
+
+This program is able to train a Bayesian linear regression model or load a model from file, output regression predictions for a test set, and save the trained model to a file.
+
+To train a BayesianLinearRegression model, the `input` and `responses`parameters must be given. The `center`and `scale` parameters control the centering and the normalizing options. A trained model can be saved with the `output_model`. If no training is desired at all, a model can be passed via the `input_model` parameter.
+
+The program can also provide predictions for test data using either the trained model or the given input model.  Test points can be specified with the `test` parameter.  Predicted responses to the test points can be saved with the `predictions` output parameter. The corresponding standard deviation can be save by precising the `stds` parameter.
+
+### Example
+For example, the following command trains a model on the data ``data`` and responses ``responses``with center set to true and scale set to false (so, Bayesian linear regression is being solved, and then the model is saved to ``blr_model``:
+
+```julia
+julia> using CSV
+julia> data = CSV.read("data.csv")
+julia> responses = CSV.read("responses.csv")
+julia> blr_model, _, _ = bayesian_linear_regression(center=1,
+            input=data, responses=responses, scale=0)
+```
+
+The following command uses the ``blr_model`` to provide predicted  responses for the data ``test`` and save those  responses to ``test_predictions``: 
+
+```julia
+julia> using CSV
+julia> test = CSV.read("test.csv")
+julia> _, test_predictions, _ =
+            bayesian_linear_regression(input_model=blr_model, test=test)
+```
+
+Because the estimator computes a predictive distribution instead of a simple point estimate, the `stds` parameter allows one to save the prediction uncertainties: 
+
+```julia
+julia> using CSV
+julia> test = CSV.read("test.csv")
+julia> _, test_predictions, stds =
+            bayesian_linear_regression(input_model=blr_model, test=test)
+```
+
+### See also
+
+ - [Bayesian Interpolation](https://cs.uwaterloo.ca/~mannr/cs886-w10/mackay-bayesian.pdf)
+ - [Bayesian Linear Regression, Section 3.3](https://www.microsoft.com/en-us/research/wp-content/uploads/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf)
+ - [BayesianLinearRegression C++ class documentation](../../user/methods/bayesian_linear_regression.md)
 
 ## lars()
 {: #lars }
@@ -3118,98 +3118,6 @@ julia> ic, _ = radical(X; replicates=40)
  - [ICA using spacings estimates of entropy (pdf)](https://www.jmlr.org/papers/volume4/learned-miller03a/learned-miller03a.pdf)
  - [Radical C++ class documentation](../../user/methods/radical.md)
 
-## random_forest()
-{: #random_forest }
-
-#### Random forests
-{: #random_forest_descr }
-
-```julia
-julia> using mlpack: random_forest
-julia> output_model, predictions, probabilities = random_forest( ;
-          input_model=nothing, labels=Int[], maximum_depth=0,
-          minimum_gain_split=0.0, minimum_leaf_size=1, num_trees=10,
-          print_training_accuracy=false, seed=0, subspace_dim=0, test=zeros(0,
-          0), test_labels=Int[], training=zeros(0, 0), verbose=false,
-          warm_start=false)
-```
-
-An implementation of the standard random forest algorithm by Leo Breiman for classification.  Given labeled data, a random forest can be trained and saved for future use; or, a pre-trained random forest can be used for classification. [Detailed documentation](#random_forest_detailed-documentation).
-
-
-
-### Input options
-
-| ***name*** | ***type*** | ***description*** | ***default*** |
-|------------|------------|-------------------|---------------|
-| `check_input_matrices` | [`Bool`](#doc_Bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `false` |
-| `input_model` | [`RandomForestModel`](#doc_model) | Pre-trained random forest to use for classification. | `nothing` |
-| `labels` | [`Int vector-like`](#doc_Int_vector_like) | Labels for training dataset. | `Int[]` |
-| `maximum_depth` | [`Int`](#doc_Int) | Maximum depth of the tree (0 means no limit). | `0` |
-| `minimum_gain_split` | [`Float64`](#doc_Float64) | Minimum gain needed to make a split when building a tree. | `0.0` |
-| `minimum_leaf_size` | [`Int`](#doc_Int) | Minimum number of points in each leaf node. | `1` |
-| `num_trees` | [`Int`](#doc_Int) | Number of trees in the random forest. | `10` |
-| `print_training_accuracy` | [`Bool`](#doc_Bool) | If set, then the accuracy of the model on the training set will be predicted (verbose must also be specified). | `false` |
-| `seed` | [`Int`](#doc_Int) | Random seed.  If 0, 'std::time(NULL)' is used. | `0` |
-| `subspace_dim` | [`Int`](#doc_Int) | Dimensionality of random subspace to use for each split.  '0' will autoselect the square root of data dimensionality. | `0` |
-| `test` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | Test dataset to produce predictions for. | `zeros(0, 0)` |
-| `test_labels` | [`Int vector-like`](#doc_Int_vector_like) | Test dataset labels, if accuracy calculation is desired. | `Int[]` |
-| `training` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | Training dataset. | `zeros(0, 0)` |
-| `verbose` | [`Bool`](#doc_Bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `false` |
-| `warm_start` | [`Bool`](#doc_Bool) | If true and passed along with `training` and `input_model` then trains more trees on top of existing model. | `false` |
-
-### Output options
-
-Results are returned as a tuple, and can be unpacked directly into return values or stored directly as a tuple; undesired results can be ignored with the _ keyword.
-
-| ***name*** | ***type*** | ***description*** |
-|------------|------------|-------------------|
-| `output_model` | [`RandomForestModel`](#doc_model) | Model to save trained random forest to. | 
-| `predictions` | [`Int vector-like`](#doc_Int_vector_like) | Predicted classes for each point in the test set. | 
-| `probabilities` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | Predicted class probabilities for each point in the test set. | 
-
-### Detailed documentation
-{: #random_forest_detailed-documentation }
-
-This program is an implementation of the standard random forest classification algorithm by Leo Breiman.  A random forest can be trained and saved for later use, or a random forest may be loaded and predictions or class probabilities for points may be generated.
-
-The training set and associated labels are specified with the `training` and `labels` parameters, respectively.  The labels should be in the range `[0, num_classes - 1]`. Optionally, if `labels` is not specified, the labels are assumed to be the last dimension of the training dataset.
-
-When a model is trained, the `output_model` output parameter may be used to save the trained model.  A model may be loaded for predictions with the `input_model`parameter. The `input_model` parameter may not be specified when the `training` parameter is specified.  The `minimum_leaf_size` parameter specifies the minimum number of training points that must fall into each leaf for it to be split.  The `num_trees` controls the number of trees in the random forest.  The `minimum_gain_split` parameter controls the minimum required gain for a decision tree node to split.  Larger values will force higher-confidence splits.  The `maximum_depth` parameter specifies the maximum depth of the tree.  The `subspace_dim` parameter is used to control the number of random dimensions chosen for an individual node's split.  If `print_training_accuracy` is specified, the calculated accuracy on the training set will be printed.
-
-Test data may be specified with the `test` parameter, and if performance measures are desired for that test set, labels for the test points may be specified with the `test_labels` parameter.  Predictions for each test point may be saved via the `predictions`output parameter.  Class probabilities for each prediction may be saved with the `probabilities` output parameter.
-
-### Example
-For example, to train a random forest with a minimum leaf size of 20 using 10 trees on the dataset contained in ``data``with labels ``labels``, saving the output random forest to ``rf_model`` and printing the training error, one could call
-
-```julia
-julia> using CSV
-julia> data = CSV.read("data.csv")
-julia> labels = CSV.read("labels.csv"; type=Int)
-julia> rf_model, _, _ = random_forest(labels=labels,
-            minimum_leaf_size=20, num_trees=10, print_training_accuracy=1,
-            training=data)
-```
-
-Then, to use that model to classify points in ``test_set`` and print the test error given the labels ``test_labels`` using that model, while saving the predictions for each point to ``predictions``, one could call 
-
-```julia
-julia> using CSV
-julia> test_set = CSV.read("test_set.csv")
-julia> test_labels = CSV.read("test_labels.csv"; type=Int)
-julia> _, predictions, _ = random_forest(input_model=rf_model,
-            test=test_set, test_labels=test_labels)
-```
-
-### See also
-
- - [decision_tree()](#decision_tree)
- - [hoeffding_tree()](#hoeffding_tree)
- - [softmax_regression()](#softmax_regression)
- - [Random forest on Wikipedia](https://en.wikipedia.org/wiki/Random_forest)
- - [Random forests (pdf)](https://www.eecis.udel.edu/~shatkay/Course/papers/BreimanRandomForests2001.pdf)
- - [RandomForest C++ class documentation](../../user/methods/random_forest.md)
-
 ## krann()
 {: #krann }
 
@@ -3457,6 +3365,98 @@ julia> codes, _, _ = sparse_coding(input_model=model,
  - [Efficient sparse coding algorithms (pdf)](https://proceedings.neurips.cc/paper_files/paper/2006/file/2d71b2ae158c7c5912cc0bbde2bb9d95-Paper.pdf)
  - [Regularization and variable selection via the elastic net](https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=46217f372a75dddc2254fdbc6b9418ba3554e453)
  - [SparseCoding C++ class documentation](../../user/methods/sparse_coding.md)
+
+## random_forest()
+{: #random_forest }
+
+#### Random Forests
+{: #random_forest_descr }
+
+```julia
+julia> using mlpack: random_forest
+julia> output_model, predictions, probabilities = random_forest( ;
+          input_model=nothing, labels=Int[], maximum_depth=0,
+          minimum_gain_split=0.0, minimum_leaf_size=1, num_trees=10,
+          print_training_accuracy=false, seed=0, subspace_dim=0, test=zeros(0,
+          0), test_labels=Int[], training=zeros(0, 0), verbose=false,
+          warm_start=false)
+```
+
+An implementation of the standard random forest algorithm by Leo Breiman for classification.  Given labeled data, a random forest can be trained and saved for future use; or, a pre-trained random forest can be used for classification. [Detailed documentation](#random_forest_detailed-documentation).
+
+
+
+### Input options
+
+| ***name*** | ***type*** | ***description*** | ***default*** |
+|------------|------------|-------------------|---------------|
+| `check_input_matrices` | [`Bool`](#doc_Bool) | If specified, the input matrix is checked for NaN and inf values; an exception is thrown if any are found. | `false` |
+| `input_model` | [`RandomForestModel`](#doc_model) | Pre-trained random forest to use for classification. | `nothing` |
+| `labels` | [`Int vector-like`](#doc_Int_vector_like) | Labels for training dataset. | `Int[]` |
+| `maximum_depth` | [`Int`](#doc_Int) | Maximum depth of the tree (0 means no limit). | `0` |
+| `minimum_gain_split` | [`Float64`](#doc_Float64) | Minimum gain needed to make a split when building a tree. | `0.0` |
+| `minimum_leaf_size` | [`Int`](#doc_Int) | Minimum number of points in each leaf node. | `1` |
+| `num_trees` | [`Int`](#doc_Int) | Number of trees in the random forest. | `10` |
+| `print_training_accuracy` | [`Bool`](#doc_Bool) | If set, then the accuracy of the model on the training set will be predicted (verbose must also be specified). | `false` |
+| `seed` | [`Int`](#doc_Int) | Random seed.  If 0, 'std::time(NULL)' is used. | `0` |
+| `subspace_dim` | [`Int`](#doc_Int) | Dimensionality of random subspace to use for each split.  '0' will autoselect the square root of data dimensionality. | `0` |
+| `test` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | Test dataset to produce predictions for. | `zeros(0, 0)` |
+| `test_labels` | [`Int vector-like`](#doc_Int_vector_like) | Test dataset labels, if accuracy calculation is desired. | `Int[]` |
+| `training` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | Training dataset. | `zeros(0, 0)` |
+| `verbose` | [`Bool`](#doc_Bool) | Display informational messages and the full list of parameters and timers at the end of execution. | `false` |
+| `warm_start` | [`Bool`](#doc_Bool) | If true and passed along with `training` and `input_model` then trains more trees on top of existing model. | `false` |
+
+### Output options
+
+Results are returned as a tuple, and can be unpacked directly into return values or stored directly as a tuple; undesired results can be ignored with the _ keyword.
+
+| ***name*** | ***type*** | ***description*** |
+|------------|------------|-------------------|
+| `output_model` | [`RandomForestModel`](#doc_model) | Model to save trained random forest to. | 
+| `predictions` | [`Int vector-like`](#doc_Int_vector_like) | Predicted classes for each point in the test set. | 
+| `probabilities` | [`Float64 matrix-like`](#doc_Float64_matrix_like) | Predicted class probabilities for each point in the test set. | 
+
+### Detailed documentation
+{: #random_forest_detailed-documentation }
+
+This program is an implementation of the standard random forest classification algorithm by Leo Breiman.  A random forest can be trained and saved for later use, or a random forest may be loaded and predictions or class probabilities for points may be generated.
+
+The training set and associated labels are specified with the `training` and `labels` parameters, respectively.  The labels should be in the range `[0, num_classes - 1]`. Optionally, if `labels` is not specified, the labels are assumed to be the last dimension of the training dataset.
+
+When a model is trained, the `output_model` output parameter may be used to save the trained model.  A model may be loaded for predictions with the `input_model`parameter. The `input_model` parameter may not be specified when the `training` parameter is specified.  The `minimum_leaf_size` parameter specifies the minimum number of training points that must fall into each leaf for it to be split.  The `num_trees` controls the number of trees in the random forest.  The `minimum_gain_split` parameter controls the minimum required gain for a decision tree node to split.  Larger values will force higher-confidence splits.  The `maximum_depth` parameter specifies the maximum depth of the tree.  The `subspace_dim` parameter is used to control the number of random dimensions chosen for an individual node's split.  If `print_training_accuracy` is specified, the calculated accuracy on the training set will be printed.
+
+Test data may be specified with the `test` parameter, and if performance measures are desired for that test set, labels for the test points may be specified with the `test_labels` parameter.  Predictions for each test point may be saved via the `predictions`output parameter.  Class probabilities for each prediction may be saved with the `probabilities` output parameter.
+
+### Example
+For example, to train a random forest with a minimum leaf size of 20 using 10 trees on the dataset contained in ``data``with labels ``labels``, saving the output random forest to ``rf_model`` and printing the training error, one could call
+
+```julia
+julia> using CSV
+julia> data = CSV.read("data.csv")
+julia> labels = CSV.read("labels.csv"; type=Int)
+julia> rf_model, _, _ = random_forest(labels=labels,
+            minimum_leaf_size=20, num_trees=10, print_training_accuracy=1,
+            training=data)
+```
+
+Then, to use that model to classify points in ``test_set`` and print the test error given the labels ``test_labels`` using that model, while saving the predictions for each point to ``predictions``, one could call 
+
+```julia
+julia> using CSV
+julia> test_set = CSV.read("test_set.csv")
+julia> test_labels = CSV.read("test_labels.csv"; type=Int)
+julia> _, predictions, _ = random_forest(input_model=rf_model,
+            test=test_set, test_labels=test_labels)
+```
+
+### See also
+
+ - [decision_tree()](#decision_tree)
+ - [hoeffding_tree()](#hoeffding_tree)
+ - [softmax_regression()](#softmax_regression)
+ - [Random forest on Wikipedia](https://en.wikipedia.org/wiki/Random_forest)
+ - [Random forests (pdf)](https://www.eecis.udel.edu/~shatkay/Course/papers/BreimanRandomForests2001.pdf)
+ - [RandomForest C++ class documentation](../../user/methods/random_forest.md)
 
 ## adaboost()
 {: #adaboost }

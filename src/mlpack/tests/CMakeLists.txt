@@ -7,8 +7,10 @@ add_executable(mlpack_test
   # Tests for neural network code (and reinforcement learning code).
   ann/activation_functions_test.cpp
   ann/ann_dist_test.cpp
-  # This includes all files in ann/layer/.
+  # This includes all files in ann/layer/ excluding serialization
   ann/layer_test.cpp
+  # This includes all files in ann/layer/ with serialization
+  ann/layer_test_serialization.cpp
   ann/ann_regularizer_test.cpp
   ann/ann_test_tools.hpp
   ann/convolutional_network_test.cpp
@@ -99,6 +101,7 @@ add_executable(mlpack_test
   maximal_inputs_test.cpp
   metric_test.cpp
   mean_shift_test.cpp
+  mfcc_test.cpp
   mock_categorical_data.hpp
   nbc_test.cpp
   nca_test.cpp
@@ -158,6 +161,8 @@ add_executable(mlpack_test
   main_tests/adaboost_probabilities_test.cpp
   main_tests/approx_kfn_test.cpp
   main_tests/bayesian_linear_regression_test.cpp
+  main_tests/bayesian_linear_regression_train_test.cpp
+  main_tests/bayesian_linear_regression_predict_test.cpp
   main_tests/cf_test.cpp
   main_tests/dbscan_test.cpp
   main_tests/decision_tree_test.cpp
@@ -206,6 +211,9 @@ add_executable(mlpack_test
   main_tests/preprocess_split_test.cpp
   main_tests/radical_test.cpp
   main_tests/random_forest_test.cpp
+  main_tests/random_forest_train_test.cpp
+  main_tests/random_forest_classify_test.cpp
+  main_tests/random_forest_probabilities_test.cpp
   main_tests/range_search_test.cpp
   main_tests/softmax_regression_test.cpp
   main_tests/sparse_coding_test.cpp
